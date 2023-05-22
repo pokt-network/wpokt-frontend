@@ -5,7 +5,7 @@ import { PoktIcon } from "./icons/pokt";
 import logo from "../public/logo/full_white.png";
 
 
-export function NavBar() {
+export function Header() {
     return (
         <HStack justify="space-between" align="center" paddingX={10} paddingY={5}>
             <Image src={logo} alt="logo" width={122} height={36} />
