@@ -1,41 +1,50 @@
-import { Box, Flex, Heading, Link, Text, VStack } from "@chakra-ui/react";
+import { Box, Flex, HStack, Heading, Link, Text, VStack } from "@chakra-ui/react";
 import { DiscordIcon, GithubIcon, TelegramIcon, TwitterIcon } from "./icons/socials";
 
 export function Footer() {
     return (
-        <Flex justify="space-between" padding={10} gap={4} background="darkOverlay">
-            <Flex direction="column" gap={4}>
-                <Box>
-                    <Heading size="sm">Stay Updated</Heading>
-                    <Text>Come and help us grow the  POKT community alongside the protocol.</Text>
-                    <Text>Join our social media channels.</Text>
-                </Box>
-                <Flex gap={8}>
-                    <DiscordIcon width={8} height={8} />
-                    <GithubIcon width={8} height={8} />
-                    <TelegramIcon width={8} height={8} />
-                    <TwitterIcon width={8} height={8} />
+        <Flex direction="column" justify="center" padding={10} background="darkOverlay">
+            <Flex justify="space-between" padding={10} gap={4}>
+                <Flex direction="column" gap={4}>
+                    <Box>
+                        <Heading size="md">Connect With Us</Heading>
+                    </Box>
+                    <Flex gap={8}>
+                        <Link href="https://discord.com/invite/pokt" isExternal>
+                            <DiscordIcon width={8} height={8} href="https://discord.com/invite/pokt" />
+                        </Link>
+                        <Link href="https://github.com/pokt-network/pocket" isExternal>
+                            <GithubIcon width={8} height={8} href="https://github.com/pokt-network/pocket" />
+                        </Link>
+                        <Link href="https://twitter.com/POKTnetwork" isExternal>
+                            <TwitterIcon width={8} height={8} href="https://twitter.com/POKTnetwork" />
+                        </Link>
+                    </Flex>
                 </Flex>
+                <VStack align="left">
+                    <Heading size="sm">Resources</Heading>
+                    <Link href="https://docs.pokt.network" isExternal>
+                        Documentation
+                    </Link>
+                    <Link href="https://poktscan.com" isExternal>
+                        Explorer
+                    </Link>
+                    <Link href="https://forum.pokt.network" isExternal>
+                        Forum
+                    </Link>
+                </VStack>
             </Flex>
-            <VStack align="left">
-                <Heading size="sm">Product</Heading>
-                <Link>What is the Pocket Network?</Link>
-                <Link>Website</Link>
-            </VStack>
-            <VStack align="left">
-                <Heading size="sm">Community</Heading>
-                <Link>Blog</Link>
-                <Link>Forum</Link>
-                <Link>Join Discord</Link>
-            </VStack>
-            <VStack align="left">
-                <Heading size="sm">Resources</Heading>
-                <Link>White Paper</Link>
-                <Link>Economic One Pager</Link>
-                <Link>Dev Portal</Link>
-                <Link>Terms of Use</Link>
-                <Link>Privacy Policy</Link>
-            </VStack>
+            <HStack alignSelf="center">
+                <Text>© 2023 Pocket Network</Text>
+                <Text>|</Text>
+                <Link href="https://www.pokt.network/privacy-policy" isExternal>
+                    Terms of Use
+                </Link>
+                <Text>|</Text>
+                <Link href="https://www.pokt.network/terms-of-use" isExternal>
+                    Privacy Policy
+                </Link>
+            </HStack>
         </Flex>
     )
 }

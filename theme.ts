@@ -1,4 +1,4 @@
-import { extendTheme } from "@chakra-ui/react"
+import { ChakraProps, extendTheme } from "@chakra-ui/react"
 
 export const colors = {
     poktBlue: "rgba(29, 138, 237, 1)",
@@ -11,4 +11,16 @@ export const colors = {
 
 export const theme = extendTheme({
     colors,
+    configs: {
+        initialColorMode: "dark",
+        useSystemColorMode: false,
+    },
+    styles: {
+        global: {
+            'html, body': {
+                color: 'white',
+                backgroundColor: 'rgba(24, 33, 41, 1)',
+            }
+        },
+    }
 })
