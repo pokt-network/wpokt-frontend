@@ -3,11 +3,11 @@ import { DiscordIcon, GithubIcon, TelegramIcon, TwitterIcon } from "./icons/soci
 
 export function Footer() {
     return (
-        <Flex direction="column" justify="center" padding={10} background="darkOverlay">
+        <Flex direction="column" justify="center" paddingX={10} background="darkOverlay">
             <Flex justify="space-between" padding={10} gap={4}>
                 <Flex direction="column" gap={4}>
                     <Box>
-                        <Heading size="md">Connect With Us</Heading>
+                        <Heading size="sm">Connect With Us</Heading>
                     </Box>
                     <Flex gap={8}>
                         <Link href="https://discord.com/invite/pokt" isExternal>
@@ -21,7 +21,7 @@ export function Footer() {
                         </Link>
                     </Flex>
                 </Flex>
-                <VStack align="left">
+                <VStack align="left" spacing={1}>
                     <Heading size="sm">Resources</Heading>
                     <Link href="https://docs.pokt.network" isExternal>
                         Documentation
@@ -34,7 +34,7 @@ export function Footer() {
                     </Link>
                 </VStack>
             </Flex>
-            <HStack alignSelf="center">
+            <HStack alignSelf="center" mb={4}>
                 <Text>© 2023 Pocket Network</Text>
                 <Text>|</Text>
                 <Link href="https://www.pokt.network/privacy-policy" isExternal>

@@ -12,15 +12,15 @@ export default function Home() {
   return (
     <Flex direction="column" minHeight="100vh">
       <Header />
+      <Heading
+        size="lg"
+        color="poktBlue"
+        textAlign="center"
+        padding={4}
+      >
+        Pocket/Ethereum Exchange
+      </Heading>
       <Box flexGrow={1}>
-        <Heading
-          size="lg"
-          color="poktBlue"
-          textAlign="center"
-          padding={4}
-        >
-          Pocket/Ethereum Exchange
-        </Heading>
         <Center paddingX={10}>
           <Divider borderColor={"poktLime"} />
         </Center>

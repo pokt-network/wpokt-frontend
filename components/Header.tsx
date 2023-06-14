@@ -11,18 +11,6 @@ export function Header() {
             <Image src={logo} alt="logo" width={122} height={36} />
             <ButtonGroup>
                 <Button
-                    borderWidth={2}
-                    borderColor="poktLime"
-                >
-                    Buy POKT
-                </Button>
-                <Button
-                    borderWidth={2}
-                    borderColor="poktLime"
-                >
-                    Buy wPOKT
-                </Button>
-                <Button
                     color="darkBlue"
                     background="poktLime"
                     borderWidth={2}
