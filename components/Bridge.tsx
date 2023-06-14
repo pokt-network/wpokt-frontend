@@ -1,12 +1,16 @@
-import { Box, Button, Center, Container, Flex, HStack, Link, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Center, Container, Flex, HStack, Link, Text, VStack, useDisclosure } from "@chakra-ui/react";
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
 import { useState } from "react";
+import { CustomAddressModal } from "./modal/CustomAddressModal";
+import { ProgressModal } from "./modal/ProgressModal";
 
 export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAddress?: string}) {
     // bridgePath: 0 = POKT -> wPOKT, 1 = wPOKT -> POKT
     const [bridgePath, setBridgePath] = useState<number>(0)
     const [customAddress, setCustomAddress] = useState<string>("")
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
     const poktBalance = 9876
     const wpoktBalance = 1234
 
@@ -64,10 +68,12 @@ export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAd
                                     color="poktLime"
                                     textAlign="center"
                                     textDecoration="underline"
+                                    onClick={onOpen}
                                 >
                                     Enter custom address
                                 </Link>
                             </Center>
+                            <CustomAddressModal isOpen={isOpen} onClose={onClose} destination={bridgePath}><></></CustomAddressModal>
                         </Box>
                     </Center>
                     <Center my={6}>
@@ -87,10 +93,11 @@ export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAd
                         </VStack>
                     </Center>
                     <Center>
-                        <Button bg="poktLime">
+                        <Button bg="poktLime" onClick={onProgressOpen}>
                             Wrap
                         </Button>
                     </Center>
+                    <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose} destination={bridgePath}><></></ProgressModal>
                 </Container>
             ) : (
                 <Container bg="darkOverlay" paddingY={4}>
@@ -140,10 +147,12 @@ export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAd
                                     color="poktLime"
                                     textAlign="center"
                                     textDecoration="underline"
-                                    >
+                                    onClick={onOpen}
+                                >
                                     Enter custom address
                                 </Link>
                             </Center>
+                            <CustomAddressModal isOpen={isOpen} onClose={onClose} destination={bridgePath}><></></CustomAddressModal>
                         </Box>
                     </Center>
                     <Center my={6}>
@@ -163,10 +172,11 @@ export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAd
                         </VStack>
                     </Center>
                     <Center>
-                        <Button bg="poktLime">
+                        <Button bg="poktLime" onClick={onProgressOpen}>
                             Unwrap
                         </Button>
                     </Center>
+                    <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose} destination={bridgePath}><></></ProgressModal>
                 </Container>
             )}
         </VStack>

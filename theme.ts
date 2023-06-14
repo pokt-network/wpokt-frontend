@@ -1,4 +1,5 @@
 import { ChakraProps, extendTheme } from "@chakra-ui/react"
+import { modalTheme } from "./components/theme/modal"
 
 export const colors = {
     poktBlue: "rgba(29, 138, 237, 1)",
@@ -14,6 +15,9 @@ export const theme = extendTheme({
     configs: {
         initialColorMode: "dark",
         useSystemColorMode: false,
+    },
+    components: {
+        Modal: modalTheme
     },
     styles: {
         global: {
