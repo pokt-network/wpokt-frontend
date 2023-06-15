@@ -1,9 +1,11 @@
-import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, Link } from "@chakra-ui/react";
+import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, Link, ModalProps } from "@chakra-ui/react";
 import { BluePoktIcon } from "../icons/pokt";
-import { ProgressModalProps } from "./ProgressModal";
+import { useGlobalContext } from "@/context/Globals";
 
 
-export function TimeoutModal(props: ProgressModalProps) {
+export function TimeoutModal(props: ModalProps) {
+    const { destination } = useGlobalContext()
+
     return (
         <Modal {...props} size="sm" isCentered>
             <ModalOverlay />
@@ -32,7 +34,7 @@ export function TimeoutModal(props: ProgressModalProps) {
                             If there has been a change, this page will update.
                         </Text>
                         <Link textDecor="underline" color="poktLime" mt={3}>
-                            {props.destination === 1 ? "View this transaction on Etherscan" : "View this transaction on PoktScan"}
+                            {destination === "pokt" ? "View this transaction on Etherscan" : "View this transaction on PoktScan"}
                         </Link>
                     </Flex>
                 </ModalBody>

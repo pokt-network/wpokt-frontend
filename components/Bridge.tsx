@@ -8,8 +8,6 @@ import { CloseIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 
 export function Bridge() {
-    // bridgePath: 0 = POKT -> wPOKT, 1 = wPOKT -> POKT
-    const [bridgePath, setBridgePath] = useState<number>(1)
     const [customAddress, setCustomAddress] = useState<string>("")
     const { poktAddress, ethAddress, destination, setDestination } = useGlobalContext()
 
@@ -21,11 +19,11 @@ export function Bridge() {
 
 
     return (
-        <VStack>
-            <Button bg="poktLime" onClick={() => setBridgePath(bridgePath === 1 ? 0 : 1)}>
-                {bridgePath === 1 ? "wPOKT -> POKT" : "POKT -> wPOKT"}
+        <VStack minWidth="580px">
+            <Button bg="poktLime" onClick={() => setDestination(destination === "pokt" ? "eth" : "pokt")}>
+                {destination === "eth" ? "POKT" : "wPOKT"} &rarr; {destination === "eth" ? "wPOKT" : "POKT"}
             </Button>
-            {bridgePath !== 1 ? (
+            {destination === "eth" ? (
                 <Container bg="darkOverlay" paddingY={4}>
                     <Center>
                         <Box width={320}>
@@ -92,7 +90,7 @@ export function Bridge() {
                                 Enter custom address
                             </Link>
                         </Center>
-                        <CustomAddressModal isOpen={isOpen} onClose={onClose} destination={bridgePath}><></></CustomAddressModal>
+                        <CustomAddressModal isOpen={isOpen} onClose={onClose}><></></CustomAddressModal>
                     </Box>
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
@@ -115,7 +113,7 @@ export function Bridge() {
                             Wrap
                         </Button>
                     </Center>
-                    <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose} destination={bridgePath}><></></ProgressModal>
+                    <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose}><></></ProgressModal>
                 </Container>
             ) : (
                 <Container bg="darkOverlay" paddingY={4}>
@@ -183,7 +181,7 @@ export function Bridge() {
                             Enter custom address
                         </Link>
                     </Center>
-                    <CustomAddressModal isOpen={isOpen} onClose={onClose} destination={bridgePath}><></></CustomAddressModal>
+                    <CustomAddressModal isOpen={isOpen} onClose={onClose}><></></CustomAddressModal>
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
@@ -205,7 +203,7 @@ export function Bridge() {
                             Unwrap
                         </Button>
                     </Center>
-                    <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose} destination={bridgePath}><></></ProgressModal>
+                    <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose}><></></ProgressModal>
                 </Container>
             )}
         </VStack>

@@ -1,6 +1,31 @@
 import { ProviderProps, createContext, useContext, useEffect, useState } from "react";
 
-export const GlobalContext = createContext<any>(undefined)
+export interface GlobalContextProps {
+    mobile: boolean
+    setMobile: (mobile: boolean) => void
+    poktBalance: number
+    setPoktBalance: (balance: number) => void
+    poktAddress: string
+    setPoktAddress: (address: string) => void
+    ethAddress: string
+    setEthAddress: (address: string) => void
+    destination: string
+    setDestination: (destination: string) => void
+}
+
+export const GlobalContext = createContext<GlobalContextProps>({
+    mobile: false,
+    setMobile: () => {},
+    poktBalance: 0,
+    setPoktBalance: () => {},
+    poktAddress: "",
+    setPoktAddress: () => {},
+    ethAddress: "",
+    setEthAddress: () => {},
+    destination: "eth",
+    setDestination: () => {}
+})
+
 export const useGlobalContext = () => useContext(GlobalContext)
 
 export function GlobalContextProvider({ children }: any) {
@@ -8,7 +33,7 @@ export function GlobalContextProvider({ children }: any) {
     const [poktBalance, setPoktBalance] = useState<number>(0)
     const [poktAddress, setPoktAddress] = useState<string>("")
     const [ethAddress, setEthAddress] = useState<string>("")
-    const [destination, setDestionation] = useState<string>("eth") // 0 = wPOKT, 1 = POKT
+    const [destination, setDestination] = useState<string>("eth") // 0 = wPOKT, 1 = POKT
 
     useEffect(() => {
         toggleMobile();
@@ -34,7 +59,7 @@ export function GlobalContextProvider({ children }: any) {
             ethAddress,
             setEthAddress,
             destination,
-            setDestionation
+            setDestination
         }}>
             {children}
         </GlobalContext.Provider>

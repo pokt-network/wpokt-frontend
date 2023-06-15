@@ -4,13 +4,12 @@ import { BlueEthIcon } from "../icons/eth";
 import { BlueCopperIcon } from "../icons/copper";
 import { BluePoktIcon } from "../icons/pokt";
 import { BlueCheckIcon } from "../icons/misc";
+import { useGlobalContext } from "@/context/Globals";
 
-export interface ProgressModalProps extends ModalProps {
-    destination: number // 0 = wPOKT, 1 = POKT
-}
 
-export function ProgressModal(props: ProgressModalProps) {
+export function ProgressModal(props: ModalProps) {
     const [step, setStep] = useState<number>(0)
+    const { destination } = useGlobalContext()
 
     return (
         <Modal {...props} size="sm" isCentered>
@@ -24,7 +23,7 @@ export function ProgressModal(props: ProgressModalProps) {
                     </Text>
                     <Flex justify="center">
                         <Flex direction="column" align="center">
-                            {step > 0 ? <BlueCheckIcon/> : <>{props.destination === 1 ? <BlueEthIcon /> : <BluePoktIcon />}</>}
+                            {step > 0 ? <BlueCheckIcon/> : <>{destination === "pokt" ? <BlueEthIcon /> : <BluePoktIcon />}</>}
                             {step === 0 && <Divider borderColor="poktLime" orientation="vertical" height="50px" />}
                         </Flex>
                         <Divider borderColor="poktLime" height="25px" maxWidth="50px" />
@@ -34,11 +33,11 @@ export function ProgressModal(props: ProgressModalProps) {
                         </Flex>
                         <Divider borderColor="poktLime" height="25px" maxWidth="50px" />
                         <Flex direction="column" align="center">
-                            {step > 2 ? <BlueCheckIcon/> : <>{props.destination === 1 ? <BluePoktIcon /> : <BlueEthIcon />}</>}
+                            {step > 2 ? <BlueCheckIcon/> : <>{destination === "pokt" ? <BluePoktIcon /> : <BlueEthIcon />}</>}
                             {step >= 2 && <Divider borderColor="poktLime" orientation="vertical" height="50px" />}
                         </Flex>
                     </Flex>
-                    <ProgressModalStatusDescription step={step} destination={props.destination} />
+                    <ProgressModalStatusDescription step={step} destination={destination} />
                 </ModalBody>
             </ModalContent>
         </Modal>
@@ -46,7 +45,7 @@ export function ProgressModal(props: ProgressModalProps) {
 }
 
 
-export function ProgressModalStatusDescription({url, step, destination}: {url?: string, step: number, destination: number}) {
+export function ProgressModalStatusDescription({url, step, destination}: {url?: string, step: number, destination: string}) {
     return (
         <Flex
             direction="column"
@@ -58,7 +57,7 @@ export function ProgressModalStatusDescription({url, step, destination}: {url?: 
             padding={3}
             gap={2}
         >
-            {destination === 1 ? (
+            {destination === "pokt" ? (
                 <>
                 <Box textAlign="center">
                     <Text color="poktBlue">

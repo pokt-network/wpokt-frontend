@@ -1,14 +1,15 @@
 import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, useDisclosure, ModalProps, Input, Center, Button } from "@chakra-ui/react";
 import { useState } from "react";
 import { ErrorIcon } from "../icons/misc";
+import { useGlobalContext } from "@/context/Globals";
 
 export interface CustomAddressModalProps extends ModalProps {
     onConfirm?: (address: string) => void
-    destination: number // 0 = wPOKT, 1 = POKT
 }
 
 export function CustomAddressModal(props: CustomAddressModalProps) {
     const [isInvalidAddress, setIsInvalidAddress] = useState<boolean>(true)
+    const { destination } = useGlobalContext()
     
     return (
         <Modal {...props} size="sm" isCentered>
@@ -28,7 +29,7 @@ export function CustomAddressModal(props: CustomAddressModalProps) {
                             {isInvalidAddress && (
                                 <Flex align="center" gap={1}>
                                     <ErrorIcon />
-                                    <Text color="red.500">Valid {props.destination === 1 ? "POKT" : "ETH"} address required</Text>
+                                    <Text color="red.500">Valid {destination === "pokt" ? "POKT" : "ETH"} address required</Text>
                                 </Flex>
                             )}
                         </Flex>

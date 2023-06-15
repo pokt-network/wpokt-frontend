@@ -11,7 +11,7 @@ import { GlobalContextProvider } from '@/context/Globals'
 export default function Home() {
   return (
     <GlobalContextProvider>
-      <Flex direction="column" minHeight="100vh">
+      <Flex direction="column" minHeight="100vh" overflowX="hidden">
         <Header />
         <Heading
           size="lg"
@@ -21,12 +21,12 @@ export default function Home() {
         >
           Pocket/Ethereum Exchange
         </Heading>
-        <Box flexGrow={1}>
-          <Center paddingX={10}>
-            <Divider borderColor={"poktLime"} />
-          </Center>
+        <Center paddingX={10}>
+          <Divider borderColor={"poktLime"} />
+        </Center>
+        <Flex flexGrow={1} justify="center" align="center">
           <Bridge />
-        </Box>
+        </Flex>
         <Footer />
       </Flex>
     </GlobalContextProvider>
