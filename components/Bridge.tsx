@@ -1,16 +1,21 @@
-import { Box, Button, Center, Container, Flex, HStack, Link, Text, VStack, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Center, Container, Flex, HStack, Input, Link, Text, VStack, useDisclosure } from "@chakra-ui/react";
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
 import { useState } from "react";
 import { CustomAddressModal } from "./modal/CustomAddressModal";
 import { ProgressModal } from "./modal/ProgressModal";
+import { CloseIcon } from "./icons/misc";
+import { useGlobalContext } from "@/context/Globals";
 
-export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAddress?: string}) {
+export function Bridge() {
     // bridgePath: 0 = POKT -> wPOKT, 1 = wPOKT -> POKT
-    const [bridgePath, setBridgePath] = useState<number>(0)
+    const [bridgePath, setBridgePath] = useState<number>(1)
     const [customAddress, setCustomAddress] = useState<string>("")
+    const { poktAddress, ethAddress, destination, setDestination } = useGlobalContext()
+
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
+
     const poktBalance = 9876
     const wpoktBalance = 1234
 
@@ -29,7 +34,14 @@ export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAd
                                 <Text>{poktAddress ? `${poktBalance} POKT in wallet` : 'No wallet connected'}</Text>
                             </HStack>
                             {poktAddress ? (
-                                <Flex></Flex>
+                                <Box>
+                                    <PoktIcon fill="white" position="fixed" ml={280} mt="6px" width="26px" height="26px" />
+                                    <Input
+                                        type="number"
+                                        borderRadius={0}
+                                        placeholder="Enter POKT amount"
+                                    />
+                                </Box>
                             ) : (
                                 <Center>
                                     <Button
@@ -45,37 +57,43 @@ export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAd
                             )}
                         </Box>
                     </Center>
-                    <Center mt={6}>
-                        <Box width={320}>
-                            <Text mb={1}>Destination Wallet</Text>
-                            {ethAddress ? (
-                                <Flex></Flex>
-                            ) : (
-                                <Center>
-                                    <Button
-                                        variant="outline"
-                                        borderColor="poktLime"
-                                        bg="transparent"
-                                        color="white"
-                                        leftIcon={<EthIcon fill={"white"}/>}
-                                    >
-                                        Connect Wallet
-                                    </Button>
-                                </Center>
-                            )}
-                            <Center mt={1}>
-                                <Link
-                                    color="poktLime"
-                                    textAlign="center"
-                                    textDecoration="underline"
-                                    onClick={onOpen}
+                    <Box>
+                        <Center mt={6}>
+                            <Box width={320}>
+                                <Text mb={1} textAlign="left">Destination Wallet</Text>
+                            </Box>
+                        </Center>
+                        {ethAddress ? (
+                            <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2}>
+                                <EthIcon fill="poktBlue" width="26px" height="26px" />
+                                <Text>{ethAddress}</Text>
+                                <CloseIcon width="22.63px" height="22.63px" fill="poktLime" />
+                            </Flex>
+                        ) : (
+                            <Center>
+                                <Button
+                                    variant="outline"
+                                    borderColor="poktLime"
+                                    bg="transparent"
+                                    color="white"
+                                    leftIcon={<EthIcon fill={"white"}/>}
                                 >
-                                    Enter custom address
-                                </Link>
+                                    Connect Wallet
+                                </Button>
                             </Center>
-                            <CustomAddressModal isOpen={isOpen} onClose={onClose} destination={bridgePath}><></></CustomAddressModal>
-                        </Box>
-                    </Center>
+                        )}
+                        <Center mt={1}>
+                            <Link
+                                color="poktLime"
+                                textAlign="center"
+                                textDecoration="underline"
+                                onClick={onOpen}
+                            >
+                                Enter custom address
+                            </Link>
+                        </Center>
+                        <CustomAddressModal isOpen={isOpen} onClose={onClose} destination={bridgePath}><></></CustomAddressModal>
+                    </Box>
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
@@ -108,9 +126,16 @@ export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAd
                                 <Text>{poktAddress ? `${wpoktBalance} wPOKT in wallet` : 'No wallet connected'}</Text>
                             </HStack>
                             {ethAddress ? (
-                                <Flex></Flex>
-                                ) : (
-                                    <Center>
+                                <Box>
+                                    <EthIcon fill="white" position="fixed" ml={280} mt="6px" width="26px" height="26px" />
+                                    <Input
+                                        type="number"
+                                        borderRadius={0}
+                                        placeholder="Enter wPOKT amount"
+                                    />
+                                </Box>
+                            ) : (
+                                <Center>
                                     <Button
                                         variant="outline"
                                         borderColor="poktLime"
@@ -127,34 +152,38 @@ export function Bridge({ poktAddress, ethAddress }: {poktAddress?: string, ethAd
                     <Center mt={6}>
                         <Box width={320}>
                             <Text mb={1}>Destination Wallet</Text>
-                            {poktAddress ? (
-                                <Flex></Flex>
-                                ) : (
-                                    <Center>
-                                    <Button
-                                        variant="outline"
-                                        borderColor="poktLime"
-                                        bg="transparent"
-                                        color="white"
-                                        leftIcon={<PoktIcon fill={"white"}/>}
-                                        >
-                                        Connect SendWallet
-                                    </Button>
-                                </Center>
-                            )}
-                            <Center mt={1}>
-                                <Link
-                                    color="poktLime"
-                                    textAlign="center"
-                                    textDecoration="underline"
-                                    onClick={onOpen}
-                                >
-                                    Enter custom address
-                                </Link>
-                            </Center>
-                            <CustomAddressModal isOpen={isOpen} onClose={onClose} destination={bridgePath}><></></CustomAddressModal>
                         </Box>
                     </Center>
+                    {poktAddress ? (
+                        <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2}>
+                            <PoktIcon fill="poktBlue" width="26px" height="26px" />
+                            <Text>{poktAddress}</Text>
+                            <CloseIcon width="22.63px" height="22.63px" fill="poktLime" />
+                        </Flex>
+                    ) : (
+                        <Center>
+                            <Button
+                                variant="outline"
+                                borderColor="poktLime"
+                                bg="transparent"
+                                color="white"
+                                leftIcon={<PoktIcon fill={"white"}/>}
+                                >
+                                Connect SendWallet
+                            </Button>
+                        </Center>
+                    )}
+                    <Center mt={1}>
+                        <Link
+                            color="poktLime"
+                            textAlign="center"
+                            textDecoration="underline"
+                            onClick={onOpen}
+                        >
+                            Enter custom address
+                        </Link>
+                    </Center>
+                    <CustomAddressModal isOpen={isOpen} onClose={onClose} destination={bridgePath}><></></CustomAddressModal>
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>

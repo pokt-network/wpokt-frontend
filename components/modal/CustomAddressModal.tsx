@@ -32,7 +32,7 @@ export function CustomAddressModal(props: CustomAddressModalProps) {
                                 </Flex>
                             )}
                         </Flex>
-                        <Input />
+                        <Input borderRadius={0} placeholder="Enter address" />
                     </Box>
                     <Center mt={4} mb={2}>
                         <Button bg="poktLime" onClick={() => props.onConfirm}>Confirm</Button>

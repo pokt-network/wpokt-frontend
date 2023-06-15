@@ -24,6 +24,7 @@ export const theme = extendTheme({
             'html, body': {
                 color: 'white',
                 backgroundColor: 'rgba(24, 33, 41, 1)',
+                fontSize: '14px',
             }
         },
     }
