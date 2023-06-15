@@ -4,8 +4,9 @@ import { PoktIcon } from "./icons/pokt";
 import { useState } from "react";
 import { CustomAddressModal } from "./modal/CustomAddressModal";
 import { ProgressModal } from "./modal/ProgressModal";
-import { CloseIcon } from "./icons/misc";
+import { CloseIcon, InfoIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";
+import { TimeInfoModal } from "./modal/TimeInfoModal";
 
 export function Bridge() {
     const [customAddress, setCustomAddress] = useState<string>("")
@@ -13,6 +14,7 @@ export function Bridge() {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
+    const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
 
     const poktBalance = 9876
     const wpoktBalance = 1234
@@ -104,7 +106,10 @@ export function Bridge() {
                             </Box>
                             <Box>
                                 <Text>Estimated time for bridge:</Text>
-                                <Text>~30 Minutes</Text>
+                                <Flex align="center" gap={2}>
+                                    <Text>~30 Minutes</Text>
+                                    <InfoIcon _hover={{ cursor: "pointer" }} onClick={onInfoOpen} />
+                                </Flex>
                             </Box>
                         </VStack>
                     </Center>
@@ -194,7 +199,10 @@ export function Bridge() {
                             </Box>
                             <Box>
                                 <Text>Estimated time for bridge:</Text>
-                                <Text>~30 Minutes</Text>
+                                <Flex align="center" gap={2}>
+                                    <Text>~30 Minutes</Text>
+                                    <InfoIcon _hover={{ cursor: "pointer" }} onClick={onInfoOpen} />
+                                </Flex>
                             </Box>
                         </VStack>
                     </Center>
@@ -206,6 +214,7 @@ export function Bridge() {
                     <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose}><></></ProgressModal>
                 </Container>
             )}
+            <TimeInfoModal isOpen={isInfoOpen} onClose={onInfoClose}><></></TimeInfoModal>
         </VStack>
     )
 }
