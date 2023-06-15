@@ -12,7 +12,7 @@ export function ProgressModal(props: ModalProps) {
     const { destination } = useGlobalContext()
 
     return (
-        <Modal {...props} size="sm" isCentered>
+        <Modal {...props} size="md" isCentered>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center" color="poktBlue">WRAPPING IN PROGRESS</ModalHeader>

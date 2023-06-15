@@ -12,7 +12,7 @@ export function CustomAddressModal(props: CustomAddressModalProps) {
     const { destination } = useGlobalContext()
     
     return (
-        <Modal {...props} size="sm" isCentered>
+        <Modal {...props} size="md" isCentered>
             <ModalOverlay />
             <ModalContent bg="darkBlue">
                 <ModalHeader textAlign="center" color="poktBlue">Custom Destination Address</ModalHeader>
