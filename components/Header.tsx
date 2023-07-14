@@ -17,11 +17,16 @@ import logo from "../public/logo/full_white.png";
 import { useGlobalContext } from "@/context/Globals";
 import { CloseIcon, MenuIcon } from "./icons/misc";
 import { useRef } from "react";
+import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccount, useDisconnect } from "wagmi";
 
 
 export function Header() {
     const { mobile, poktAddress, ethAddress } = useGlobalContext()
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const { openConnectModal } = useConnectModal()
+    const { address } = useAccount()
+    const { disconnect } = useDisconnect()
     const width = 220
 
     return (
@@ -109,7 +114,7 @@ export function Header() {
                 </>
             ) : (
                 <ButtonGroup>
-                    {ethAddress ? (
+                    {address ? (
                         <Button
                             color="white"
                             background="darkOverlay"
@@ -118,8 +123,9 @@ export function Header() {
                             borderColor="darkOverlay"
                             padding={4}
                             paddingY={6}
+                            onClick={() => disconnect()}
                         >
-                            {ethAddress.substring(0,4) + "..." + ethAddress.substring(ethAddress.length - 4)}
+                            {address.substring(0,4) + "..." + address.substring(address.length - 4)}
                         </Button>
                     ) : (
                         <Button
@@ -130,9 +136,16 @@ export function Header() {
                             leftIcon={<EthIcon />}
                             padding={4}
                             paddingY={6}
+                            onClick={openConnectModal}
                         >
                             Connect
                         </Button>
+                        // <ConnectButton
+                        //     label="Connect"
+                        //     accountStatus="address"
+                        //     chainStatus="none"
+                        //     showBalance={false}
+                        // />
                     )}
                     {poktAddress ? (
                         <Button

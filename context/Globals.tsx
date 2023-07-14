@@ -11,6 +11,10 @@ export interface GlobalContextProps {
     setEthAddress: (address: string) => void
     destination: string
     setDestination: (destination: string) => void
+    customEthAddress: string
+    setCustomEthAddress: (address: string) => void
+    customPoktAddress: string
+    setCustomPoktAddress: (address: string) => void
 }
 
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -23,7 +27,11 @@ export const GlobalContext = createContext<GlobalContextProps>({
     ethAddress: "",
     setEthAddress: () => {},
     destination: "eth",
-    setDestination: () => {}
+    setDestination: () => {},
+    customEthAddress: "",
+    setCustomEthAddress: () => {},
+    customPoktAddress: "",
+    setCustomPoktAddress: () => {}
 })
 
 export const useGlobalContext = () => useContext(GlobalContext)
@@ -34,6 +42,8 @@ export function GlobalContextProvider({ children }: any) {
     const [poktAddress, setPoktAddress] = useState<string>("")
     const [ethAddress, setEthAddress] = useState<string>("")
     const [destination, setDestination] = useState<string>("eth") // 0 = wPOKT, 1 = POKT
+    const [customEthAddress, setCustomEthAddress] = useState<string>("")
+    const [customPoktAddress, setCustomPoktAddress] = useState<string>("")
 
     useEffect(() => {
         toggleMobile();
@@ -59,7 +69,11 @@ export function GlobalContextProvider({ children }: any) {
             ethAddress,
             setEthAddress,
             destination,
-            setDestination
+            setDestination,
+            customEthAddress,
+            setCustomEthAddress,
+            customPoktAddress,
+            setCustomPoktAddress
         }}>
             {children}
         </GlobalContext.Provider>

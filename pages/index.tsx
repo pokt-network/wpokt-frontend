@@ -1,6 +1,3 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Box, Center, Divider, Flex, Heading } from '@chakra-ui/react'

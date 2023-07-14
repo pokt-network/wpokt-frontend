@@ -7,10 +7,15 @@ import { ProgressModal } from "./modal/ProgressModal";
 import { CloseIcon, InfoIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { TimeInfoModal } from "./modal/TimeInfoModal";
+import { useAccount } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 export function Bridge() {
     const [customAddress, setCustomAddress] = useState<string>("")
     const { poktAddress, ethAddress, destination, setDestination } = useGlobalContext()
+
+    const { address } = useAccount()
+    const { openConnectModal } = useConnectModal()
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
@@ -63,10 +68,10 @@ export function Bridge() {
                                 <Text mb={1} textAlign="left">Destination Wallet</Text>
                             </Box>
                         </Center>
-                        {ethAddress ? (
+                        {address ? (
                             <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2}>
                                 <EthIcon fill="poktBlue" width="26px" height="26px" />
-                                <Text>{ethAddress}</Text>
+                                <Text>{address}</Text>
                                 <CloseIcon width="22.63px" height="22.63px" fill="poktLime" />
                             </Flex>
                         ) : (
@@ -77,6 +82,7 @@ export function Bridge() {
                                     bg="transparent"
                                     color="white"
                                     leftIcon={<EthIcon fill={"white"}/>}
+                                    onClick={openConnectModal}
                                 >
                                     Connect Wallet
                                 </Button>
@@ -128,7 +134,7 @@ export function Bridge() {
                                 <Text>Amount to unwrap</Text>
                                 <Text>{poktAddress ? `${wpoktBalance} wPOKT in wallet` : 'No wallet connected'}</Text>
                             </HStack>
-                            {ethAddress ? (
+                            {address ? (
                                 <Box>
                                     <EthIcon fill="white" position="fixed" ml={280} mt="6px" width="26px" height="26px" />
                                     <Input
@@ -145,7 +151,8 @@ export function Bridge() {
                                         bg="transparent"
                                         color="white"
                                         leftIcon={<EthIcon fill={"white"}/>}
-                                        >
+                                        onClick={openConnectModal}
+                                    >
                                         Connect Wallet
                                     </Button>
                                 </Center>
@@ -171,7 +178,7 @@ export function Bridge() {
                                 bg="transparent"
                                 color="white"
                                 leftIcon={<PoktIcon fill={"white"}/>}
-                                >
+                            >
                                 Connect SendWallet
                             </Button>
                         </Center>
