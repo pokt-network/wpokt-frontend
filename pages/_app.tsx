@@ -3,12 +3,13 @@ import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from "../theme"
-import { WagmiConfig, createConfig, configureChains, mainnet } from 'wagmi'
+import { WagmiConfig, createConfig, configureChains } from 'wagmi'
+import { goerli, mainnet } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public'
 import { RainbowKitProvider, getDefaultWallets, darkTheme } from '@rainbow-me/rainbowkit'
  
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet],
+  [goerli],
   [publicProvider()],
 )
 

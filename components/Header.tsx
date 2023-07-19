@@ -1,13 +1,10 @@
 import { Button, ButtonGroup, HStack, IconButton, useDisclosure, Drawer,
     DrawerBody,
-    DrawerFooter,
     DrawerHeader,
     DrawerOverlay,
     DrawerContent,
-    DrawerCloseButton,
     Flex,
     Text,
-    Center,
     Link,
     VStack, } from "@chakra-ui/react";
 import Image from "next/image";
@@ -16,13 +13,12 @@ import { PoktIcon } from "./icons/pokt";
 import logo from "../public/logo/full_white.png";
 import { useGlobalContext } from "@/context/Globals";
 import { CloseIcon, MenuIcon } from "./icons/misc";
-import { useRef } from "react";
-import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect } from "wagmi";
 
 
 export function Header() {
-    const { mobile, poktAddress, ethAddress } = useGlobalContext()
+    const { mobile, poktAddress, ethAddress, setPoktAddress, connectSendWallet } = useGlobalContext()
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { openConnectModal } = useConnectModal()
     const { address } = useAccount()
@@ -49,17 +45,18 @@ export function Header() {
                     <DrawerContent bg="#242C34" color="white" maxW={width}>
                         <DrawerHeader textAlign="center" color="poktBlue">MENU</DrawerHeader>
                         <DrawerBody>
-                            {ethAddress ? (
+                            {address ? (
                                 <VStack spacing={1}>
                                     <Flex align="center" justify="space-between" bg="darkBlue" width={width} padding={2}>
                                         <EthIcon fill="poktBlue" width="26px" height="26px" />
-                                        <Text>{ethAddress.substring(0,4) + "..." + ethAddress.substring(ethAddress.length - 4)}</Text>
+                                        <Text>{address.substring(0,4) + "..." + address.substring(address.length - 4)}</Text>
                                         <CloseIcon width="22.63px" height="22.63px" fill="none" />
                                     </Flex>
                                     <Link
                                         color="poktLime"
                                         textAlign="center"
                                         textDecor="underline"
+                                        onClick={() => disconnect()}
                                     >
                                         Disconnect
                                     </Link>
@@ -73,6 +70,7 @@ export function Header() {
                                         borderWidth={2}
                                         borderColor="poktLime"
                                         leftIcon={<EthIcon />}
+                                        onClick={openConnectModal}
                                     >
                                         Connect
                                     </Button>
@@ -90,6 +88,7 @@ export function Header() {
                                         color="poktLime"
                                         textAlign="center"
                                         textDecoration="underline"
+                                        onClick={() => setPoktAddress("")}
                                     >
                                         Disconnect
                                     </Link>
@@ -103,6 +102,7 @@ export function Header() {
                                         borderWidth={2}
                                         borderColor="poktLime"
                                         leftIcon={<PoktIcon />}
+                                        onClick={connectSendWallet}
                                     >
                                         Connect
                                     </Button>
@@ -140,12 +140,6 @@ export function Header() {
                         >
                             Connect
                         </Button>
-                        // <ConnectButton
-                        //     label="Connect"
-                        //     accountStatus="address"
-                        //     chainStatus="none"
-                        //     showBalance={false}
-                        // />
                     )}
                     {poktAddress ? (
                         <Button
@@ -156,6 +150,7 @@ export function Header() {
                             borderColor="darkOverlay"
                             padding={4}
                             paddingY={6}
+                            onClick={() => setPoktAddress("")}
                         >
                             {poktAddress.substring(0,4) + "..." + poktAddress.substring(poktAddress.length - 4)}
                         </Button>
@@ -168,6 +163,7 @@ export function Header() {
                             leftIcon={<PoktIcon />}
                             padding={4}
                             paddingY={6}
+                            onClick={connectSendWallet}
                         >
                             Connect
                         </Button>

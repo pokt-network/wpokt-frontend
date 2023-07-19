@@ -7,6 +7,7 @@ export interface GlobalContextProps {
     setPoktBalance: (balance: number) => void
     poktAddress: string
     setPoktAddress: (address: string) => void
+    connectSendWallet: () => void
     ethAddress: string
     setEthAddress: (address: string) => void
     destination: string
@@ -24,6 +25,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
     setPoktBalance: () => {},
     poktAddress: "",
     setPoktAddress: () => {},
+    connectSendWallet: () => {},
     ethAddress: "",
     setEthAddress: () => {},
     destination: "eth",
@@ -50,6 +52,8 @@ export function GlobalContextProvider({ children }: any) {
         window.addEventListener('resize', toggleMobile);
     });
 
+    useEffect(() => { getPoktBalance() }, [poktAddress])
+
     function toggleMobile() {
         if (window && window.innerWidth < 700) {
             setMobile(true);
@@ -57,6 +61,69 @@ export function GlobalContextProvider({ children }: any) {
             setMobile(false);
         }
     };
+
+    async function connectSendWallet() {
+        if (window.pocketNetwork === undefined) {
+            // uh oh no SendWallet found, request that the user install it first.
+            return alert("SendWallet not found! Please visit https://sendwallet.net to install");
+        }
+        // Connect Wallet
+        let address = await window.pocketNetwork
+            .send("pokt_requestAccounts")
+            .then(([address]: any[]) => {
+                console.log("Connected POKT address:", address);
+                return address;
+            })
+            .catch((e: any) => {
+                console.error("Failed to connect POKT address:", e);
+                return null;
+            });
+        setPoktAddress(address)
+    }
+
+    async function getPoktBalance() {
+        if (poktAddress) {
+            // Get uPokt Balance
+            let balance = await window.pocketNetwork
+                .send("pokt_balance", [{ address: poktAddress }])
+                .then(({ balance }) => {
+                    console.log("POKT Balance:", {
+                        balanceInUpokt: balance,
+                        balanceInPokt: balance / 1e6,
+                    });
+                    return balance;
+                })
+                .catch((e: any) => {
+                    console.error("Error getting POKT balance:", e);
+                    return null;
+                });
+            setPoktBalance(balance)
+        }
+    }
+
+    async function sendPokt(to: string, amount: number | bigint) {
+        if (!poktAddress) return alert("Please connect your POKT wallet first")
+        // Send Transaction
+        let hash = await window.pocketNetwork
+            .send("pokt_sendTransaction", [
+                {
+                    amount: amount.toString(), // in uPOKT
+                    from: poktAddress,
+                    to: to,
+                    memo: "Sent with SendWallet.net",
+                },
+            ])
+            .then(({ hash }: any) => {
+                console.log("Successful POKT tx:", {
+                    txHash: hash,
+                });
+                return hash;
+            })
+            .catch((e: any) => {
+                console.error("Failed POKT tx:", e);
+                return null;
+            });
+    }
 
     return (
         <GlobalContext.Provider value={{
@@ -66,6 +133,7 @@ export function GlobalContextProvider({ children }: any) {
             setPoktBalance,
             poktAddress,
             setPoktAddress,
+            connectSendWallet,
             ethAddress,
             setEthAddress,
             destination,

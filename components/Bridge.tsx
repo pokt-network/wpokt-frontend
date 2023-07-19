@@ -7,21 +7,28 @@ import { ProgressModal } from "./modal/ProgressModal";
 import { CloseIcon, InfoIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { TimeInfoModal } from "./modal/TimeInfoModal";
-import { useAccount } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { formatPokt } from "@/utils/pokt";
+import { WPOKT_ADDRESS } from "@/utils/constants";
 
 export function Bridge() {
     const [customAddress, setCustomAddress] = useState<string>("")
-    const { poktAddress, ethAddress, destination, setDestination } = useGlobalContext()
+    const { poktAddress, ethAddress, destination, setDestination, connectSendWallet, poktBalance } = useGlobalContext()
 
     const { address } = useAccount()
     const { openConnectModal } = useConnectModal()
+    const { data: balanceData } = useBalance({
+        address,
+        token: WPOKT_ADDRESS,
+        watch: true
+    })
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
     const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
 
-    const poktBalance = 9876
+    // const poktBalance = 9876
     const wpoktBalance = 1234
 
 
@@ -36,7 +43,7 @@ export function Bridge() {
                         <Box width={320}>
                             <HStack justify="space-between" mb={1}>
                                 <Text>Amount to wrap</Text>
-                                <Text>{poktAddress ? `${poktBalance} POKT in wallet` : 'No wallet connected'}</Text>
+                                <Text>{poktAddress ? `${formatPokt(poktBalance)} POKT in wallet` : 'No wallet connected'}</Text>
                             </HStack>
                             {poktAddress ? (
                                 <Box>
@@ -55,6 +62,7 @@ export function Bridge() {
                                         bg="transparent"
                                         color="white"
                                         leftIcon={<PoktIcon fill={"white"}/>}
+                                        onClick={connectSendWallet}
                                     >
                                         Connect SendWallet
                                     </Button>
@@ -88,7 +96,7 @@ export function Bridge() {
                                 </Button>
                             </Center>
                         )}
-                        <Center mt={1}>
+                        {/* <Center mt={1}>
                             <Link
                                 color="poktLime"
                                 textAlign="center"
@@ -98,7 +106,7 @@ export function Bridge() {
                                 Enter custom address
                             </Link>
                         </Center>
-                        <CustomAddressModal isOpen={isOpen} onClose={onClose}><></></CustomAddressModal>
+                        <CustomAddressModal isOpen={isOpen} onClose={onClose}><></></CustomAddressModal> */}
                     </Box>
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
@@ -120,7 +128,7 @@ export function Bridge() {
                         </VStack>
                     </Center>
                     <Center>
-                        <Button bg="poktLime" onClick={onProgressOpen}>
+                        <Button bg="poktLime" onClick={onProgressOpen} isDisabled={!poktAddress||!address}>
                             Wrap
                         </Button>
                     </Center>
@@ -132,7 +140,7 @@ export function Bridge() {
                         <Box width={320}>
                             <HStack justify="space-between" mb={1}>
                                 <Text>Amount to unwrap</Text>
-                                <Text>{poktAddress ? `${wpoktBalance} wPOKT in wallet` : 'No wallet connected'}</Text>
+                                <Text>{address ? `${balanceData?.formatted ?? 0} wPOKT in wallet` : 'No wallet connected'}</Text>
                             </HStack>
                             {address ? (
                                 <Box>
@@ -178,12 +186,13 @@ export function Bridge() {
                                 bg="transparent"
                                 color="white"
                                 leftIcon={<PoktIcon fill={"white"}/>}
+                                onClick={connectSendWallet}
                             >
                                 Connect SendWallet
                             </Button>
                         </Center>
                     )}
-                    <Center mt={1}>
+                    {/* <Center mt={1}>
                         <Link
                             color="poktLime"
                             textAlign="center"
@@ -193,7 +202,7 @@ export function Bridge() {
                             Enter custom address
                         </Link>
                     </Center>
-                    <CustomAddressModal isOpen={isOpen} onClose={onClose}><></></CustomAddressModal>
+                    <CustomAddressModal isOpen={isOpen} onClose={onClose}><></></CustomAddressModal> */}
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
@@ -214,7 +223,7 @@ export function Bridge() {
                         </VStack>
                     </Center>
                     <Center>
-                        <Button bg="poktLime" onClick={onProgressOpen}>
+                        <Button bg="poktLime" onClick={onProgressOpen} isDisabled={!poktAddress||!address}>
                             Unwrap
                         </Button>
                     </Center>
