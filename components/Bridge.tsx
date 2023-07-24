@@ -1,7 +1,7 @@
 import { Box, Button, Center, Container, Flex, HStack, Input, Link, Text, VStack, useDisclosure } from "@chakra-ui/react";
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CustomAddressModal } from "./modal/CustomAddressModal";
 import { ProgressModal } from "./modal/ProgressModal";
 import { CloseIcon, InfoIcon } from "./icons/misc";
@@ -9,12 +9,16 @@ import { useGlobalContext } from "@/context/Globals";
 import { TimeInfoModal } from "./modal/TimeInfoModal";
 import { useAccount, useBalance } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { formatPokt } from "@/utils/pokt";
+import { formatPokt, parsePokt } from "@/utils/pokt";
 import { WPOKT_ADDRESS } from "@/utils/constants";
 
 export function Bridge() {
     const [customAddress, setCustomAddress] = useState<string>("")
-    const { poktAddress, ethAddress, destination, setDestination, connectSendWallet, poktBalance } = useGlobalContext()
+    const [poktAmountInput, setPoktAmountInput] = useState<string>("")
+    const [wPoktAmountInput, setWPoktAmountInput] = useState<string>("")
+    const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
+    const [wPoktAmount, setWPoktAmount] = useState<bigint>(BigInt(0))
+    const { poktAddress, ethAddress, destination, setDestination, connectSendWallet, poktBalance, bridgePoktToEthereum, poktTxOngoing } = useGlobalContext()
 
     const { address } = useAccount()
     const { openConnectModal } = useConnectModal()
@@ -24,9 +28,15 @@ export function Bridge() {
         watch: true
     })
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
     const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
+
+
+    useEffect(() => {
+        if (poktTxOngoing) {
+            onProgressOpen()
+        }
+    }, [poktTxOngoing])
 
     // const poktBalance = 9876
     const wpoktBalance = 1234
@@ -52,6 +62,12 @@ export function Bridge() {
                                         type="number"
                                         borderRadius={0}
                                         placeholder="Enter POKT amount"
+                                        value={poktAmountInput}
+                                        onChange={(e) => {
+                                            const { value } = e.currentTarget
+                                            setPoktAmountInput(value)
+                                            setPoktAmount(parsePokt(value ?? 0))
+                                        }}
                                     />
                                 </Box>
                             ) : (
@@ -128,7 +144,15 @@ export function Bridge() {
                         </VStack>
                     </Center>
                     <Center>
-                        <Button bg="poktLime" onClick={onProgressOpen} isDisabled={!poktAddress||!address}>
+                        <Button
+                            bg="poktLime"
+                            onClick={async () => {
+                                const recipient = address ?? ""
+                                await bridgePoktToEthereum(recipient, poktAmount)
+                                // onProgressOpen()
+                            }}
+                            isDisabled={!poktAddress||!address||!poktAmount}
+                        >
                             Wrap
                         </Button>
                     </Center>

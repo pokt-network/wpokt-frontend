@@ -1,3 +1,5 @@
+import { ETH_CHAIN_ID, POKT_MULTISIG_ADDRESS } from "@/utils/constants";
+import { isValidEthAddress } from "@/utils/misc";
 import { ProviderProps, createContext, useContext, useEffect, useState } from "react";
 
 export interface GlobalContextProps {
@@ -11,7 +13,19 @@ export interface GlobalContextProps {
     ethAddress: string
     setEthAddress: (address: string) => void
     destination: string
-    setDestination: (destination: string) => void
+    setDestination: (destination: string) => void,
+    poktAmount: bigint
+    setPoktAmount: (amount: bigint) => void
+    wPoktAmount: bigint
+    setWPoktAmount: (amount: bigint) => void
+    bridgePoktToEthereum: (ethAddress: string, amount: number | bigint) => Promise<void>
+    poktTxHash: string
+    setPoktTxHash: (hash: string) => void
+    poktTxOngoing: boolean
+    poktTxSuccess: boolean
+    poktTxError: boolean
+    ethTxHash: string
+    setEthTxHash: (hash: string) => void
     customEthAddress: string
     setCustomEthAddress: (address: string) => void
     customPoktAddress: string
@@ -30,6 +44,18 @@ export const GlobalContext = createContext<GlobalContextProps>({
     setEthAddress: () => {},
     destination: "eth",
     setDestination: () => {},
+    poktAmount: BigInt(0),
+    setPoktAmount: () => {},
+    wPoktAmount: BigInt(0),
+    setWPoktAmount: () => {},
+    bridgePoktToEthereum: async () => {},
+    poktTxHash: "",
+    setPoktTxHash: () => {},
+    poktTxOngoing: false,
+    poktTxSuccess: false,
+    poktTxError: false,
+    ethTxHash: "",
+    setEthTxHash: () => {},
     customEthAddress: "",
     setCustomEthAddress: () => {},
     customPoktAddress: "",
@@ -43,9 +69,16 @@ export function GlobalContextProvider({ children }: any) {
     const [poktBalance, setPoktBalance] = useState<number>(0)
     const [poktAddress, setPoktAddress] = useState<string>("")
     const [ethAddress, setEthAddress] = useState<string>("")
-    const [destination, setDestination] = useState<string>("eth") // 0 = wPOKT, 1 = POKT
+    const [destination, setDestination] = useState<string>("eth") // eth = pokt -> wpokt, pokt = wpokt -> pokt
+    const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
+    const [wPoktAmount, setWPoktAmount] = useState<bigint>(BigInt(0))
     const [customEthAddress, setCustomEthAddress] = useState<string>("")
     const [customPoktAddress, setCustomPoktAddress] = useState<string>("")
+    const [poktTxHash, setPoktTxHash] = useState<string>("")
+    const [ethTxHash, setEthTxHash] = useState<string>("")
+    const [poktTxOngoing, setPoktTxOngoing] = useState<boolean>(false)
+    const [poktTxSuccess, setPoktTxSuccess] = useState<boolean>(false)
+    const [poktTxError, setPoktTxError] = useState<boolean>(false)
 
     useEffect(() => {
         toggleMobile();
@@ -101,28 +134,31 @@ export function GlobalContextProvider({ children }: any) {
         }
     }
 
-    async function sendPokt(to: string, amount: number | bigint) {
-        if (!poktAddress) return alert("Please connect your POKT wallet first")
+    async function bridgePoktToEthereum(ethAddress: string, amount: number | bigint) {
+        setPoktTxOngoing(false)
+        setPoktTxSuccess(false)
+        if (!poktAddress) return console.error("Please connect your POKT wallet first")
+        if (!isValidEthAddress(ethAddress)) return console.error("Please enter a valid Ethereum address")
         // Send Transaction
-        let hash = await window.pocketNetwork
-            .send("pokt_sendTransaction", [
-                {
-                    amount: amount.toString(), // in uPOKT
-                    from: poktAddress,
-                    to: to,
-                    memo: "Sent with SendWallet.net",
-                },
-            ])
-            .then(({ hash }: any) => {
-                console.log("Successful POKT tx:", {
-                    txHash: hash,
-                });
-                return hash;
-            })
-            .catch((e: any) => {
-                console.error("Failed POKT tx:", e);
-                return null;
-            });
+        try {
+            setPoktTxOngoing(true)
+            setPoktTxSuccess(true)
+            // const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
+            //     {
+            //         amount: amount.toString(), // in uPOKT
+            //         from: poktAddress,
+            //         to: POKT_MULTISIG_ADDRESS,
+            //         memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
+            //     },
+            // ])
+            // console.log("Sent POKT:", {
+            //     txHash: hash,
+            // });
+            // setPoktTxHash(hash)
+            // setPoktTxOngoing(true)
+        } catch (error) {
+            console.error("Failed sending POKT:", error);
+        }
     }
 
     return (
@@ -138,6 +174,18 @@ export function GlobalContextProvider({ children }: any) {
             setEthAddress,
             destination,
             setDestination,
+            poktAmount,
+            setPoktAmount,
+            wPoktAmount,
+            setWPoktAmount,
+            bridgePoktToEthereum,
+            poktTxHash,
+            setPoktTxHash,
+            poktTxOngoing,
+            poktTxSuccess,
+            poktTxError,
+            ethTxHash,
+            setEthTxHash,
             customEthAddress,
             setCustomEthAddress,
             customPoktAddress,

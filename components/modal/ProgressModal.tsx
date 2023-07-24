@@ -1,23 +1,61 @@
-import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider } from "@chakra-ui/react";
-import { useState } from "react";
+import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider, useDisclosure } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { BlueEthIcon } from "../icons/eth";
 import { BlueCopperIcon } from "../icons/copper";
 import { BluePoktIcon } from "../icons/pokt";
 import { BlueCheckIcon } from "../icons/misc";
 import { useGlobalContext } from "@/context/Globals";
+import { MintModal } from "./MintModal";
 
 
 export function ProgressModal(props: ModalProps) {
-    const [step, setStep] = useState<number>(0)
-    const { destination } = useGlobalContext()
+    const {
+        destination,
+        poktTxHash,
+        poktTxOngoing,
+        poktTxSuccess,
+        poktTxError,
+    } = useGlobalContext()
+
+    // STEPS
+    // 0. Sending POKT to vault
+    // 1. Vault is validating order
+    // 2. Waiting for user to mint wPOKT
+    // 3. Minting wPOKT
+    // 4. wPOKT minted
+    const [step, setStep] = useState<number>(getCurrentStep())
+
+    const { isOpen, onOpen, onClose } = useDisclosure()
+
+    useEffect(() => { setStep(getCurrentStep()) }, [poktTxOngoing, poktTxSuccess, poktTxError])
+    useEffect(() => { readyToMintWPokt() }, [step])
+
+    function getCurrentStep(): number {
+        if (destination === "pokt") {
+            // TODO: add eth to pokt steps
+            return 0
+        } else {
+            // if done, return 4
+            // if minting, return 3
+            // if ready to mint, return 2
+            if (poktTxSuccess) return 1
+            return 0
+        }
+    }
+
+    function readyToMintWPokt() {
+        if (step === 2 && destination !== "pokt") {
+            onOpen()
+        }
+    }
 
     return (
         <Modal {...props} size="md" isCentered>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader textAlign="center" color="poktBlue">WRAPPING IN PROGRESS</ModalHeader>
+                <ModalHeader textAlign="center" color="poktBlue">{destination === 'pokt' && 'UN'}WRAPPING IN PROGRESS</ModalHeader>
                 <ModalCloseButton color="poktBlue" />
-                <ModalBody padding={0}>
+                <ModalBody padding={0} onClick={() => setStep(step + 1)}>
                     <Text paddingX={8} mb={8}>
                         You can close this window or refresh this page without interrupting the process.
                     </Text>
@@ -37,7 +75,10 @@ export function ProgressModal(props: ModalProps) {
                             {step >= 2 && <Divider borderColor="poktLime" orientation="vertical" height="50px" />}
                         </Flex>
                     </Flex>
-                    <ProgressModalStatusDescription step={step} destination={destination} />
+                    <ProgressModalStatusDescription step={step} destination={destination} poktTxHash={poktTxHash} />
+                    {(step === 2 && destination !== "pokt") && (
+                        <MintModal isOpen={isOpen} onClose={onClose}><></></MintModal>
+                    )}
                 </ModalBody>
             </ModalContent>
         </Modal>
@@ -45,7 +86,7 @@ export function ProgressModal(props: ModalProps) {
 }
 
 
-export function ProgressModalStatusDescription({url, step, destination}: {url?: string, step: number, destination: string}) {
+export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, destination}: {poktTxHash?: string, ethTxHash?: string, step: number, destination: string}) {
     return (
         <Flex
             direction="column"
@@ -61,14 +102,14 @@ export function ProgressModalStatusDescription({url, step, destination}: {url?: 
                 <>
                 <Box textAlign="center">
                     <Text color="poktBlue">
-                        {step === 0 && "Sending your wPOKT to Copper"}
+                        {step === 0 && "Sending your wPOKT to the vault"}
                         {step === 1 && "Bridging your order"}
                         {step === 2 && "Unlocking POKT"}
                         {step > 2 && "Transaction Complete!"}
                     </Text>
                     <Text>
                         {step === 0 && "It may take up to 32 blocks to arrive, which is about 6 minutes."}
-                        {step === 1 && "Copper is reviewing and approving your order. This process should take about 5-10 minutes."}
+                        {step === 1 && "We are reviewing and approving your order. This process should take about 5-10 minutes."}
                         {step === 2 && "Your POKT is on the way! It may take a few blocks to confirm. Pocket blocks complete every 15 minutes."}
                         {step > 2 && "Your wPOKT is in your destination wallet."}
                     </Text>
@@ -91,12 +132,12 @@ export function ProgressModalStatusDescription({url, step, destination}: {url?: 
                     </Text>
                     <Text>
                         {step === 0 && "This may take several blocks to confirm. Pocket blocks complete every 15 minutes."}
-                        {step === 1 && "Copper is reviewing and approving your order. This process should take about 5-10 minutes."}
+                        {step === 1 && "We are reviewing and approving your order. This process should take about 5-10 minutes."}
                         {step === 2 && "Your wPOKT is on the way! It may take up to 32 blocks to arrive, which is about 6 minutes."}
                         {step > 2 && "Your wPOKT is in your destination wallet."}
                     </Text>
                 </Box>
-                <Link textDecor="underline" color="poktLime">
+                <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://poktscan.com/tx/${poktTxHash}` : `https://etherscan.io/tx/${ethTxHash}`}>
                     {step === 0 && "View this transaction on PoktScan"}
                     {step === 1 && "View last transaction on PoktScan"}
                     {step === 2 && "View this transaction on Etherscan"}
