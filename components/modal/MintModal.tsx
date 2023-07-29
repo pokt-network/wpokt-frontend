@@ -1,13 +1,26 @@
 import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, Link, ModalProps, Button } from "@chakra-ui/react";
 import { BluePoktIcon } from "../icons/pokt";
 import { useGlobalContext } from "@/context/Globals";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { parseEther } from "viem";
+import { MINT_CONTROLLER_ADDRESS } from "@/utils/constants";
+import { MINT_CONTROLLER_ABI } from "@/utils/abis";
+import { Mint } from "@/types";
 
+export interface MintModalProps extends ModalProps {
+    mintInfo: Mint
+}
 
-export function MintModal(props: ModalProps) {
+export function MintModal(props: MintModalProps) {
     const { address } = useAccount()
     const { data: ethBalance } = useBalance({ address })
+    const { config } = usePrepareContractWrite({
+        address: MINT_CONTROLLER_ADDRESS,
+        abi: MINT_CONTROLLER_ABI,
+        functionName: 'mintwrappedPocket',
+        args: [props.mintInfo.data, props.mintInfo.signatures]
+    })
+    const mintFunc = useContractWrite(config)
 
     return (
         <Modal {...props} size="md" isCentered>
@@ -44,6 +57,7 @@ export function MintModal(props: ModalProps) {
                         <Button
                             bg="poktLime"
                             mt={3}
+                            onClick={mintFunc.write}
                         >
                             Mint wPOKT
                         </Button>

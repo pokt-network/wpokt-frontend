@@ -1,6 +1,13 @@
-import { ETH_CHAIN_ID, POKT_MULTISIG_ADDRESS } from "@/utils/constants";
+import { Burn, Mint } from "@/types";
 import { isValidEthAddress } from "@/utils/misc";
-import { ProviderProps, createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+
+export async function fetchMints(ethAddress: string): Promise<Mint[]> {
+    const res =  await fetch(`/api/mints/all?recipient=${ethAddress}`)
+    const mints = await res.json()
+    return mints as Mint[]
+}
 
 export interface GlobalContextProps {
     mobile: boolean
@@ -26,10 +33,14 @@ export interface GlobalContextProps {
     poktTxError: boolean
     ethTxHash: string
     setEthTxHash: (hash: string) => void
-    customEthAddress: string
-    setCustomEthAddress: (address: string) => void
-    customPoktAddress: string
-    setCustomPoktAddress: (address: string) => void
+    currentMint: Mint|undefined
+    setCurrentMint: (mint: Mint|undefined) => void
+    currentBurn: Burn|undefined
+    setCurrentBurn: (burn: Burn|undefined) => void
+    allPendingMints: Mint[]
+    setAllPendingMints: (mints: Mint[]) => void
+    allPendingBurns: Burn[]
+    setAllPendingBurns: (burns: Burn[]) => void
 }
 
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -56,10 +67,14 @@ export const GlobalContext = createContext<GlobalContextProps>({
     poktTxError: false,
     ethTxHash: "",
     setEthTxHash: () => {},
-    customEthAddress: "",
-    setCustomEthAddress: () => {},
-    customPoktAddress: "",
-    setCustomPoktAddress: () => {}
+    currentMint: undefined,
+    setCurrentMint: () => {},
+    currentBurn: undefined,
+    setCurrentBurn: () => {},
+    allPendingMints: [],
+    setAllPendingMints: () => {},
+    allPendingBurns: [],
+    setAllPendingBurns: () => {},
 })
 
 export const useGlobalContext = () => useContext(GlobalContext)
@@ -79,13 +94,35 @@ export function GlobalContextProvider({ children }: any) {
     const [poktTxOngoing, setPoktTxOngoing] = useState<boolean>(false)
     const [poktTxSuccess, setPoktTxSuccess] = useState<boolean>(false)
     const [poktTxError, setPoktTxError] = useState<boolean>(false)
+    const [currentMint, setCurrentMint] = useState<Mint|undefined>(undefined)
+    const [currentBurn, setCurrentBurn] = useState<Burn|undefined>(undefined)
+    const [allPendingMints, setAllPendingMints] = useState<Mint[]>([])
+    const [allPendingBurns, setAllPendingBurns] = useState<Burn[]>([])
 
+    
     useEffect(() => {
         toggleMobile();
         window.addEventListener('resize', toggleMobile);
     });
-
+    
     useEffect(() => { getPoktBalance() }, [poktAddress])
+    
+    const {address} = useAccount()
+
+    async function getMints(address: string) {
+        console.log(address)
+        const mints = await fetchMints(address)
+        if (mints && mints.length > 0) {
+            setAllPendingMints(mints)
+        }
+        console.log("mints", mints)
+    }
+
+    useEffect(() => {
+        if (address) {
+            getMints(address)
+        }
+    }, [address])
 
     function toggleMobile() {
         if (window && window.innerWidth < 700) {
@@ -186,10 +223,14 @@ export function GlobalContextProvider({ children }: any) {
             poktTxError,
             ethTxHash,
             setEthTxHash,
-            customEthAddress,
-            setCustomEthAddress,
-            customPoktAddress,
-            setCustomPoktAddress
+            currentMint,
+            setCurrentMint,
+            currentBurn,
+            setCurrentBurn,
+            allPendingMints,
+            setAllPendingMints,
+            allPendingBurns,
+            setAllPendingBurns,
         }}>
             {children}
         </GlobalContext.Provider>

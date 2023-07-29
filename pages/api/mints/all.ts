@@ -1,13 +1,22 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { getAllMints } from '@/lib/mint';
+import { getAllMintsFromRecipient } from '@/lib/mint';
 
-const findAll = async (req: NextApiRequest, res: NextApiResponse) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') return res.status(405).end();
 
-  const mints = await getAllMints();
+  const { recipient } = req.query;
 
-  return res.status(200).json(mints);
+  if (typeof recipient !== 'string' || !recipient) return res.status(400).end();
+
+  try {
+    const mints = await getAllMintsFromRecipient(recipient);
+
+    if (!mints) return res.status(204).end();
+
+    return res.status(200).json(mints);
+  } catch (error) {
+    console.error('Error finding mints:', error);
+    return res.status(500).end();
+  }
 };
-
-export default findAll;

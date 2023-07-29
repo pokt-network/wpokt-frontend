@@ -4,7 +4,7 @@ import { dbPromise } from '@/lib/mongodb';
 import { CollectionMints, Mint } from '@/types';
 import {
   POKT_MULTISIG_ADDRESS,
-  WRAPPED_POCKET_ADDRESS,
+  WPOKT_ADDRESS,
 } from '@/utils/constants';
 
 export const getMintFromId = async (id: string): Promise<Mint | null> => {
@@ -13,7 +13,7 @@ export const getMintFromId = async (id: string): Promise<Mint | null> => {
 
     const mint = await client.collection(CollectionMints).findOne({
       _id: new ObjectId(id),
-      wpokt_address: WRAPPED_POCKET_ADDRESS,
+      wpokt_address: WPOKT_ADDRESS,
       vault_address: POKT_MULTISIG_ADDRESS,
     });
 
@@ -24,7 +24,7 @@ export const getMintFromId = async (id: string): Promise<Mint | null> => {
   }
 };
 
-export const getAllMints = async (): Promise<Mint[]> => {
+export const getAllMintsFromRecipient = async (ethAddress: string): Promise<Mint[]> => {
   try {
     const client = await dbPromise;
 
@@ -32,8 +32,9 @@ export const getAllMints = async (): Promise<Mint[]> => {
       .collection(CollectionMints)
       .find(
         {
-          wpokt_address: WRAPPED_POCKET_ADDRESS,
+          wpokt_address: WPOKT_ADDRESS,
           vault_address: POKT_MULTISIG_ADDRESS,
+          recipient_address: ethAddress,
         },
         { sort: { created_at: -1 } },
       )
