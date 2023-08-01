@@ -7,18 +7,21 @@ import { ProgressModal } from "./modal/ProgressModal";
 import { CloseIcon, InfoIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { TimeInfoModal } from "./modal/TimeInfoModal";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useAccount, useBalance, useContractWrite, useFeeData, usePrepareContractWrite } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { formatPokt, parsePokt } from "@/utils/pokt";
 import { MINT_CONTROLLER_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
-import { WRAPPED_POCKET_ABI } from "@/utils/abis";
-import { getAddress, parseUnits } from "viem";
+import { MINT_CONTROLLER_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
+import { createPublicClient, formatEther, getAddress, http, parseUnits } from "viem";
+import { goerli } from "wagmi/chains";
+
 
 export function Bridge() {
     const [poktAmountInput, setPoktAmountInput] = useState<string>("")
     const [wPoktAmountInput, setWPoktAmountInput] = useState<string>("")
     const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
     const [wPoktAmount, setWPoktAmount] = useState<bigint>(BigInt(0))
+    const [estGasCost, setEstGasCost] = useState<string>("")
     const { poktAddress, destination, setDestination, connectSendWallet, poktBalance, bridgePoktToEthereum, poktTxOngoing } = useGlobalContext()
 
     const { address } = useAccount()
@@ -27,6 +30,7 @@ export function Bridge() {
         address,
         token: WPOKT_ADDRESS,
     })
+    const { data: feeData } = useFeeData({ chainId: goerli.id })
 
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
     const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
@@ -38,12 +42,18 @@ export function Bridge() {
         }
     }, [poktTxOngoing])
 
+    useEffect(() => {
+        if (address && poktAddress && destination) {
+            getGasCost(destination)
+        }
+    },[address, poktAddress, destination])
+
 
     const { config } = usePrepareContractWrite({
         address: WPOKT_ADDRESS,
         abi: WRAPPED_POCKET_ABI,
         functionName: 'burnAndBridge',
-        args: [wPoktAmount, getAddress(`0x${poktAddress}`)]
+        args: [wPoktAmount, poktAddress ? getAddress(`0x${poktAddress}`) : ''],
     })
     const burnFunc = useContractWrite(config)
     
@@ -57,6 +67,31 @@ export function Bridge() {
         }
     }
 
+    async function getGasCost(dest: string): Promise<void> {
+        let gas: bigint
+        const pubClient = createPublicClient({
+            chain: goerli,
+            transport: http()
+        })
+        if (dest === "pokt") {
+            gas = await pubClient.estimateContractGas({
+                address: WPOKT_ADDRESS,
+                abi: WRAPPED_POCKET_ABI,
+                functionName: 'burnAndBridge',
+                args: [wPoktAmount, getAddress(`0x${poktAddress}`)],
+                account: getAddress(address ?? '')
+            })
+        } else {
+            gas = await pubClient.estimateContractGas({
+                address: MINT_CONTROLLER_ADDRESS,
+                abi: MINT_CONTROLLER_ABI,
+                functionName: 'mintWrappedPocket',
+                args: [poktAmount, getAddress(address ?? '')],
+                account: getAddress(address ?? '')
+            })
+        }
+        setEstGasCost(formatEther(gas * (feeData?.maxFeePerGas ?? BigInt(0))))
+    }
 
     return (
         <VStack minWidth="580px">
@@ -133,11 +168,11 @@ export function Bridge() {
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
-                                <Text>{0.01} POKT</Text>
+                                <Text>{0.01} POKT + {estGasCost ?? '----'} ETH</Text>
                             </Box>
                             <Box>
                                 <Text>Estimated wPOKT Received:</Text>
-                                <Text>{poktAmountInput ?? '----'} wPOKT</Text>
+                                <Text>{poktAmountInput.length ? poktAmountInput : '----'} wPOKT</Text>
                             </Box>
                             <Box>
                                 <Text>Estimated time for bridge:</Text>
@@ -181,7 +216,7 @@ export function Bridge() {
                                         value={wPoktAmountInput}
                                         onChange={(e) => {
                                             const { value } = e.currentTarget
-                                            setWPoktAmountInput(value)
+                                            setWPoktAmountInput(value ?? '')
                                             setWPoktAmount(value ? parseUnits(value, 6) : BigInt(0))
                                         }}
                                     />
@@ -227,26 +262,15 @@ export function Bridge() {
                             </Button>
                         </Center>
                     )}
-                    {/* <Center mt={1}>
-                        <Link
-                            color="poktLime"
-                            textAlign="center"
-                            textDecoration="underline"
-                            onClick={onOpen}
-                        >
-                            Enter custom address
-                        </Link>
-                    </Center>
-                    <CustomAddressModal isOpen={isOpen} onClose={onClose}><></></CustomAddressModal> */}
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
-                                <Text>{0.001} Gwei</Text>
+                                <Text>{estGasCost ?? '----'} ETH</Text>
                             </Box>
                             <Box>
                                 <Text>Estimated POKT Received:</Text>
-                                <Text>{wPoktAmountInput ?? '----'} POKT</Text>
+                                <Text>{wPoktAmountInput.length ? wPoktAmountInput : '----'} POKT</Text>
                             </Box>
                             <Box>
                                 <Text>Estimated time for bridge:</Text>
@@ -261,7 +285,7 @@ export function Bridge() {
                         <Button
                             bg="poktLime"
                             onClick={burn}
-                            isDisabled={!poktAddress||!address}
+                            isDisabled={!poktAddress||!address||!wPoktAmount}
                         >
                             Unwrap
                         </Button>
