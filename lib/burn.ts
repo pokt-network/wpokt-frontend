@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 
 import { dbPromise } from '@/lib/mongodb';
 import { Burn, CollectionBurns } from '@/types';
-import { WRAPPED_POCKET_ADDRESS } from '@/utils/constants';
+import { WPOKT_ADDRESS } from '@/utils/constants';
 
 export const getBurnFromId = async (id: string): Promise<Burn | null> => {
   try {
@@ -10,7 +10,7 @@ export const getBurnFromId = async (id: string): Promise<Burn | null> => {
 
     const burn = await client.collection(CollectionBurns).findOne({
       _id: new ObjectId(id),
-      wpokt_address: WRAPPED_POCKET_ADDRESS,
+      wpokt_address: WPOKT_ADDRESS,
     });
 
     return burn as Burn | null;
@@ -28,7 +28,7 @@ export const getAllBurns = async (): Promise<Burn[]> => {
       .collection(CollectionBurns)
       .find(
         {
-          wpokt_address: WRAPPED_POCKET_ADDRESS,
+          wpokt_address: WPOKT_ADDRESS,
         },
         { sort: { created_at: -1 } },
       )

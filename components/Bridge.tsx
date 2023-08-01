@@ -7,25 +7,25 @@ import { ProgressModal } from "./modal/ProgressModal";
 import { CloseIcon, InfoIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { TimeInfoModal } from "./modal/TimeInfoModal";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { formatPokt, parsePokt } from "@/utils/pokt";
-import { WPOKT_ADDRESS } from "@/utils/constants";
+import { MINT_CONTROLLER_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
+import { WRAPPED_POCKET_ABI } from "@/utils/abis";
+import { getAddress, parseUnits } from "viem";
 
 export function Bridge() {
-    const [customAddress, setCustomAddress] = useState<string>("")
     const [poktAmountInput, setPoktAmountInput] = useState<string>("")
     const [wPoktAmountInput, setWPoktAmountInput] = useState<string>("")
     const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
     const [wPoktAmount, setWPoktAmount] = useState<bigint>(BigInt(0))
-    const { poktAddress, ethAddress, destination, setDestination, connectSendWallet, poktBalance, bridgePoktToEthereum, poktTxOngoing } = useGlobalContext()
+    const { poktAddress, destination, setDestination, connectSendWallet, poktBalance, bridgePoktToEthereum, poktTxOngoing } = useGlobalContext()
 
     const { address } = useAccount()
     const { openConnectModal } = useConnectModal()
     const { data: balanceData } = useBalance({
         address,
         token: WPOKT_ADDRESS,
-        watch: true
     })
 
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
@@ -38,8 +38,24 @@ export function Bridge() {
         }
     }, [poktTxOngoing])
 
-    // const poktBalance = 9876
-    const wpoktBalance = 1234
+
+    const { config } = usePrepareContractWrite({
+        address: WPOKT_ADDRESS,
+        abi: WRAPPED_POCKET_ABI,
+        functionName: 'burnAndBridge',
+        args: [wPoktAmount, getAddress(`0x${poktAddress}`)]
+    })
+    const burnFunc = useContractWrite(config)
+    
+    async function burn() {
+        console.log("Config:", config)
+        console.log("Burn Func:", burnFunc)
+        if (burnFunc.writeAsync) {
+            await burnFunc.writeAsync()
+            console.log("Burn Data:", burnFunc.data)
+            onProgressOpen()
+        }
+    }
 
 
     return (
@@ -112,17 +128,6 @@ export function Bridge() {
                                 </Button>
                             </Center>
                         )}
-                        {/* <Center mt={1}>
-                            <Link
-                                color="poktLime"
-                                textAlign="center"
-                                textDecoration="underline"
-                                onClick={onOpen}
-                            >
-                                Enter custom address
-                            </Link>
-                        </Center>
-                        <CustomAddressModal isOpen={isOpen} onClose={onClose}><></></CustomAddressModal> */}
                     </Box>
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
@@ -132,7 +137,7 @@ export function Bridge() {
                             </Box>
                             <Box>
                                 <Text>Estimated wPOKT Received:</Text>
-                                <Text>---- wPOKT</Text>
+                                <Text>{poktAmountInput ?? '----'} wPOKT</Text>
                             </Box>
                             <Box>
                                 <Text>Estimated time for bridge:</Text>
@@ -173,6 +178,12 @@ export function Bridge() {
                                         type="number"
                                         borderRadius={0}
                                         placeholder="Enter wPOKT amount"
+                                        value={wPoktAmountInput}
+                                        onChange={(e) => {
+                                            const { value } = e.currentTarget
+                                            setWPoktAmountInput(value)
+                                            setWPoktAmount(value ? parseUnits(value, 6) : BigInt(0))
+                                        }}
                                     />
                                 </Box>
                             ) : (
@@ -235,7 +246,7 @@ export function Bridge() {
                             </Box>
                             <Box>
                                 <Text>Estimated POKT Received:</Text>
-                                <Text>---- POKT</Text>
+                                <Text>{wPoktAmountInput ?? '----'} POKT</Text>
                             </Box>
                             <Box>
                                 <Text>Estimated time for bridge:</Text>
@@ -247,7 +258,11 @@ export function Bridge() {
                         </VStack>
                     </Center>
                     <Center>
-                        <Button bg="poktLime" onClick={onProgressOpen} isDisabled={!poktAddress||!address}>
+                        <Button
+                            bg="poktLime"
+                            onClick={burn}
+                            isDisabled={!poktAddress||!address}
+                        >
                             Unwrap
                         </Button>
                     </Center>

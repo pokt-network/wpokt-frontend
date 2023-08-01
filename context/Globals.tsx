@@ -87,8 +87,6 @@ export function GlobalContextProvider({ children }: any) {
     const [destination, setDestination] = useState<string>("eth") // eth = pokt -> wpokt, pokt = wpokt -> pokt
     const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
     const [wPoktAmount, setWPoktAmount] = useState<bigint>(BigInt(0))
-    const [customEthAddress, setCustomEthAddress] = useState<string>("")
-    const [customPoktAddress, setCustomPoktAddress] = useState<string>("")
     const [poktTxHash, setPoktTxHash] = useState<string>("")
     const [ethTxHash, setEthTxHash] = useState<string>("")
     const [poktTxOngoing, setPoktTxOngoing] = useState<boolean>(false)
