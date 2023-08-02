@@ -1,4 +1,4 @@
-import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider, useDisclosure, useTimeout } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { BlueEthIcon } from "../icons/eth";
 import { BlueCopperIcon } from "../icons/copper";
@@ -13,11 +13,14 @@ export function ProgressModal(props: ModalProps) {
         destination,
         ethTxHash,
         poktTxHash,
+        setPoktTxHash,
         poktTxOngoing,
         poktTxSuccess,
         poktTxError,
         burnFunc,
-        burnTxInfo
+        burnTx,
+        currentBurn,
+        setCurrentBurn
     } = useGlobalContext()
 
     // STEPS
@@ -30,18 +33,27 @@ export function ProgressModal(props: ModalProps) {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    useEffect(() => { setStep(getCurrentStep()) }, [poktTxOngoing, poktTxSuccess, poktTxError, burnTxInfo?.status])
+    useEffect(() => { setStep(getCurrentStep()) }, [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status])
     useEffect(() => { readyToMintWPokt() }, [step])
     useEffect(() => {
         if (step === 1 && destination === "pokt" && ethTxHash) getBurnInfo()
     }, [step, destination, ethTxHash])
 
+    useTimeout(() => {
+        if (step >= 1 && destination === "pokt" && ethTxHash) getBurnInfo()
+    }, 15000)
+
     function getCurrentStep(): number {
         if (destination === "pokt") {
             // TODO: add eth to pokt steps
+            if (currentBurn?.status === "success") return 3
+            if (currentBurn?.status === "signed" || currentBurn?.status === "submitted") {
+                setPoktTxHash(currentBurn?.return_tx_hash || "")
+                return 2
+            }
             console.log("Burn func status:", burnFunc)
-            console.log("Burn tx info:", burnTxInfo)
-            if (burnTxInfo?.isSuccess) return 1
+            console.log("Burn tx info:", burnTx)
+            if (burnTx?.isSuccess) return 1
             return 0
         } else {
             // if done, return 4
@@ -63,6 +75,7 @@ export function ProgressModal(props: ModalProps) {
             const res = await fetch(`/api/burns/hash/${ethTxHash}`)
             const burn = await res.json()
             console.log("Burn from DB:", burn)
+            setCurrentBurn(burn)
         } catch (error) {
             console.error(error)
         }

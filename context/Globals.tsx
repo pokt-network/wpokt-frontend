@@ -45,7 +45,7 @@ export interface GlobalContextProps {
     allPendingBurns: Burn[]
     setAllPendingBurns: (burns: Burn[]) => void
     burnFunc: any
-    burnTxInfo: any
+    burnTx: any
 }
 
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -81,7 +81,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
     allPendingBurns: [],
     setAllPendingBurns: () => {},
     burnFunc: () => {},
-    burnTxInfo: () => {}
+    burnTx: () => {}
 })
 
 export const useGlobalContext = () => useContext(GlobalContext)
@@ -184,7 +184,7 @@ export function GlobalContextProvider({ children }: any) {
     })
     const burnFunc = useContractWrite(config)
 
-    const burnTxInfo = useWaitForTransaction({
+    const burnTx = useWaitForTransaction({
         hash: burnFunc.data?.hash
     })
 
@@ -249,7 +249,7 @@ export function GlobalContextProvider({ children }: any) {
             allPendingBurns,
             setAllPendingBurns,
             burnFunc,
-            burnTxInfo
+            burnTx
         }}>
             {children}
         </GlobalContext.Provider>

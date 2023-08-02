@@ -5,12 +5,12 @@ import { getBurnFromHash } from '@/lib/burn';
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') return res.status(405).end();
 
-  const { hash } = req.query;
+  const { txhash } = req.query;
 
-  if (typeof hash !== 'string' || !hash) return res.status(400).end();
+  if (typeof txhash !== 'string' || !txhash) return res.status(400).end();
 
   try {
-    const burn = getBurnFromHash(hash);
+    const burn = await getBurnFromHash(txhash);
 
     if (!burn) return res.status(204).end();
 
