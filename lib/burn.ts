@@ -40,3 +40,25 @@ export const getAllBurns = async (): Promise<Burn[]> => {
     return [];
   }
 };
+
+export const getBurnFromHash = async (hash: string): Promise<Burn[]> => {
+  try {
+    const client = await dbPromise;
+
+    const burn = await client
+      .collection(CollectionBurns)
+      .find(
+        {
+          wpokt_address: WPOKT_ADDRESS,
+          transaction_hash: hash,
+        },
+        { sort: { created_at: -1 } },
+      )
+      .toArray();
+
+    return burn as Burn[];
+  } catch (error) {
+    console.error('Error finding burns:', error);
+    return [];
+  }
+};

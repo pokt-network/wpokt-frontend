@@ -19,10 +19,22 @@ import { goerli } from "wagmi/chains";
 export function Bridge() {
     const [poktAmountInput, setPoktAmountInput] = useState<string>("")
     const [wPoktAmountInput, setWPoktAmountInput] = useState<string>("")
-    const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
-    const [wPoktAmount, setWPoktAmount] = useState<bigint>(BigInt(0))
     const [estGasCost, setEstGasCost] = useState<string>("")
-    const { poktAddress, destination, setDestination, connectSendWallet, poktBalance, bridgePoktToEthereum, poktTxOngoing } = useGlobalContext()
+    const {
+        poktAddress,
+        destination,
+        setDestination,
+        connectSendWallet,
+        poktBalance,
+        bridgePoktToEthereum,
+        poktTxOngoing,
+        setEthTxHash,
+        poktAmount,
+        wPoktAmount,
+        setPoktAmount,
+        setWPoktAmount,
+        burnFunc
+    } = useGlobalContext()
 
     const { address } = useAccount()
     const { openConnectModal } = useConnectModal()
@@ -49,21 +61,26 @@ export function Bridge() {
     },[address, poktAddress, destination])
 
 
-    const { config } = usePrepareContractWrite({
-        address: WPOKT_ADDRESS,
-        abi: WRAPPED_POCKET_ABI,
-        functionName: 'burnAndBridge',
-        args: [wPoktAmount, poktAddress ? getAddress(`0x${poktAddress}`) : ''],
-    })
-    const burnFunc = useContractWrite(config)
+    // const { config } = usePrepareContractWrite({
+    //     address: WPOKT_ADDRESS,
+    //     abi: WRAPPED_POCKET_ABI,
+    //     functionName: 'burnAndBridge',
+    //     args: [wPoktAmount, poktAddress ? getAddress(`0x${poktAddress}`) : ''],
+    // })
+    // const burnFunc = useContractWrite(config)
     
     async function burn() {
-        console.log("Config:", config)
         console.log("Burn Func:", burnFunc)
         if (burnFunc.writeAsync) {
-            await burnFunc.writeAsync()
-            console.log("Burn Data:", burnFunc.data)
-            onProgressOpen()
+            try {
+                const tx = await burnFunc.writeAsync()
+                console.log("Burn Data:", burnFunc.data)
+                console.log("Burn Tx:", tx)
+                setEthTxHash(tx.hash)
+                onProgressOpen()
+            } catch (error) {
+                console.error(error)
+            }
         }
     }
 
@@ -95,7 +112,7 @@ export function Bridge() {
 
     return (
         <VStack minWidth="580px">
-            <Button bg="poktLime" onClick={() => setDestination(destination === "pokt" ? "eth" : "pokt")}>
+            <Button bg="poktLime" color="darkBlue" onClick={() => setDestination(destination === "pokt" ? "eth" : "pokt")}>
                 {destination === "eth" ? "POKT" : "wPOKT"} &rarr; {destination === "eth" ? "wPOKT" : "POKT"}
             </Button>
             {destination === "eth" ? (
@@ -168,7 +185,7 @@ export function Bridge() {
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
-                                <Text>{0.01} POKT + {estGasCost ?? '----'} ETH</Text>
+                                <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
                             </Box>
                             <Box>
                                 <Text>Estimated wPOKT Received:</Text>
@@ -186,6 +203,7 @@ export function Bridge() {
                     <Center>
                         <Button
                             bg="poktLime"
+                            color="darkBlue"
                             onClick={async () => {
                                 const recipient = address ?? ""
                                 await bridgePoktToEthereum(recipient, poktAmount)
@@ -266,7 +284,7 @@ export function Bridge() {
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
-                                <Text>{estGasCost ?? '----'} ETH</Text>
+                                <Text>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
                             </Box>
                             <Box>
                                 <Text>Estimated POKT Received:</Text>
@@ -284,6 +302,7 @@ export function Bridge() {
                     <Center>
                         <Button
                             bg="poktLime"
+                            color="darkBlue"
                             onClick={burn}
                             isDisabled={!poktAddress||!address||!wPoktAmount}
                         >

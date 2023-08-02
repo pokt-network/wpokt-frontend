@@ -1,7 +1,10 @@
 import { Burn, Mint } from "@/types";
+import { WRAPPED_POCKET_ABI } from "@/utils/abis";
+import { WPOKT_ADDRESS } from "@/utils/constants";
 import { isValidEthAddress } from "@/utils/misc";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { getAddress } from "viem";
+import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 
 export async function fetchMints(ethAddress: string): Promise<Mint[]> {
     const res =  await fetch(`/api/mints/all?recipient=${ethAddress}`)
@@ -41,6 +44,8 @@ export interface GlobalContextProps {
     setAllPendingMints: (mints: Mint[]) => void
     allPendingBurns: Burn[]
     setAllPendingBurns: (burns: Burn[]) => void
+    burnFunc: any
+    burnTxInfo: any
 }
 
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -75,6 +80,8 @@ export const GlobalContext = createContext<GlobalContextProps>({
     setAllPendingMints: () => {},
     allPendingBurns: [],
     setAllPendingBurns: () => {},
+    burnFunc: () => {},
+    burnTxInfo: () => {}
 })
 
 export const useGlobalContext = () => useContext(GlobalContext)
@@ -169,6 +176,18 @@ export function GlobalContextProvider({ children }: any) {
         }
     }
 
+    const { config } = usePrepareContractWrite({
+        address: WPOKT_ADDRESS,
+        abi: WRAPPED_POCKET_ABI,
+        functionName: 'burnAndBridge',
+        args: [wPoktAmount, poktAddress ? getAddress(`0x${poktAddress}`) : ''],
+    })
+    const burnFunc = useContractWrite(config)
+
+    const burnTxInfo = useWaitForTransaction({
+        hash: burnFunc.data?.hash
+    })
+
     async function bridgePoktToEthereum(ethAddress: string, amount: number | bigint) {
         setPoktTxOngoing(false)
         setPoktTxSuccess(false)
@@ -229,6 +248,8 @@ export function GlobalContextProvider({ children }: any) {
             setAllPendingMints,
             allPendingBurns,
             setAllPendingBurns,
+            burnFunc,
+            burnTxInfo
         }}>
             {children}
         </GlobalContext.Provider>
