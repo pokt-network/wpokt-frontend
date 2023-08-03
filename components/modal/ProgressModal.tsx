@@ -12,6 +12,7 @@ export function ProgressModal(props: ModalProps) {
     const {
         destination,
         ethTxHash,
+        setEthTxHash,
         poktTxHash,
         setPoktTxHash,
         poktTxOngoing,
@@ -19,6 +20,10 @@ export function ProgressModal(props: ModalProps) {
         poktTxError,
         burnFunc,
         burnTx,
+        currentMint,
+        setCurrentMint,
+        mintTx,
+        mintTxHash,
         currentBurn,
         setCurrentBurn
     } = useGlobalContext()
@@ -33,14 +38,19 @@ export function ProgressModal(props: ModalProps) {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    useEffect(() => { setStep(getCurrentStep()) }, [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status])
+    useEffect(() => { setStep(getCurrentStep()) }, [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, mintTx?.status, currentMint?.status])
     useEffect(() => { readyToMintWPokt() }, [step])
     useEffect(() => {
         if (step === 1 && destination === "pokt" && ethTxHash) getBurnInfo()
     }, [step, destination, ethTxHash])
 
     useTimeout(() => {
-        if (step >= 1 && destination === "pokt" && ethTxHash) getBurnInfo()
+        if (step >= 1 && destination === "pokt" && ethTxHash) {
+            getBurnInfo()
+        } else if (step >= 2 && destination !== "pokt" && mintTxHash) {
+            console.log("Getting mint info")
+            // getMintInfo()
+        }
     }, 15000)
 
     function getCurrentStep(): number {
@@ -59,6 +69,15 @@ export function ProgressModal(props: ModalProps) {
             // if done, return 4
             // if minting, return 3
             // if ready to mint, return 2
+            if (currentMint?.status === "success" || mintTx?.isSuccess) {
+                setEthTxHash(mintTxHash || "")
+                return 4
+            }
+            if (currentMint?.status === "pending" || mintTx?.isLoading) {
+                setEthTxHash(mintTxHash || "")
+                return 3
+            }
+            if (currentMint?.status === "signed") return 2
             if (poktTxSuccess) return 1
             return 0
         }
@@ -169,7 +188,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         {step > 2 && "Your wPOKT is in your destination wallet."}
                     </Text>
                 </Box>
-                <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://poktscan.com/tx/${poktTxHash}` : `https://etherscan.io/tx/${ethTxHash}`} isExternal>
+                <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://poktscan.com/tx/${poktTxHash}` : `https://goerli.etherscan.io/tx/${ethTxHash}`} isExternal>
                     {step === 0 && "View this transaction on PoktScan"}
                     {step === 1 && "View last transaction on PoktScan"}
                     {step === 2 && "View this transaction on Etherscan"}

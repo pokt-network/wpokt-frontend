@@ -126,6 +126,7 @@ export function Bridge() {
                 isOpen={isResumeMintOpen}
                 onClose={onResumeMintClose}
                 mintInfo={allPendingMints.length > 0 ? allPendingMints[0] : undefined}
+                openProgressModal={onProgressOpen}
             ><></>
             </ResumeWrapModal>
             {destination === "eth" ? (

@@ -9,10 +9,11 @@ import { useGlobalContext } from "@/context/Globals";
 
 export interface ResumeWrapModalProps extends ModalProps {
     mintInfo?: Mint
+    openProgressModal: () => void
 }
 
-export function ResumeWrapModal({ mintInfo, ...props }: ResumeWrapModalProps) {
-    const { setMintTxHash } = useGlobalContext()
+export function ResumeWrapModal({ mintInfo, openProgressModal, ...props }: ResumeWrapModalProps) {
+    const { setMintTxHash, setCurrentMint } = useGlobalContext()
     const { config } = usePrepareContractWrite({
         address: MINT_CONTROLLER_ADDRESS,
         abi: MINT_CONTROLLER_ABI,
@@ -26,6 +27,9 @@ export function ResumeWrapModal({ mintInfo, ...props }: ResumeWrapModalProps) {
             if (!mintFunc.writeAsync) throw new Error("No writeAsync function")
             const tx = await mintFunc.writeAsync()
             setMintTxHash(tx.hash)
+            setCurrentMint(mintInfo)
+            openProgressModal()
+            props.onClose()
         } catch (error) {
             console.error(error)
         }
