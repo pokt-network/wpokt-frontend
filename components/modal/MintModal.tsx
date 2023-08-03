@@ -12,6 +12,7 @@ export interface MintModalProps extends ModalProps {
 }
 
 export function MintModal(props: MintModalProps) {
+    const { setMintTxHash } = useGlobalContext()
     const { address } = useAccount()
     const { data: ethBalance } = useBalance({ address })
     const { config } = usePrepareContractWrite({
@@ -21,6 +22,17 @@ export function MintModal(props: MintModalProps) {
         args: [props.mintInfo?.data, props.mintInfo?.signatures]
     })
     const mintFunc = useContractWrite(config)
+
+    async function mintWPokt() {
+        try {
+            if (!mintFunc.writeAsync) throw new Error("No writeAsync function")
+            const tx = await mintFunc.writeAsync()
+            setMintTxHash(tx.hash)
+            props.onClose()
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     return (
         <Modal {...props} size="md" isCentered>
@@ -56,8 +68,9 @@ export function MintModal(props: MintModalProps) {
                         </Text>
                         <Button
                             bg="poktLime"
+                            color="darkBlue"
                             mt={3}
-                            onClick={mintFunc.write}
+                            onClick={mintWPokt}
                         >
                             Mint wPOKT
                         </Button>

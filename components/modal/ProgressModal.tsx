@@ -1,7 +1,7 @@
-import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider, useDisclosure, useTimeout } from "@chakra-ui/react";
+import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider, useDisclosure, useTimeout, SkeletonCircle, Circle } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { BlueEthIcon } from "../icons/eth";
-import { BlueCopperIcon } from "../icons/copper";
+import { BlueBridgeIcon } from "../icons/copper";
 import { BluePoktIcon } from "../icons/pokt";
 import { BlueCheckIcon } from "../icons/misc";
 import { useGlobalContext } from "@/context/Globals";
@@ -112,17 +112,37 @@ export function ProgressModal(props: ModalProps) {
                     </Text>
                     <Flex justify="center">
                         <Flex direction="column" align="center">
-                            {step > 0 ? <BlueCheckIcon/> : <>{destination === "pokt" ? <BlueEthIcon /> : <BluePoktIcon />}</>}
+                            {step > 0 ? <BlueCheckIcon/> : 
+                                <Circle>
+                                    <SkeletonCircle position="fixed" size="20" />
+                                    {destination === "pokt" ? <BlueEthIcon zIndex={2} /> : <BluePoktIcon zIndex={2} />}
+                                </Circle>
+                            }
                             {step === 0 && <Divider borderColor="poktLime" orientation="vertical" height="50px" />}
                         </Flex>
                         <Divider borderColor="poktLime" height="25px" maxWidth="50px" />
                         <Flex direction="column" align="center">
-                            {step > 1 ? <BlueCheckIcon/> : <BlueCopperIcon />}
+                            {step > 1 ? <BlueCheckIcon/> : step === 1 ? (
+                                <Circle>
+                                    <SkeletonCircle position="fixed" size="20" />
+                                    <BlueBridgeIcon zIndex={2} />
+                                </Circle>
+                            ) : <BlueBridgeIcon/>}
                             {step === 1 && <Divider borderColor="poktLime" orientation="vertical" height="50px" />}
                         </Flex>
                         <Divider borderColor="poktLime" height="25px" maxWidth="50px" />
                         <Flex direction="column" align="center">
-                            {step > 2 ? <BlueCheckIcon/> : <>{destination === "pokt" ? <BluePoktIcon /> : <BlueEthIcon />}</>}
+                            {destination === "pokt" ? step > 2 ? <BlueCheckIcon/> : <>{step === 2 ? (
+                                <Circle>
+                                    <SkeletonCircle position="fixed" size="20" />
+                                    <BluePoktIcon zIndex={2} />
+                                </Circle>
+                            ) : <BluePoktIcon />}</> : step > 3 ? <BlueCheckIcon/> : <>{step >= 2 ? (
+                                <Circle>
+                                    <SkeletonCircle position="fixed" size="20" />
+                                    <BlueEthIcon zIndex={2} />
+                                </Circle>
+                            ): <BlueEthIcon />}</>}
                             {step >= 2 && <Divider borderColor="poktLime" orientation="vertical" height="50px" />}
                         </Flex>
                     </Flex>
@@ -184,8 +204,8 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                     <Text>
                         {step === 0 && "This may take several blocks to confirm. Pocket blocks complete every 15 minutes."}
                         {step === 1 && "We are reviewing and approving your order. This process should take about 5-10 minutes."}
-                        {step === 2 && "Your wPOKT is on the way! It may take up to 32 blocks to arrive, which is about 6 minutes."}
-                        {step > 2 && "Your wPOKT is in your destination wallet."}
+                        {(step === 2 || step === 3) && "Your wPOKT is on the way! It may take up to 32 blocks to arrive, which is about 6 minutes."}
+                        {step > 3 && "Your wPOKT is in your destination wallet."}
                     </Text>
                 </Box>
                 <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://poktscan.com/tx/${poktTxHash}` : `https://goerli.etherscan.io/tx/${ethTxHash}`} isExternal>
