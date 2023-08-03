@@ -91,6 +91,7 @@ export function ProgressModal(props: ModalProps) {
 
     async function getBurnInfo() {
         try {
+            if (currentBurn?.status === "success") return
             const res = await fetch(`/api/burns/hash/${ethTxHash}`)
             const burn = await res.json()
             console.log("Burn from DB:", burn)
