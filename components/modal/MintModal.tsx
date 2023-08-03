@@ -8,7 +8,7 @@ import { MINT_CONTROLLER_ABI } from "@/utils/abis";
 import { Mint } from "@/types";
 
 export interface MintModalProps extends ModalProps {
-    mintInfo: Mint
+    mintInfo?: Mint
 }
 
 export function MintModal(props: MintModalProps) {
@@ -18,7 +18,7 @@ export function MintModal(props: MintModalProps) {
         address: MINT_CONTROLLER_ADDRESS,
         abi: MINT_CONTROLLER_ABI,
         functionName: 'mintwrappedPocket',
-        args: [props.mintInfo.data, props.mintInfo.signatures]
+        args: [props.mintInfo?.data, props.mintInfo?.signatures]
     })
     const mintFunc = useContractWrite(config)
 

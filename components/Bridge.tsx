@@ -2,7 +2,6 @@ import { Box, Button, Center, Container, Flex, HStack, Input, Link, Text, VStack
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
 import { useEffect, useState } from "react";
-import { CustomAddressModal } from "./modal/CustomAddressModal";
 import { ProgressModal } from "./modal/ProgressModal";
 import { CloseIcon, InfoIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";

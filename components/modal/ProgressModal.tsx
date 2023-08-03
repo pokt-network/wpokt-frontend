@@ -128,7 +128,7 @@ export function ProgressModal(props: ModalProps) {
                     </Flex>
                     <ProgressModalStatusDescription step={step} destination={destination} poktTxHash={poktTxHash} ethTxHash={ethTxHash} />
                     {(step === 2 && destination !== "pokt") && (
-                        <MintModal isOpen={isOpen} onClose={onClose}><></></MintModal>
+                        <MintModal isOpen={isOpen} onClose={onClose} mintInfo={currentMint}><></></MintModal>
                     )}
                 </ModalBody>
             </ModalContent>

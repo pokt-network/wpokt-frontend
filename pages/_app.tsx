@@ -7,6 +7,7 @@ import { WagmiConfig, createConfig, configureChains } from 'wagmi'
 import { goerli, mainnet } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public'
 import { RainbowKitProvider, getDefaultWallets, darkTheme } from '@rainbow-me/rainbowkit'
+import React from 'react';
  
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [goerli],
@@ -43,7 +44,8 @@ export default function App({ Component, pageProps }: AppProps) {
           borderRadius: 'small'
         })}>
           <ChakraProvider theme={theme}>
-            <Component {...pageProps} />
+            {/* <Component {...pageProps} /> */}
+            {React.createElement(Component, pageProps)}
           </ChakraProvider>
         </RainbowKitProvider>
       </WagmiConfig>

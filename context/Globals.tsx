@@ -6,6 +6,12 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { getAddress } from "viem";
 import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 
+declare global {
+    interface Window {
+        pocketNetwork: any;
+    }
+}
+
 export async function fetchMints(ethAddress: string): Promise<Mint[]> {
     const res =  await fetch(`/api/mints/all?recipient=${ethAddress}`)
     const mints = await res.json()
@@ -173,7 +179,7 @@ export function GlobalContextProvider({ children }: any) {
             // Get uPokt Balance
             let balance = await window.pocketNetwork
                 .send("pokt_balance", [{ address: poktAddress }])
-                .then(({ balance }) => {
+                .then(({ balance }: any) => {
                     console.log("POKT Balance:", {
                         balanceInUpokt: balance,
                         balanceInPokt: balance / 1e6,
