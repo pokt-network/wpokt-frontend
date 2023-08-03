@@ -1,14 +1,35 @@
 import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Button, Box } from "@chakra-ui/react";
 import { BluePoktIcon } from "../icons/pokt";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { MINT_CONTROLLER_ADDRESS } from "@/utils/constants";
+import { MINT_CONTROLLER_ABI } from "@/utils/abis";
+import { Mint } from "@/types";
+import { formatUnits, parseUnits } from "viem";
+import { useGlobalContext } from "@/context/Globals";
 
 export interface ResumeWrapModalProps extends ModalProps {
-    timestamp: string
-    amount: string
+    mintInfo?: Mint
 }
 
-export function ResumeWrapModal({ timestamp, amount, ...props }: ResumeWrapModalProps) {
-    const { address } = useAccount()
+export function ResumeWrapModal({ mintInfo, ...props }: ResumeWrapModalProps) {
+    const { setMintTxHash } = useGlobalContext()
+    const { config } = usePrepareContractWrite({
+        address: MINT_CONTROLLER_ADDRESS,
+        abi: MINT_CONTROLLER_ABI,
+        functionName: 'mintWrappedPocket',
+        args: [mintInfo?.data, mintInfo?.signatures]
+    })
+    const mintFunc = useContractWrite(config)
+
+    async function mintWPokt() {
+        try {
+            if (!mintFunc.writeAsync) throw new Error("No writeAsync function")
+            const tx = await mintFunc.writeAsync()
+            setMintTxHash(tx.hash)
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     return (
         <Modal {...props} size="md" isCentered>
@@ -33,16 +54,19 @@ export function ResumeWrapModal({ timestamp, amount, ...props }: ResumeWrapModal
                         </Text>
                         <Box>
                             <Text>
-                                On {timestamp}, you began a bridge to:
+                                On {mintInfo?.created_at.toLocaleString()}, you began a bridge to:
                             </Text>
-                            <Text textAlign='center'>{address}</Text>
+                            <Text textAlign='center'>{mintInfo?.recipient_address}</Text>
                             <Text>
-                                for {amount} POKT. You still need to complete the bridge by minting your wPOKT.
+                                for {formatUnits(BigInt(mintInfo?.amount||0), 6)} POKT. You still need to complete the bridge by minting your wPOKT.
                             </Text>
                         </Box>
                         <Button
                             bg="poktLime"
+                            color="darkBlue"
                             mt={3}
+                            onClick={mintWPokt}
+                            isLoading={mintFunc.isLoading}
                         >
                             Complete Bridge
                         </Button>

@@ -14,6 +14,7 @@ import { MINT_CONTROLLER_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
 import { MINT_CONTROLLER_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { createPublicClient, formatEther, getAddress, http, parseUnits } from "viem";
 import { goerli } from "wagmi/chains";
+import { ResumeWrapModal } from "./modal/ResumeWrapModal";
 
 
 export function Bridge() {
@@ -33,7 +34,8 @@ export function Bridge() {
         wPoktAmount,
         setPoktAmount,
         setWPoktAmount,
-        burnFunc
+        burnFunc,
+        allPendingMints
     } = useGlobalContext()
 
     const { address } = useAccount()
@@ -46,6 +48,7 @@ export function Bridge() {
 
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
     const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
+    const { isOpen: isResumeMintOpen, onOpen: onResumeMintOpen, onClose: onResumeMintClose } = useDisclosure()
 
 
     useEffect(() => {
@@ -59,6 +62,10 @@ export function Bridge() {
             getGasCost(destination)
         }
     },[address, poktAddress, destination])
+
+    useEffect(() => {
+        if (allPendingMints.length > 0) onResumeMintOpen()
+    }, [allPendingMints])
 
 
     // const { config } = usePrepareContractWrite({
@@ -115,6 +122,12 @@ export function Bridge() {
             <Button bg="poktLime" color="darkBlue" onClick={() => setDestination(destination === "pokt" ? "eth" : "pokt")}>
                 {destination === "eth" ? "POKT" : "wPOKT"} &rarr; {destination === "eth" ? "wPOKT" : "POKT"}
             </Button>
+            <ResumeWrapModal
+                isOpen={isResumeMintOpen}
+                onClose={onResumeMintClose}
+                mintInfo={allPendingMints.length > 0 ? allPendingMints[0] : undefined}
+            ><></>
+            </ResumeWrapModal>
             {destination === "eth" ? (
                 <Container bg="darkOverlay" paddingY={4}>
                     <Center>

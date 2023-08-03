@@ -46,6 +46,9 @@ export interface GlobalContextProps {
     setAllPendingBurns: (burns: Burn[]) => void
     burnFunc: any
     burnTx: any
+    mintTx: any
+    mintTxHash: `0x${string}`|undefined
+    setMintTxHash: (hash: `0x${string}`|undefined) => void
 }
 
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -81,7 +84,10 @@ export const GlobalContext = createContext<GlobalContextProps>({
     allPendingBurns: [],
     setAllPendingBurns: () => {},
     burnFunc: () => {},
-    burnTx: () => {}
+    burnTx: () => {},
+    mintTx: () => {},
+    mintTxHash: undefined,
+    setMintTxHash: () => {}
 })
 
 export const useGlobalContext = () => useContext(GlobalContext)
@@ -103,7 +109,11 @@ export function GlobalContextProvider({ children }: any) {
     const [currentBurn, setCurrentBurn] = useState<Burn|undefined>(undefined)
     const [allPendingMints, setAllPendingMints] = useState<Mint[]>([])
     const [allPendingBurns, setAllPendingBurns] = useState<Burn[]>([])
+    
+    const [mintTxHash, setMintTxHash] = useState<`0x${string}`|undefined>(undefined)
 
+    
+    const {address} = useAccount()
     
     useEffect(() => {
         toggleMobile();
@@ -112,23 +122,25 @@ export function GlobalContextProvider({ children }: any) {
     
     useEffect(() => { getPoktBalance() }, [poktAddress])
     
-    const {address} = useAccount()
-
-    async function getMints(address: string) {
-        console.log(address)
-        const mints = await fetchMints(address)
-        if (mints && mints.length > 0) {
-            setAllPendingMints(mints)
-        }
-        console.log("mints", mints)
-    }
-
     useEffect(() => {
         if (address) {
             getMints(address)
         }
     }, [address])
-
+    
+    async function getMints(address: string) {
+        try {
+            const mints = await fetchMints(address)
+            if (mints && mints.length > 0) {
+                const pending = mints.filter(mint => mint.status === "signed")
+                setAllPendingMints(pending)
+                console.log("pending", pending)
+            }
+        } catch (error) {
+            console.error("Error fetching mints:", error)
+        }
+    }
+    
     function toggleMobile() {
         if (window && window.innerWidth < 700) {
             setMobile(true);
@@ -186,6 +198,10 @@ export function GlobalContextProvider({ children }: any) {
 
     const burnTx = useWaitForTransaction({
         hash: burnFunc.data?.hash
+    })
+
+    const mintTx = useWaitForTransaction({
+        hash: mintTxHash
     })
 
     async function bridgePoktToEthereum(ethAddress: string, amount: number | bigint) {
@@ -249,7 +265,10 @@ export function GlobalContextProvider({ children }: any) {
             allPendingBurns,
             setAllPendingBurns,
             burnFunc,
-            burnTx
+            burnTx,
+            mintTx,
+            mintTxHash,
+            setMintTxHash
         }}>
             {children}
         </GlobalContext.Provider>
