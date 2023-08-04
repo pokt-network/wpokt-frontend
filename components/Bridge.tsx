@@ -1,4 +1,4 @@
-import { Box, Button, Center, Container, Divider, Flex, HStack, Input, Link, Text, VStack, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Center, Container, Divider, Flex, HStack, Input, Link, Text, VStack, useDisclosure, useToast } from "@chakra-ui/react";
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
 import { useEffect, useState } from "react";
@@ -56,6 +56,7 @@ export function Bridge() {
     const { isOpen: isGasInfoOpen, onOpen: onGasInfoOpen, onClose: onGasInfoClose } = useDisclosure()
     const { isOpen: isResumeMintOpen, onOpen: onResumeMintOpen, onClose: onResumeMintClose } = useDisclosure()
 
+    const toast = useToast()
 
     useEffect(() => {
         if (poktTxOngoing) {
@@ -90,7 +91,9 @@ export function Bridge() {
     
 
     async function burn() {
-        console.log("Burn Func:", burnFunc)
+        if (wPoktBalanceData && wPoktAmount > wPoktBalanceData?.value) {
+            return displayInsufficientTokenBalanceToast()
+        }
         if (burnFunc.writeAsync) {
             try {
                 const tx = await burnFunc.writeAsync()
@@ -135,6 +138,36 @@ export function Bridge() {
         setEstGasCost(gas > BigInt(0) ? formatEther(gas * (feeData?.maxFeePerGas ?? BigInt(0))) : "")
     }
 
+    function displayInsufficientGasToast() {
+        const toastId = 'insufficient-gas'
+        if (!toast.isActive(toastId)) toast({
+            id: toastId,
+            position: "top-right",
+            duration: 5000,
+            render: () => (
+                <HStack mt={'140px'} spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
+                    <ErrorIcon />
+                    <Text color="error">You may not have enough gas in your wallet.</Text>
+                </HStack>
+            )
+        })
+    }
+
+    function displayInsufficientTokenBalanceToast() {
+        const toastId = 'insufficient-balance'
+        if (!toast.isActive(toastId)) toast({
+            id: toastId,
+            position: "top-right",
+            duration: 5000,
+            render: () => (
+                <HStack mt={'140px'} spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
+                    <ErrorIcon />
+                    <Text color="error">Insufficient token balance.</Text>
+                </HStack>
+            )
+        })
+    }
+
     return (
         <VStack minWidth="580px">
             <Button
@@ -166,6 +199,8 @@ export function Bridge() {
                                     <Input
                                         type="number"
                                         borderRadius={0}
+                                        borderColor={poktAmount + parsePokt(0.01) > poktBalance && poktAmount !== BigInt(0) ? "error" : 'none'}
+                                        _focus={{ borderColor: poktAmount + parsePokt(0.01) > poktBalance && poktAmount !== BigInt(0) ? "error" : 'none' }}
                                         placeholder="Enter POKT amount"
                                         value={poktAmountInput}
                                         onChange={(e) => {
@@ -231,7 +266,7 @@ export function Bridge() {
                                 <Flex align="center" gap={2}>
                                     <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
                                     <InfoIcon _hover={{ cursor: "pointer" }} onClick={onGasInfoOpen} />
-                                    {(insufficientEthGas||insufficientPoktGas) && <ErrorIcon />}
+                                    {(insufficientEthGas||insufficientPoktGas) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
                             </Box>
                             <Box>
@@ -253,6 +288,7 @@ export function Bridge() {
                             color="darkBlue"
                             _hover={{ bg: "hover.poktLime" }}
                             onClick={async () => {
+                                if (poktAmount + parsePokt(0.01) > poktBalance) return displayInsufficientTokenBalanceToast()
                                 const recipient = address ?? ""
                                 await bridgePoktToEthereum(recipient, poktAmount)
                                 // onProgressOpen()
@@ -278,6 +314,8 @@ export function Bridge() {
                                     <Input
                                         type="number"
                                         borderRadius={0}
+                                        borderColor={wPoktBalanceData && wPoktAmount > wPoktBalanceData?.value && wPoktAmount !== BigInt(0) ? "error" : 'none'}
+                                        _focus={{ borderColor: wPoktBalanceData && wPoktAmount > wPoktBalanceData?.value && wPoktAmount !== BigInt(0) ? "error" : 'none' }}
                                         placeholder="Enter wPOKT amount"
                                         value={wPoktAmountInput}
                                         onChange={(e) => {
@@ -340,7 +378,7 @@ export function Bridge() {
                                 <Text>Estimated Gas Cost:</Text>
                                 <Flex align="center" gap={2}>
                                     <Text>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
-                                    {insufficientEthGas && <ErrorIcon />}
+                                    {insufficientEthGas && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
                             </Box>
                             <Box>
