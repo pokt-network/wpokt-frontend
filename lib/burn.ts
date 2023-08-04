@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
 import { dbPromise } from '@/lib/mongodb';
-import { Burn, CollectionBurns } from '@/types';
+import { Burn, CollectionBurns, Status } from '@/types';
 import { WPOKT_ADDRESS } from '@/utils/constants';
 
 export const getBurnFromId = async (id: string): Promise<Burn | null> => {
@@ -29,6 +29,28 @@ export const getAllBurns = async (): Promise<Burn[]> => {
       .find(
         {
           wpokt_address: WPOKT_ADDRESS,
+        },
+        { sort: { created_at: -1 } },
+      )
+      .toArray();
+
+    return burns as Burn[];
+  } catch (error) {
+    console.error('Error finding burns:', error);
+    return [];
+  }
+};
+
+export const getAllBurnsFromSender = async (ethAddress: string): Promise<Burn[]> => {
+  try {
+    const client = await dbPromise;
+
+    const burns = await client
+      .collection(CollectionBurns)
+      .find(
+        {
+          wpokt_address: WPOKT_ADDRESS,
+          sender_address: ethAddress,
         },
         { sort: { created_at: -1 } },
       )

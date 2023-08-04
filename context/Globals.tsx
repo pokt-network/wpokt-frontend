@@ -1,7 +1,9 @@
+import { InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { WPOKT_ADDRESS } from "@/utils/constants";
 import { isValidEthAddress } from "@/utils/misc";
+import { HStack, Text, useToast } from "@chakra-ui/react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAddress } from "viem";
 import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
@@ -12,10 +14,16 @@ declare global {
     }
 }
 
-export async function fetchMints(ethAddress: string): Promise<Mint[]> {
-    const res =  await fetch(`/api/mints/all?recipient=${ethAddress}`)
+export async function fetchActiveMints(ethAddress: string): Promise<Mint[]> {
+    const res =  await fetch(`/api/mints/active?recipient=${ethAddress}`)
     const mints = await res.json()
     return mints as Mint[]
+}
+
+export async function fetchActiveBurns(ethAddress: string): Promise<Burn[]> {
+    const res =  await fetch(`/api/burns/active?sender=${ethAddress}`)
+    const burns = await res.json()
+    return burns as Burn[]
 }
 
 export interface GlobalContextProps {
@@ -119,6 +127,8 @@ export function GlobalContextProvider({ children }: any) {
     const [mintTxHash, setMintTxHash] = useState<`0x${string}`|undefined>(undefined)
     
     const {address} = useAccount()
+
+    const toast = useToast()
     
     useEffect(() => {
         toggleMobile();
@@ -129,17 +139,56 @@ export function GlobalContextProvider({ children }: any) {
     
     useEffect(() => {
         if (address) {
-            getMints(address)
+            getActiveBridgeRequests(address)
         }
     }, [address])
-    
-    async function getMints(address: string) {
+
+    async function getActiveBridgeRequests(address: string) {
+        await getActiveBurns(address)
+        await getActiveMints(address)
+    }
+
+    async function getActiveBurns(address: string) {
         try {
-            const mints = await fetchMints(address)
+            const burns = await fetchActiveBurns(address)
+            console.log("Active burns:", burns)
+            if (burns && burns.length > 0) {
+                const toastId = 'burn-in-progress'
+                if (!toast.isActive(toastId)) toast({
+                    id: toastId,
+                    position: "top-right",
+                    duration: 10000,
+                    render: () => (
+                        <HStack mt={'140px'} spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="poktLime" borderBottomWidth={1}>
+                            <InfoIcon fill="poktLime" />
+                            <Text>You have {burns.length} unwrap request{burns.length > 1 ? 's' : ''} in progress</Text>
+                        </HStack>
+                    )
+                })
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+    
+    async function getActiveMints(address: string) {
+        try {
+            const mints = await fetchActiveMints(address)
             if (mints && mints.length > 0) {
                 const pending = mints.filter(mint => mint.status === "signed")
                 setAllPendingMints(pending)
-                console.log("pending", pending)
+                const toastId = 'mint-in-progress'
+                if (!toast.isActive(toastId)) toast({
+                    id: toastId,
+                    position: "top-right",
+                    duration: 10000,
+                    render: () => (
+                        <HStack mt={'140px'} spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="poktLime" borderBottomWidth={1}>
+                            <InfoIcon fill="poktLime" />
+                            <Text>You have {mints.length} wrap request{mints.length > 1 ? 's' : ''} in progress</Text>
+                        </HStack>
+                    )
+                })
             }
         } catch (error) {
             console.error("Error fetching mints:", error)

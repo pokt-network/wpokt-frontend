@@ -19,20 +19,20 @@ export function TimeInfoModal(props: ModalProps) {
                         gap={4}
                         mb={10}
                     >
-                        <Box textAlign="center">
-                            <Text color="poktBlue" fontSize={16}>Pocket blocks complete every 15 minutes.</Text>
+                        <Box>
+                            <Text color="poktBlue" fontSize={16} textAlign="center">Pocket blocks complete every 15 minutes.</Text>
                             <Text>
                                 Depending on when you sign a bridge transaction, it may take up to 15 minutes to appear on-chain.
                             </Text>
                         </Box>
-                        <Box textAlign="center">
-                            <Text color="poktBlue" fontSize={16}>The bridge verifies your request between chains.</Text>
+                        <Box>
+                            <Text color="poktBlue" fontSize={16} textAlign="center">The bridge verifies your request between chains.</Text>
                             <Text>
                                 It takes a few minutes to reach consensus and start a transaction on-chain.
                             </Text>
                         </Box>
-                        <Box textAlign="center">
-                            <Text color="poktBlue" fontSize={16}>Ethereum blocks complete every 12 seconds.</Text>
+                        <Box>
+                            <Text color="poktBlue" fontSize={16} textAlign="center">Ethereum blocks complete every 12 seconds.</Text>
                             <Text>
                                 For large sums of money, it is common to wait for up to 32 blocks to resolve before proceeding with a transaction.
                             </Text>

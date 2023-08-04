@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
 import { dbPromise } from '@/lib/mongodb';
-import { CollectionMints, Mint } from '@/types';
+import { CollectionMints, Mint, Status } from '@/types';
 import {
   POKT_MULTISIG_ADDRESS,
   WPOKT_ADDRESS,
