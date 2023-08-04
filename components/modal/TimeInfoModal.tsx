@@ -26,7 +26,7 @@ export function TimeInfoModal(props: ModalProps) {
                             </Text>
                         </Box>
                         <Box textAlign="center">
-                            <Text color="poktBlue" fontSize={16}>Copper verifies your bridge between chains.</Text>
+                            <Text color="poktBlue" fontSize={16}>The bridge verifies your request between chains.</Text>
                             <Text>
                                 It takes a few minutes to reach consensus and start a transaction on-chain.
                             </Text>

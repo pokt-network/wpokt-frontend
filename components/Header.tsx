@@ -71,6 +71,7 @@ export function Header() {
                                         borderColor="poktLime"
                                         leftIcon={<EthIcon />}
                                         onClick={openConnectModal}
+                                        _hover={{ bg: "hover.poktLime" }}
                                     >
                                         Connect
                                     </Button>
@@ -103,6 +104,7 @@ export function Header() {
                                         borderColor="poktLime"
                                         leftIcon={<PoktIcon />}
                                         onClick={connectSendWallet}
+                                        _hover={{ bg: "hover.poktLime" }}
                                     >
                                         Connect
                                     </Button>
@@ -121,6 +123,7 @@ export function Header() {
                             leftIcon={<EthIcon fill="poktBlue" width="28px" height="28px" />}
                             borderWidth={2}
                             borderColor="darkOverlay"
+                            _hover={{ bg: "hover.darkBlue" }}
                             padding={4}
                             paddingY={6}
                             onClick={() => disconnect()}
@@ -133,6 +136,7 @@ export function Header() {
                             background="poktLime"
                             borderWidth={2}
                             borderColor="poktLime"
+                            _hover={{ bg: "hover.poktLime" }}
                             leftIcon={<EthIcon />}
                             padding={4}
                             paddingY={6}
@@ -148,6 +152,7 @@ export function Header() {
                             leftIcon={<PoktIcon fill="poktBlue" width="28px" height="28px" />}
                             borderWidth={2}
                             borderColor="darkOverlay"
+                            _hover={{ bg: "hover.darkBlue" }}
                             padding={4}
                             paddingY={6}
                             onClick={() => setPoktAddress("")}
@@ -160,6 +165,7 @@ export function Header() {
                             background="poktLime"
                             borderWidth={2}
                             borderColor="poktLime"
+                            _hover={{ bg: "hover.poktLime" }}
                             leftIcon={<PoktIcon />}
                             padding={4}
                             paddingY={6}

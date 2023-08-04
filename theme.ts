@@ -7,7 +7,12 @@ export const colors = {
     darkBlue: "rgba(24, 33, 41, 1)",
     darkOverlay: "rgba(255, 255, 255, 0.05)",
     warning: "rgba(247, 216, 88, 1)",
-    error: "rgba(249, 50, 50, 1)"
+    error: "rgba(249, 50, 50, 1)",
+    hover: {
+        poktBlue: "rgba(29, 138, 237, 0.5)",
+        poktLime: "rgba(185, 240, 0, 0.5)",
+        darkBlue: "rgba(24, 33, 41, 0.5)",
+    }
 }
 
 export const theme = extendTheme({

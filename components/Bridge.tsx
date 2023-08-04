@@ -14,6 +14,7 @@ import { MINT_CONTROLLER_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { createPublicClient, formatEther, getAddress, http, parseUnits } from "viem";
 import { goerli } from "wagmi/chains";
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
+import { GasInfoModal } from "./modal/GasInfoModal";
 
 
 export function Bridge() {
@@ -46,7 +47,8 @@ export function Bridge() {
     const { data: feeData } = useFeeData({ chainId: goerli.id })
 
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
-    const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
+    const { isOpen: isTimeInfoOpen, onOpen: onTimeInfoOpen, onClose: onTimeInfoClose } = useDisclosure()
+    const { isOpen: isGasInfoOpen, onOpen: onGasInfoOpen, onClose: onGasInfoClose } = useDisclosure()
     const { isOpen: isResumeMintOpen, onOpen: onResumeMintOpen, onClose: onResumeMintClose } = useDisclosure()
 
 
@@ -118,7 +120,12 @@ export function Bridge() {
 
     return (
         <VStack minWidth="580px">
-            <Button bg="poktLime" color="darkBlue" onClick={() => setDestination(destination === "pokt" ? "eth" : "pokt")}>
+            <Button
+                bg="poktLime"
+                color="darkBlue"
+                _hover={{ bg: "hover.poktLime" }}
+                onClick={() => setDestination(destination === "pokt" ? "eth" : "pokt")}
+            >
                 {destination === "eth" ? "POKT" : "wPOKT"} &rarr; {destination === "eth" ? "wPOKT" : "POKT"}
             </Button>
             <ResumeWrapModal
@@ -158,6 +165,7 @@ export function Bridge() {
                                         borderColor="poktLime"
                                         bg="transparent"
                                         color="white"
+                                        _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                         leftIcon={<PoktIcon fill={"white"}/>}
                                         onClick={connectSendWallet}
                                     >
@@ -186,6 +194,7 @@ export function Bridge() {
                                     borderColor="poktLime"
                                     bg="transparent"
                                     color="white"
+                                    _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                     leftIcon={<EthIcon fill={"white"}/>}
                                     onClick={openConnectModal}
                                 >
@@ -198,7 +207,10 @@ export function Bridge() {
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
-                                <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
+                                <Flex align="center" gap={2}>
+                                    <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
+                                    <InfoIcon _hover={{ cursor: "pointer" }} onClick={onGasInfoOpen} />
+                                </Flex>
                             </Box>
                             <Box>
                                 <Text>Estimated wPOKT Received:</Text>
@@ -208,7 +220,7 @@ export function Bridge() {
                                 <Text>Estimated time for bridge:</Text>
                                 <Flex align="center" gap={2}>
                                     <Text>~30 Minutes</Text>
-                                    <InfoIcon _hover={{ cursor: "pointer" }} onClick={onInfoOpen} />
+                                    <InfoIcon _hover={{ cursor: "pointer" }} onClick={onTimeInfoOpen} />
                                 </Flex>
                             </Box>
                         </VStack>
@@ -217,6 +229,7 @@ export function Bridge() {
                         <Button
                             bg="poktLime"
                             color="darkBlue"
+                            _hover={{ bg: "hover.poktLime" }}
                             onClick={async () => {
                                 const recipient = address ?? ""
                                 await bridgePoktToEthereum(recipient, poktAmount)
@@ -259,6 +272,7 @@ export function Bridge() {
                                         borderColor="poktLime"
                                         bg="transparent"
                                         color="white"
+                                        _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                         leftIcon={<EthIcon fill={"white"}/>}
                                         onClick={openConnectModal}
                                     >
@@ -286,6 +300,7 @@ export function Bridge() {
                                 borderColor="poktLime"
                                 bg="transparent"
                                 color="white"
+                                _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                 leftIcon={<PoktIcon fill={"white"}/>}
                                 onClick={connectSendWallet}
                             >
@@ -307,7 +322,7 @@ export function Bridge() {
                                 <Text>Estimated time for bridge:</Text>
                                 <Flex align="center" gap={2}>
                                     <Text>~30 Minutes</Text>
-                                    <InfoIcon _hover={{ cursor: "pointer" }} onClick={onInfoOpen} />
+                                    <InfoIcon _hover={{ cursor: "pointer" }} onClick={onTimeInfoOpen} />
                                 </Flex>
                             </Box>
                         </VStack>
@@ -316,6 +331,7 @@ export function Bridge() {
                         <Button
                             bg="poktLime"
                             color="darkBlue"
+                            _hover={{ bg: "hover.poktLime" }}
                             onClick={burn}
                             isDisabled={!poktAddress||!address||!wPoktAmount}
                         >
@@ -325,7 +341,8 @@ export function Bridge() {
                     <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose}><></></ProgressModal>
                 </Container>
             )}
-            <TimeInfoModal isOpen={isInfoOpen} onClose={onInfoClose}><></></TimeInfoModal>
+            <GasInfoModal isOpen={isGasInfoOpen} onClose={onGasInfoClose}><></></GasInfoModal>
+            <TimeInfoModal isOpen={isTimeInfoOpen} onClose={onTimeInfoClose}><></></TimeInfoModal>
         </VStack>
     )
 }
