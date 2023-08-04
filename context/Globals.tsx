@@ -4,7 +4,7 @@ import { WPOKT_ADDRESS } from "@/utils/constants";
 import { isValidEthAddress } from "@/utils/misc";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAddress } from "viem";
-import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 
 declare global {
     interface Window {
@@ -21,8 +21,8 @@ export async function fetchMints(ethAddress: string): Promise<Mint[]> {
 export interface GlobalContextProps {
     mobile: boolean
     setMobile: (mobile: boolean) => void
-    poktBalance: number
-    setPoktBalance: (balance: number) => void
+    poktBalance: bigint
+    setPoktBalance: (balance: bigint) => void
     poktAddress: string
     setPoktAddress: (address: string) => void
     connectSendWallet: () => void
@@ -60,7 +60,7 @@ export interface GlobalContextProps {
 export const GlobalContext = createContext<GlobalContextProps>({
     mobile: false,
     setMobile: () => {},
-    poktBalance: 0,
+    poktBalance: BigInt(0),
     setPoktBalance: () => {},
     poktAddress: "",
     setPoktAddress: () => {},
@@ -100,7 +100,7 @@ export const useGlobalContext = () => useContext(GlobalContext)
 
 export function GlobalContextProvider({ children }: any) {
     const [mobile, setMobile] = useState<boolean>(false)
-    const [poktBalance, setPoktBalance] = useState<number>(0)
+    const [poktBalance, setPoktBalance] = useState<bigint>(BigInt(0))
     const [poktAddress, setPoktAddress] = useState<string>("")
     const [ethAddress, setEthAddress] = useState<string>("")
     const [destination, setDestination] = useState<string>("eth") // eth = pokt -> wpokt, pokt = wpokt -> pokt
@@ -117,7 +117,6 @@ export function GlobalContextProvider({ children }: any) {
     const [allPendingBurns, setAllPendingBurns] = useState<Burn[]>([])
     
     const [mintTxHash, setMintTxHash] = useState<`0x${string}`|undefined>(undefined)
-
     
     const {address} = useAccount()
     
@@ -190,7 +189,7 @@ export function GlobalContextProvider({ children }: any) {
                     console.error("Error getting POKT balance:", e);
                     return null;
                 });
-            setPoktBalance(balance)
+            setPoktBalance(BigInt(balance))
         }
     }
 

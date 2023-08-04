@@ -1,9 +1,9 @@
-import { Box, Button, Center, Container, Flex, HStack, Input, Link, Text, VStack, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Center, Container, Divider, Flex, HStack, Input, Link, Text, VStack, useDisclosure } from "@chakra-ui/react";
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
 import { useEffect, useState } from "react";
 import { ProgressModal } from "./modal/ProgressModal";
-import { CloseIcon, InfoIcon } from "./icons/misc";
+import { CloseIcon, ErrorIcon, InfoIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { TimeInfoModal } from "./modal/TimeInfoModal";
 import { useAccount, useBalance, useContractWrite, useFeeData, usePrepareContractWrite } from "wagmi";
@@ -21,6 +21,8 @@ export function Bridge() {
     const [poktAmountInput, setPoktAmountInput] = useState<string>("")
     const [wPoktAmountInput, setWPoktAmountInput] = useState<string>("")
     const [estGasCost, setEstGasCost] = useState<string>("")
+    const [insufficientPoktGas, setInsufficientPoktGas] = useState<boolean>(false)
+    const [insufficientEthGas, setInsufficientEthGas] = useState<boolean>(false)
     const {
         poktAddress,
         destination,
@@ -40,9 +42,12 @@ export function Bridge() {
 
     const { address } = useAccount()
     const { openConnectModal } = useConnectModal()
-    const { data: balanceData } = useBalance({
+    const { data: wPoktBalanceData } = useBalance({
         address,
         token: WPOKT_ADDRESS,
+    })
+    const { data: ethBalanceData, isSuccess } = useBalance({
+        address,
     })
     const { data: feeData } = useFeeData({ chainId: goerli.id })
 
@@ -68,15 +73,22 @@ export function Bridge() {
         if (allPendingMints.length > 0) onResumeMintOpen()
     }, [allPendingMints])
 
-
-    // const { config } = usePrepareContractWrite({
-    //     address: WPOKT_ADDRESS,
-    //     abi: WRAPPED_POCKET_ABI,
-    //     functionName: 'burnAndBridge',
-    //     args: [wPoktAmount, poktAddress ? getAddress(`0x${poktAddress}`) : ''],
-    // })
-    // const burnFunc = useContractWrite(config)
+    useEffect(() => {
+        if (isSuccess && ethBalanceData && estGasCost) {
+            if (ethBalanceData?.value < parseUnits(estGasCost, 18)) {
+                setInsufficientEthGas(true)
+            } else {
+                setInsufficientEthGas(false)
+            }
+        }
+        if (BigInt(poktBalance) < poktAmount + parsePokt('0.01')) {
+            setInsufficientPoktGas(true)
+        } else {
+            setInsufficientPoktGas(false)
+        }
+    }, [ethBalanceData?.value, poktBalance, estGasCost, poktAmount, wPoktAmount])
     
+
     async function burn() {
         console.log("Burn Func:", burnFunc)
         if (burnFunc.writeAsync) {
@@ -94,28 +106,33 @@ export function Bridge() {
 
     async function getGasCost(dest: string): Promise<void> {
         let gas: bigint
-        const pubClient = createPublicClient({
-            chain: goerli,
-            transport: http()
-        })
-        if (dest === "pokt") {
-            gas = await pubClient.estimateContractGas({
-                address: WPOKT_ADDRESS,
-                abi: WRAPPED_POCKET_ABI,
-                functionName: 'burnAndBridge',
-                args: [wPoktAmount, getAddress(`0x${poktAddress}`)],
-                account: getAddress(address ?? '')
+        try {
+            const pubClient = createPublicClient({
+                chain: goerli,
+                transport: http()
             })
-        } else {
-            gas = await pubClient.estimateContractGas({
-                address: MINT_CONTROLLER_ADDRESS,
-                abi: MINT_CONTROLLER_ABI,
-                functionName: 'mintWrappedPocket',
-                args: [poktAmount, getAddress(address ?? '')],
-                account: getAddress(address ?? '')
-            })
+            if (dest === "pokt") {
+                gas = await pubClient.estimateContractGas({
+                    address: WPOKT_ADDRESS,
+                    abi: WRAPPED_POCKET_ABI,
+                    functionName: 'burnAndBridge',
+                    args: [wPoktAmount, getAddress(`0x${poktAddress}`)],
+                    account: getAddress(address ?? '')
+                })
+            } else {
+                gas = await pubClient.estimateContractGas({
+                    address: MINT_CONTROLLER_ADDRESS,
+                    abi: MINT_CONTROLLER_ABI,
+                    functionName: 'mintWrappedPocket',
+                    args: [poktAmount, getAddress(address ?? '')],
+                    account: getAddress(address ?? '')
+                })
+            }
+        } catch (error) {
+            console.error(error)
+            gas = BigInt(0)
         }
-        setEstGasCost(formatEther(gas * (feeData?.maxFeePerGas ?? BigInt(0))))
+        setEstGasCost(gas > BigInt(0) ? formatEther(gas * (feeData?.maxFeePerGas ?? BigInt(0))) : "")
     }
 
     return (
@@ -177,15 +194,16 @@ export function Bridge() {
                     </Center>
                     <Box>
                         <Center mt={6}>
-                            <Box width={320}>
-                                <Text mb={1} textAlign="left">Destination Wallet</Text>
-                            </Box>
+                            <HStack width={320} justify="space-between" mb={1}>
+                                <Text textAlign="left">Destination Wallet</Text>
+                                <Text>{address ? `${wPoktBalanceData?.formatted ?? 0} wPOKT in wallet` : 'No wallet connected'}</Text>
+                            </HStack>
                         </Center>
                         {address ? (
                             <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2}>
                                 <EthIcon fill="poktBlue" width="26px" height="26px" />
                                 <Text>{address}</Text>
-                                <CloseIcon width="22.63px" height="22.63px" fill="poktLime" />
+                                <CloseIcon width="22.63px" height="22.63px" fill="none" />
                             </Flex>
                         ) : (
                             <Center>
@@ -203,6 +221,9 @@ export function Bridge() {
                             </Center>
                         )}
                     </Box>
+                    <Center>
+                        <Divider mt={6} bgColor={"poktLime"} maxW={360} />
+                    </Center>
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
@@ -210,6 +231,7 @@ export function Bridge() {
                                 <Flex align="center" gap={2}>
                                     <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
                                     <InfoIcon _hover={{ cursor: "pointer" }} onClick={onGasInfoOpen} />
+                                    {(insufficientEthGas||insufficientPoktGas) && <ErrorIcon />}
                                 </Flex>
                             </Box>
                             <Box>
@@ -248,7 +270,7 @@ export function Bridge() {
                         <Box width={320}>
                             <HStack justify="space-between" mb={1}>
                                 <Text>Amount to unwrap</Text>
-                                <Text>{address ? `${balanceData?.formatted ?? 0} wPOKT in wallet` : 'No wallet connected'}</Text>
+                                <Text>{address ? `${wPoktBalanceData?.formatted ?? 0} wPOKT in wallet` : 'No wallet connected'}</Text>
                             </HStack>
                             {address ? (
                                 <Box>
@@ -283,15 +305,16 @@ export function Bridge() {
                         </Box>
                     </Center>
                     <Center mt={6}>
-                        <Box width={320}>
-                            <Text mb={1}>Destination Wallet</Text>
-                        </Box>
+                        <HStack width={320} mb={1} justify="space-between">
+                            <Text>Destination Wallet</Text>
+                            <Text>{poktAddress ? `${formatPokt(poktBalance)} POKT in wallet` : 'No wallet connected'}</Text>
+                        </HStack>
                     </Center>
                     {poktAddress ? (
                         <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2}>
                             <PoktIcon fill="poktBlue" width="26px" height="26px" />
                             <Text>{poktAddress}</Text>
-                            <CloseIcon width="22.63px" height="22.63px" fill="poktLime" />
+                            <CloseIcon width="22.63px" height="22.63px" fill="none" />
                         </Flex>
                     ) : (
                         <Center>
@@ -308,11 +331,17 @@ export function Bridge() {
                             </Button>
                         </Center>
                     )}
+                    <Center>
+                        <Divider mt={6} bgColor={"poktLime"} maxW={360} />
+                    </Center>
                     <Center my={6}>
                         <VStack width={320} spacing={4} align="flex-start">
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
-                                <Text>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
+                                <Flex align="center" gap={2}>
+                                    <Text>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
+                                    {insufficientEthGas && <ErrorIcon />}
+                                </Flex>
                             </Box>
                             <Box>
                                 <Text>Estimated POKT Received:</Text>
