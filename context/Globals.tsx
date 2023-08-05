@@ -63,6 +63,7 @@ export interface GlobalContextProps {
     mintTx: any
     mintTxHash: `0x${string}`|undefined
     setMintTxHash: (hash: `0x${string}`|undefined) => void
+    getPoktBalance: () => void
 }
 
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -101,7 +102,8 @@ export const GlobalContext = createContext<GlobalContextProps>({
     burnTx: () => {},
     mintTx: () => {},
     mintTxHash: undefined,
-    setMintTxHash: () => {}
+    setMintTxHash: () => {},
+    getPoktBalance: () => {}
 })
 
 export const useGlobalContext = () => useContext(GlobalContext)
@@ -109,7 +111,7 @@ export const useGlobalContext = () => useContext(GlobalContext)
 export function GlobalContextProvider({ children }: any) {
     const [mobile, setMobile] = useState<boolean>(false)
     const [poktBalance, setPoktBalance] = useState<bigint>(BigInt(0))
-    const [poktAddress, setPoktAddress] = useState<string>("")
+    const [poktAddress, setPoktAddress] = useState<string>("65a4554d91eb70517e0e937fbc3697ba9e90f3ef")
     const [ethAddress, setEthAddress] = useState<string>("")
     const [destination, setDestination] = useState<string>("eth") // eth = pokt -> wpokt, pokt = wpokt -> pokt
     const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
@@ -208,37 +210,45 @@ export function GlobalContextProvider({ children }: any) {
             // uh oh no SendWallet found, request that the user install it first.
             return alert("SendWallet not found! Please visit https://sendwallet.net to install");
         }
-        // Connect Wallet
-        let address = await window.pocketNetwork
-            .send("pokt_requestAccounts")
-            .then(([address]: any[]) => {
-                console.log("Connected POKT address:", address);
-                return address;
-            })
-            .catch((e: any) => {
-                console.error("Failed to connect POKT address:", e);
-                return null;
-            });
-        setPoktAddress(address)
+        try {
+            // Connect Wallet
+            let address = await window.pocketNetwork
+                .send("pokt_requestAccounts")
+                .then(([address]: any[]) => {
+                    console.log("Connected POKT address:", address);
+                    return address;
+                })
+                .catch((e: any) => {
+                    console.error("Failed to connect POKT address:", e);
+                    return null;
+                });
+            setPoktAddress(address)
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     async function getPoktBalance() {
         if (poktAddress) {
-            // Get uPokt Balance
-            let balance = await window.pocketNetwork
-                .send("pokt_balance", [{ address: poktAddress }])
-                .then(({ balance }: any) => {
-                    console.log("POKT Balance:", {
-                        balanceInUpokt: balance,
-                        balanceInPokt: balance / 1e6,
+            try {
+                // Get uPokt Balance
+                let balance = await window.pocketNetwork
+                    .send("pokt_balance", [{ address: poktAddress }])
+                    .then(({ balance }: any) => {
+                        console.log("POKT Balance:", {
+                            balanceInUpokt: balance,
+                            balanceInPokt: balance / 1e6,
+                        });
+                        return balance;
+                    })
+                    .catch((e: any) => {
+                        console.error("Error getting POKT balance:", e);
+                        return null;
                     });
-                    return balance;
-                })
-                .catch((e: any) => {
-                    console.error("Error getting POKT balance:", e);
-                    return null;
-                });
-            setPoktBalance(BigInt(balance))
+                setPoktBalance(BigInt(balance))
+            } catch (error) {
+                console.error(error)
+            }
         }
     }
 
@@ -322,7 +332,8 @@ export function GlobalContextProvider({ children }: any) {
             burnTx,
             mintTx,
             mintTxHash,
-            setMintTxHash
+            setMintTxHash,
+            getPoktBalance
         }}>
             {children}
         </GlobalContext.Provider>
