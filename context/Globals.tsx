@@ -111,7 +111,7 @@ export const useGlobalContext = () => useContext(GlobalContext)
 export function GlobalContextProvider({ children }: any) {
     const [mobile, setMobile] = useState<boolean>(false)
     const [poktBalance, setPoktBalance] = useState<bigint>(BigInt(0))
-    const [poktAddress, setPoktAddress] = useState<string>("65a4554d91eb70517e0e937fbc3697ba9e90f3ef")
+    const [poktAddress, setPoktAddress] = useState<string>("")
     const [ethAddress, setEthAddress] = useState<string>("")
     const [destination, setDestination] = useState<string>("eth") // eth = pokt -> wpokt, pokt = wpokt -> pokt
     const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
