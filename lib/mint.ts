@@ -24,6 +24,23 @@ export const getMintFromId = async (id: string): Promise<Mint | null> => {
   }
 };
 
+export const getMintFromPoktTx = async (txHash: string): Promise<Mint | null> => {
+  try {
+    const client = await dbPromise;
+
+    const mint = await client.collection(CollectionMints).findOne({
+      wpokt_address: WPOKT_ADDRESS,
+      vault_address: POKT_MULTISIG_ADDRESS,
+      transaction_hash: txHash,
+    });
+
+    return mint as Mint | null;
+  } catch (error) {
+    console.error('Error finding mint:', error);
+    return null;
+  }
+};
+
 export const getAllMintsFromRecipient = async (ethAddress: string): Promise<Mint[]> => {
   try {
     const client = await dbPromise;

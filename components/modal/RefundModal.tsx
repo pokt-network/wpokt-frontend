@@ -2,8 +2,11 @@ import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, Mo
 import { BluePoktIcon } from "../icons/pokt";
 import { useGlobalContext } from "@/context/Globals";
 
+interface RefundModalProps extends ModalProps {
+    refundTxHash: string
+}
 
-export function RefundModal(props: ModalProps) {
+export function RefundModal(props: RefundModalProps) {
     const { destination } = useGlobalContext()
 
     return (
@@ -30,7 +33,7 @@ export function RefundModal(props: ModalProps) {
                             Any tokens you have attempted to bridge have been returned to your wallet. 
                             Try waiting a few minutes before bridging again.
                         </Text>
-                        <Link textDecor="underline" color="poktLime" mt={3}>
+                        <Link textDecor="underline" color="poktLime" mt={3} href={`https://poktscan.com/tx/${props.refundTxHash}`} isExternal>
                             {destination === "pokt" ? "View this transaction on Etherscan" : "View this transaction on PoktScan"}
                         </Link>
                     </Flex>

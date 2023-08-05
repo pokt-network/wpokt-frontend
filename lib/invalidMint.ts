@@ -21,6 +21,23 @@ export const getInvalidMintFromId = async (
   }
 };
 
+export const getInvalidMintFromTx = async (
+  transaction_hash: string,
+): Promise<InvalidMint | null> => {
+  try {
+    const client = await dbPromise;
+
+    const invalid_mint = await client
+      .collection(CollectionInvalidMints)
+      .findOne({ vault_address: POKT_MULTISIG_ADDRESS, transaction_hash });
+
+    return invalid_mint as InvalidMint | null;
+  } catch (error) {
+    console.error('Error finding invalid mint:', error);
+    return null;
+  }
+};
+
 export const getAllInvalidMints = async (): Promise<InvalidMint[]> => {
   try {
     const client = await dbPromise;

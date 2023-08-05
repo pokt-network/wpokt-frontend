@@ -7,6 +7,8 @@ import { BlueCheckIcon } from "../icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { MintModal } from "./MintModal";
 import { TimeoutModal } from "./TimeoutModal";
+import { InvalidMint, Status } from "@/types";
+import { RefundModal } from "./RefundModal";
 
 
 export function ProgressModal(props: ModalProps) {
@@ -37,19 +39,28 @@ export function ProgressModal(props: ModalProps) {
     // 4. wPOKT minted
     const [step, setStep] = useState<number>(getCurrentStep())
     const [isBurnFetchError, setIsBurnFetchError] = useState<boolean>(false)
+    const [isMintFetchError, setIsMintFetchError] = useState<boolean>(false)
+    const [invalidMint, setInvalidMint] = useState<InvalidMint|undefined>(undefined)
+    const [poktRefundTxHash, setPoktRefundTxHash] = useState<string>("")
 
     const { isOpen: isMintOpen, onOpen: onMintOpen, onClose: onMintClose } = useDisclosure()
     const { isOpen: isTimeoutOpen, onOpen: onTimeoutOpen, onClose: onTimeoutClose } = useDisclosure()
+    const { isOpen: isRefundOpen, onOpen: onRefundOpen, onClose: onRefundClose } = useDisclosure()
 
     useEffect(() => { setStep(getCurrentStep()) }, [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, mintTx?.status, currentMint?.status])
     useEffect(() => { readyToMintWPokt() }, [step])
     useEffect(() => {
         if (step === 1 && destination === "pokt" && ethTxHash && burnTx?.isSuccess) getBurnInfo()
-    }, [step, destination, ethTxHash, burnTx?.isSuccess])
+        if (step === 1 && destination === "eth" && poktTxHash) getMintInfo()
+    }, [step, destination, ethTxHash, burnTx?.isSuccess, poktTxHash, mintTx?.isSuccess])
+    useEffect(() => {
+        if (destination === "eth" && currentMint?.status === Status.FAILED) getInvalidMintInfo()
+    }, [currentMint?.status])
 
     useTimeout(() => {
         isTakingTooLong()
         if ((step >= 0 && destination === "pokt" && ethTxHash) || isBurnFetchError) getBurnInfo()
+        if ((step >= 0 && destination === "eth" && poktTxHash) || isMintFetchError) getMintInfo()
     }, 15000)
 
     function isTakingTooLong() {
@@ -87,27 +98,27 @@ export function ProgressModal(props: ModalProps) {
 
     function getCurrentStep(): number {
         if (destination === "pokt") {
-            if (currentBurn?.status === "success") return 3
-            if (currentBurn?.status === "signed" || currentBurn?.status === "submitted") {
+            if (currentBurn?.status === Status.SUCCESS) return 3
+            if (currentBurn?.status === Status.SIGNED || currentBurn?.status === Status.SUMBITTED) {
                 setPoktTxHash(currentBurn?.return_tx_hash || "")
                 return 2
             }
-            if (currentBurn?.status === "confirmed") return 1
+            if (currentBurn?.status === Status.CONFIRMED) return 1
             return 0
         } else {
             // if done, return 4
             // if minting, return 3
             // if ready to mint, return 2
-            if (currentMint?.status === "success" || mintTx?.isSuccess) {
+            if (currentMint?.status === Status.SUCCESS || mintTx?.isSuccess) {
                 setEthTxHash(mintTxHash || "")
                 return 4
             }
-            if (currentMint?.status === "pending" || mintTx?.isLoading) {
+            if (currentMint?.status === Status.PENDING || mintTx?.isLoading) {
                 setEthTxHash(mintTxHash || "")
                 return 3
             }
-            if (currentMint?.status === "signed") return 2
-            if (poktTxSuccess) return 1
+            if (currentMint?.status === Status.SIGNED) return 2
+            if (currentMint?.status === Status.CONFIRMED) return 1
             return 0
         }
     }
@@ -129,6 +140,30 @@ export function ProgressModal(props: ModalProps) {
         } catch (error) {
             console.error(error)
             setIsBurnFetchError(true)
+        }
+    }
+
+    async function getMintInfo() {
+        try {
+            if (currentMint?.status === Status.SUCCESS) return
+            const res = await fetch(`/api/mints/hash/${poktTxHash}`)
+            const mint = await res.json()
+            console.log("Mint from DB:", mint)
+            setCurrentMint(mint)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    async function getInvalidMintInfo() {
+        try {
+            const res = await fetch(`/api/invalidMints/hash/${poktTxHash}`)
+            const invalidMint = await res.json()
+            console.log("Invalid Mint from DB:", invalidMint)
+            setInvalidMint(invalidMint)
+            setPoktRefundTxHash(invalidMint?.return_tx_hash || "")
+        } catch (error) {
+            console.error(error)
         }
     }
 
@@ -183,6 +218,9 @@ export function ProgressModal(props: ModalProps) {
                         <MintModal isOpen={isMintOpen} onClose={onMintClose} mintInfo={currentMint}><></></MintModal>
                     )}
                     <TimeoutModal isOpen={isTimeoutOpen} onClose={onTimeoutClose}><></></TimeoutModal>
+                    {(!!invalidMint||!!poktRefundTxHash) && (
+                        <RefundModal isOpen={isRefundOpen} onClose={onRefundClose} refundTxHash={poktRefundTxHash ?? invalidMint?.return_tx_hash}><></></RefundModal>
+                    )}
                 </ModalBody>
             </ModalContent>
         </Modal>
