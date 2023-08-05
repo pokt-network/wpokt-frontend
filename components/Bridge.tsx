@@ -37,12 +37,16 @@ export function Bridge() {
         setPoktAmount,
         setWPoktAmount,
         burnFunc,
-        allPendingMints
+        burnTx,
+        allPendingMints,
+        currentBurn,
+        currentMint,
+        getPoktBalance
     } = useGlobalContext()
 
     const { address } = useAccount()
     const { openConnectModal } = useConnectModal()
-    const { data: wPoktBalanceData } = useBalance({
+    const { data: wPoktBalanceData, refetch: refetchWPoktBalance } = useBalance({
         address,
         token: WPOKT_ADDRESS,
     })
@@ -88,6 +92,11 @@ export function Bridge() {
             setInsufficientPoktGas(false)
         }
     }, [ethBalanceData?.value, poktBalance, estGasCost, poktAmount, wPoktAmount])
+
+    useEffect(() => {
+        if (burnTx?.isSuccess || currentMint?.status === "success" || currentBurn?.status === "confirmed") refetchWPoktBalance()
+        if (currentBurn?.status === "success" || currentMint?.status === "confirmed") getPoktBalance()
+    }, [burnTx?.isSuccess, currentMint?.status, currentBurn?.status])
     
 
     async function burn() {

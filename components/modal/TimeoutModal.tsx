@@ -4,7 +4,7 @@ import { useGlobalContext } from "@/context/Globals";
 
 
 export function TimeoutModal(props: ModalProps) {
-    const { destination } = useGlobalContext()
+    const { destination, poktTxHash, ethTxHash } = useGlobalContext()
 
     return (
         <Modal {...props} size="md" isCentered>
@@ -33,8 +33,14 @@ export function TimeoutModal(props: ModalProps) {
                             You can keep this window open and check back later. 
                             If there has been a change, this page will update.
                         </Text>
-                        <Link textDecor="underline" color="poktLime" mt={3}>
-                            {destination === "pokt" ? "View this transaction on Etherscan" : "View this transaction on PoktScan"}
+                        <Link 
+                            textDecor="underline"
+                            color="poktLime"
+                            mt={3}
+                            href={destination === "pokt" ? (poktTxHash ? `https://poktscan.com/tx/${poktTxHash}` : `https://goerli.etherscan.io/tx/${ethTxHash}`) : (ethTxHash ? `https://goerli.etherscan.io/tx/${ethTxHash}` : `https://poktscan.com/tx/${poktTxHash}`)}
+                            isExternal
+                        >
+                            {destination === "pokt" ? (poktTxHash ? "View this transaction on PoktScan" : "View this transaction on Etherscan") : (ethTxHash ? "View this transaction on Etherscan" : "View this transaction on PoktScan")}
                         </Link>
                     </Flex>
                 </ModalBody>

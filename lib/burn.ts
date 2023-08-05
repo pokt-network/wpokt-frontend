@@ -78,7 +78,7 @@ export const getBurnFromHash = async (hash: string): Promise<Burn|null> => {
 
     return burn as Burn || null;
   } catch (error) {
-    console.error('Error finding burns:', error);
+    console.error('Error finding burn:', error);
     return null;
   }
 };

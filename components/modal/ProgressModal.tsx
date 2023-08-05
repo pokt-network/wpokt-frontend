@@ -6,6 +6,7 @@ import { BluePoktIcon } from "../icons/pokt";
 import { BlueCheckIcon } from "../icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { MintModal } from "./MintModal";
+import { TimeoutModal } from "./TimeoutModal";
 
 
 export function ProgressModal(props: ModalProps) {
@@ -35,35 +36,63 @@ export function ProgressModal(props: ModalProps) {
     // 3. Minting wPOKT
     // 4. wPOKT minted
     const [step, setStep] = useState<number>(getCurrentStep())
+    const [isBurnFetchError, setIsBurnFetchError] = useState<boolean>(false)
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen: isMintOpen, onOpen: onMintOpen, onClose: onMintClose } = useDisclosure()
+    const { isOpen: isTimeoutOpen, onOpen: onTimeoutOpen, onClose: onTimeoutClose } = useDisclosure()
 
     useEffect(() => { setStep(getCurrentStep()) }, [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, mintTx?.status, currentMint?.status])
     useEffect(() => { readyToMintWPokt() }, [step])
     useEffect(() => {
-        if (step === 1 && destination === "pokt" && ethTxHash) getBurnInfo()
-    }, [step, destination, ethTxHash])
+        if (step === 1 && destination === "pokt" && ethTxHash && burnTx?.isSuccess) getBurnInfo()
+    }, [step, destination, ethTxHash, burnTx?.isSuccess])
 
     useTimeout(() => {
-        if (step >= 1 && destination === "pokt" && ethTxHash) {
-            getBurnInfo()
-        } else if (step >= 2 && destination !== "pokt" && mintTxHash) {
-            console.log("Getting mint info")
-            // getMintInfo()
-        }
+        isTakingTooLong()
+        if ((step >= 0 && destination === "pokt" && ethTxHash) || isBurnFetchError) getBurnInfo()
     }, 15000)
+
+    function isTakingTooLong() {
+        let startTime;
+        let currentTime = Date.now()
+        if (destination === "pokt") {
+            if (step === 1) {
+                startTime = (new Date(currentBurn?.created_at as Date)).valueOf()
+                if (startTime && currentTime - startTime > 1000 * 60 * 10) return onTimeoutOpen()
+                return
+            }
+            if (step === 2) {
+                startTime = (new Date(currentBurn?.updated_at as Date)).valueOf()
+                if (startTime && currentTime - startTime > 1000 * 60 * 20) return onTimeoutOpen()
+                return
+            }
+        } else {
+            if (step === 0) {
+                startTime = (new Date(currentMint?.created_at as Date)).valueOf()
+                if (startTime && currentTime - startTime > 1000 * 60 * 20) return onTimeoutOpen()
+                return
+            }
+            if (step === 1) {
+                startTime = (new Date(currentMint?.updated_at as Date)).valueOf()
+                if (startTime && currentTime - startTime > 1000 * 60 * 10) return onTimeoutOpen()
+                return
+            }
+            if (step === 3) {
+                startTime = (new Date(currentMint?.updated_at as Date)).valueOf()
+                if (startTime && currentTime - startTime > 1000 * 60 * 10) return onTimeoutOpen()
+                return
+            }
+        }
+    }
 
     function getCurrentStep(): number {
         if (destination === "pokt") {
-            // TODO: add eth to pokt steps
             if (currentBurn?.status === "success") return 3
             if (currentBurn?.status === "signed" || currentBurn?.status === "submitted") {
                 setPoktTxHash(currentBurn?.return_tx_hash || "")
                 return 2
             }
-            console.log("Burn func status:", burnFunc)
-            console.log("Burn tx info:", burnTx)
-            if (burnTx?.isSuccess) return 1
+            if (currentBurn?.status === "confirmed") return 1
             return 0
         } else {
             // if done, return 4
@@ -85,7 +114,7 @@ export function ProgressModal(props: ModalProps) {
 
     function readyToMintWPokt() {
         if (step === 2 && destination !== "pokt") {
-            onOpen()
+            onMintOpen()
         }
     }
 
@@ -96,8 +125,10 @@ export function ProgressModal(props: ModalProps) {
             const burn = await res.json()
             console.log("Burn from DB:", burn)
             setCurrentBurn(burn)
+            setIsBurnFetchError(false)
         } catch (error) {
             console.error(error)
+            setIsBurnFetchError(true)
         }
     }
 
@@ -149,8 +180,9 @@ export function ProgressModal(props: ModalProps) {
                     </Flex>
                     <ProgressModalStatusDescription step={step} destination={destination} poktTxHash={poktTxHash} ethTxHash={ethTxHash} />
                     {(step === 2 && destination !== "pokt") && (
-                        <MintModal isOpen={isOpen} onClose={onClose} mintInfo={currentMint}><></></MintModal>
+                        <MintModal isOpen={isMintOpen} onClose={onMintClose} mintInfo={currentMint}><></></MintModal>
                     )}
+                    <TimeoutModal isOpen={isTimeoutOpen} onClose={onTimeoutClose}><></></TimeoutModal>
                 </ModalBody>
             </ModalContent>
         </Modal>
