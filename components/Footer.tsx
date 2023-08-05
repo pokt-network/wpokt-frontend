@@ -48,6 +48,9 @@ export function Footer() {
                     <Link href="https://forum.pokt.network" isExternal>
                         Forum
                     </Link>
+                    <Link href="#" isExternal>
+                        FAQ
+                    </Link>
                 </VStack>
             </Flex>
             {mobileFooter && <Center mb={2}>© 2023 Pocket Network</Center>}
