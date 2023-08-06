@@ -1,17 +1,17 @@
 import { Box, Button, Center, Container, Divider, Flex, HStack, Input, Link, Text, VStack, useDisclosure, useToast } from "@chakra-ui/react";
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ProgressModal } from "./modal/ProgressModal";
 import { CloseIcon, ErrorIcon, InfoIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { TimeInfoModal } from "./modal/TimeInfoModal";
-import { useAccount, useBalance, useContractWrite, useFeeData, usePrepareContractWrite } from "wagmi";
+import { useAccount, useBalance, useContractRead, useContractWrite, useFeeData, usePrepareContractWrite } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { formatPokt, parsePokt } from "@/utils/pokt";
-import { MINT_CONTROLLER_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
-import { MINT_CONTROLLER_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
-import { createPublicClient, formatEther, getAddress, http, parseUnits } from "viem";
+import { CHAINLINK_ETH_USD_ADDRESS, MINT_CONTROLLER_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
+import { CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI, MINT_CONTROLLER_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
+import { createPublicClient, formatEther, formatUnits, getAddress, http, parseUnits } from "viem";
 import { goerli } from "wagmi/chains";
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
 import { GasInfoModal } from "./modal/GasInfoModal";
@@ -21,6 +21,7 @@ export function Bridge() {
     const [poktAmountInput, setPoktAmountInput] = useState<string>("")
     const [wPoktAmountInput, setWPoktAmountInput] = useState<string>("")
     const [estGasCost, setEstGasCost] = useState<string>("")
+    const [ethPrice, setEthPrice] = useState<bigint|undefined>(undefined)
     const [insufficientPoktGas, setInsufficientPoktGas] = useState<boolean>(false)
     const [insufficientEthGas, setInsufficientEthGas] = useState<boolean>(false)
     const {
@@ -54,6 +55,11 @@ export function Bridge() {
         address,
     })
     const { data: feeData } = useFeeData({ chainId: goerli.id })
+    const { data: priceData, isSuccess: isPriceSuccess } = useContractRead({
+        address: CHAINLINK_ETH_USD_ADDRESS,
+        abi: CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI,
+        functionName: 'latestRoundData',
+    })
 
     const { isOpen: isProgressOpen, onOpen: onProgressOpen, onClose: onProgressClose } = useDisclosure()
     const { isOpen: isTimeInfoOpen, onOpen: onTimeInfoOpen, onClose: onTimeInfoClose } = useDisclosure()
@@ -61,6 +67,14 @@ export function Bridge() {
     const { isOpen: isResumeMintOpen, onOpen: onResumeMintOpen, onClose: onResumeMintClose } = useDisclosure()
 
     const toast = useToast()
+
+    useEffect(() => {
+        console.log("Price Data:", priceData)
+        if (priceData) {
+            const data = priceData as bigint[]
+            setEthPrice(data[1])
+        }
+    }, [isPriceSuccess])
 
     useEffect(() => {
         if (poktTxOngoing) {
@@ -97,7 +111,7 @@ export function Bridge() {
         if (burnTx?.isSuccess || currentMint?.status === "success" || currentBurn?.status === "confirmed") refetchWPoktBalance()
         if (currentBurn?.status === "success" || currentMint?.status === "confirmed") getPoktBalance()
     }, [burnTx?.isSuccess, currentMint?.status, currentBurn?.status])
-    
+
 
     async function burn() {
         if (wPoktBalanceData && wPoktAmount > wPoktBalanceData?.value) {
@@ -274,6 +288,7 @@ export function Bridge() {
                                 <Text>Estimated Gas Cost:</Text>
                                 <Flex align="center" gap={2}>
                                     <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
+                                    {(!!ethPrice && !!estGasCost) && <Text>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
                                     <InfoIcon _hover={{ cursor: "pointer" }} onClick={onGasInfoOpen} />
                                     {(insufficientEthGas||insufficientPoktGas) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
@@ -387,6 +402,7 @@ export function Bridge() {
                                 <Text>Estimated Gas Cost:</Text>
                                 <Flex align="center" gap={2}>
                                     <Text>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
+                                    {(!!ethPrice && !!estGasCost) && <Text>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
                                     {insufficientEthGas && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
                             </Box>
