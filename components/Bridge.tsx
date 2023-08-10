@@ -93,6 +93,10 @@ export function Bridge() {
     }, [allPendingMints])
 
     useEffect(() => {
+        if (poktAmount || wPoktAmount) getGasCost(destination)
+    }, [poktAmount, wPoktAmount, destination])
+
+    useEffect(() => {
         if (isSuccess && ethBalanceData && estGasCost) {
             if (ethBalanceData?.value < parseUnits(estGasCost, 18)) {
                 setInsufficientEthGas(true)
@@ -139,15 +143,16 @@ export function Bridge() {
             })
             if (dest === "pokt") {
                 gas = await pubClient.estimateContractGas({
-                    address: WPOKT_ADDRESS,
+                    address: getAddress(WPOKT_ADDRESS),
                     abi: WRAPPED_POCKET_ABI,
                     functionName: 'burnAndBridge',
                     args: [wPoktAmount, getAddress(`0x${poktAddress}`)],
                     account: getAddress(address ?? '')
                 })
             } else {
+                console.log("estimating gas...")
                 gas = await pubClient.estimateContractGas({
-                    address: MINT_CONTROLLER_ADDRESS,
+                    address: getAddress(MINT_CONTROLLER_ADDRESS),
                     abi: MINT_CONTROLLER_ABI,
                     functionName: 'mintWrappedPocket',
                     args: [poktAmount, getAddress(address ?? '')],

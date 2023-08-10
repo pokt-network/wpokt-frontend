@@ -123,6 +123,15 @@ export function ProgressModal(props: ModalProps) {
         }
     }
 
+    async function getPoktTxStatus() {
+        try {
+            const tx = await window.pocketNetwork.send("pokt_tx", [{ hash: poktTxHash }])
+            console.log("Pokt Tx Status:", tx)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     function readyToMintWPokt() {
         if (step === 2 && destination !== "pokt") {
             onMintOpen()

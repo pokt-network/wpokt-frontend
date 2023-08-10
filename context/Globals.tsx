@@ -1,7 +1,7 @@
 import { InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
-import { WPOKT_ADDRESS } from "@/utils/constants";
+import { ETH_CHAIN_ID, POKT_MULTISIG_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
 import { isValidEthAddress } from "@/utils/misc";
 import { HStack, Text, useToast } from "@chakra-ui/react";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -275,21 +275,19 @@ export function GlobalContextProvider({ children }: any) {
         if (!isValidEthAddress(ethAddress)) return console.error("Please enter a valid Ethereum address")
         // Send Transaction
         try {
+            const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
+                {
+                    amount: amount.toString(), // in uPOKT
+                    from: poktAddress,
+                    to: POKT_MULTISIG_ADDRESS,
+                    memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
+                },
+            ])
+            console.log("Sent POKT:", {
+                txHash: hash,
+            });
+            setPoktTxHash(hash)
             setPoktTxOngoing(true)
-            setPoktTxSuccess(true)
-            // const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
-            //     {
-            //         amount: amount.toString(), // in uPOKT
-            //         from: poktAddress,
-            //         to: POKT_MULTISIG_ADDRESS,
-            //         memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
-            //     },
-            // ])
-            // console.log("Sent POKT:", {
-            //     txHash: hash,
-            // });
-            // setPoktTxHash(hash)
-            // setPoktTxOngoing(true)
         } catch (error) {
             console.error("Failed sending POKT:", error);
         }
