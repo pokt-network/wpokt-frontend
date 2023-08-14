@@ -1,7 +1,7 @@
 import { InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
-import { WPOKT_ADDRESS } from "@/utils/constants";
+import { ETH_CHAIN_ID, POKT_MULTISIG_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
 import { isValidEthAddress } from "@/utils/misc";
 import { HStack, Text, useToast } from "@chakra-ui/react";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -64,6 +64,7 @@ export interface GlobalContextProps {
     mintTxHash: `0x${string}`|undefined
     setMintTxHash: (hash: `0x${string}`|undefined) => void
     getPoktBalance: () => void
+    screenWidth?: number
 }
 
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -103,13 +104,15 @@ export const GlobalContext = createContext<GlobalContextProps>({
     mintTx: () => {},
     mintTxHash: undefined,
     setMintTxHash: () => {},
-    getPoktBalance: () => {}
+    getPoktBalance: () => {},
+    screenWidth: undefined
 })
 
 export const useGlobalContext = () => useContext(GlobalContext)
 
 export function GlobalContextProvider({ children }: any) {
     const [mobile, setMobile] = useState<boolean>(false)
+    const [screenWidth, setScreenWidth] = useState<number|undefined>(undefined)
     const [poktBalance, setPoktBalance] = useState<bigint>(BigInt(0))
     const [poktAddress, setPoktAddress] = useState<string>("")
     const [ethAddress, setEthAddress] = useState<string>("")
@@ -177,6 +180,7 @@ export function GlobalContextProvider({ children }: any) {
         try {
             const mints = await fetchActiveMints(address)
             if (mints && mints.length > 0) {
+                console.log("Active mints:", mints)
                 const pending = mints.filter(mint => mint.status === "signed")
                 setAllPendingMints(pending)
                 const toastId = 'mint-in-progress'
@@ -198,10 +202,13 @@ export function GlobalContextProvider({ children }: any) {
     }
     
     function toggleMobile() {
-        if (window && window.innerWidth < 700) {
-            setMobile(true);
-        } else {
-            setMobile(false);
+        if (window) {
+            setScreenWidth(window.innerWidth);
+            if (window.innerWidth < 700) {
+                setMobile(true);
+            } else {
+                setMobile(false);
+            }
         }
     };
 
@@ -261,11 +268,13 @@ export function GlobalContextProvider({ children }: any) {
     const burnFunc = useContractWrite(config)
 
     const burnTx = useWaitForTransaction({
-        hash: burnFunc.data?.hash
+        hash: burnFunc.data?.hash,
+        confirmations: 8
     })
 
     const mintTx = useWaitForTransaction({
-        hash: mintTxHash
+        hash: mintTxHash,
+        confirmations: 8
     })
 
     async function bridgePoktToEthereum(ethAddress: string, amount: number | bigint) {
@@ -275,21 +284,19 @@ export function GlobalContextProvider({ children }: any) {
         if (!isValidEthAddress(ethAddress)) return console.error("Please enter a valid Ethereum address")
         // Send Transaction
         try {
+            const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
+                {
+                    amount: amount.toString(), // in uPOKT
+                    from: poktAddress,
+                    to: POKT_MULTISIG_ADDRESS,
+                    memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
+                },
+            ])
+            console.log("Sent POKT:", {
+                txHash: hash,
+            });
+            setPoktTxHash(hash)
             setPoktTxOngoing(true)
-            setPoktTxSuccess(true)
-            // const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
-            //     {
-            //         amount: amount.toString(), // in uPOKT
-            //         from: poktAddress,
-            //         to: POKT_MULTISIG_ADDRESS,
-            //         memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
-            //     },
-            // ])
-            // console.log("Sent POKT:", {
-            //     txHash: hash,
-            // });
-            // setPoktTxHash(hash)
-            // setPoktTxOngoing(true)
         } catch (error) {
             console.error("Failed sending POKT:", error);
         }
@@ -333,7 +340,8 @@ export function GlobalContextProvider({ children }: any) {
             mintTx,
             mintTxHash,
             setMintTxHash,
-            getPoktBalance
+            getPoktBalance,
+            screenWidth
         }}>
             {children}
         </GlobalContext.Provider>
