@@ -1,5 +1,5 @@
-import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider, useDisclosure, useTimeout, SkeletonCircle, Circle } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider, useDisclosure, useTimeout, SkeletonCircle, Circle, useInterval } from "@chakra-ui/react";
+import { useEffect, useMemo, useState } from "react";
 import { BlueEthIcon } from "../icons/eth";
 import { BlueBridgeIcon } from "../icons/copper";
 import { BluePoktIcon } from "../icons/pokt";
@@ -37,7 +37,7 @@ export function ProgressModal(props: ModalProps) {
     // 2. Waiting for user to mint wPOKT
     // 3. Minting wPOKT
     // 4. wPOKT minted
-    const [step, setStep] = useState<number>(getCurrentStep())
+    // const [step, setStep] = useState<number>(getCurrentStep())
     const [isBurnFetchError, setIsBurnFetchError] = useState<boolean>(false)
     const [isMintFetchError, setIsMintFetchError] = useState<boolean>(false)
     const [invalidMint, setInvalidMint] = useState<InvalidMint|undefined>(undefined)
@@ -47,21 +47,41 @@ export function ProgressModal(props: ModalProps) {
     const { isOpen: isTimeoutOpen, onOpen: onTimeoutOpen, onClose: onTimeoutClose } = useDisclosure()
     const { isOpen: isRefundOpen, onOpen: onRefundOpen, onClose: onRefundClose } = useDisclosure()
 
-    useEffect(() => { setStep(getCurrentStep()) }, [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, mintTx?.status, currentMint?.status])
+    const step = useMemo(() => getCurrentStep(), [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, mintTx?.status, currentMint?.status])
+    const timeInterval = useMemo(() => {
+        if (destination === "eth") {
+            if (step === 0) return 1000 * 60 * 5
+            if (step === 1) {
+                if (currentMint?.status === Status.CONFIRMED) return 1000 * 60
+                else return 1000 * 60 * 3
+            }
+            if (step === 3) return 1000 * 60
+            return 60000
+        } else {
+            if (step === 0) return 1000 * 60
+            if (step === 1) {
+                if (currentMint?.status === Status.CONFIRMED) return 1000 * 60
+                else return 1000 * 60 * 3
+            }
+            if (step === 2) return 1000 * 60 * 5
+            return 60000
+        }
+    }, [step])
     useEffect(() => { readyToMintWPokt() }, [step])
-    useEffect(() => {
-        if (step === 1 && destination === "pokt" && ethTxHash && burnTx?.isSuccess) getBurnInfo()
-        if (step === 1 && destination === "eth" && poktTxHash) getMintInfo()
-    }, [step, destination, ethTxHash, burnTx?.isSuccess, poktTxHash, mintTx?.isSuccess])
+    // useEffect(() => {
+    //     if (step === 1 && destination === "pokt" && ethTxHash && burnTx?.isSuccess) getBurnInfo()
+    //     if (step === 1 && destination === "eth" && poktTxHash) getMintInfo()
+    // }, [step, destination, ethTxHash, burnTx?.isSuccess, poktTxHash, mintTx?.isSuccess])
     useEffect(() => {
         if (destination === "eth" && currentMint?.status === Status.FAILED) getInvalidMintInfo()
     }, [currentMint?.status])
 
-    useTimeout(() => {
-        isTakingTooLong()
+    useInterval(() => {
         if ((step >= 0 && destination === "pokt" && ethTxHash) || isBurnFetchError) getBurnInfo()
-        if ((step >= 0 && destination === "eth" && poktTxHash) || isMintFetchError) getMintInfo()
-    }, 15000)
+        if ((step >= 0 && destination === "eth" && poktTxHash) || isMintFetchError) {
+            if (step !== 2) getMintInfo()
+        }
+    }, timeInterval)
 
     function isTakingTooLong() {
         let startTime;
@@ -90,7 +110,7 @@ export function ProgressModal(props: ModalProps) {
             }
             if (step === 3) {
                 startTime = (new Date(currentMint?.updated_at as Date)).valueOf()
-                if (startTime && currentTime - startTime > 1000 * 60 * 10) return onTimeoutOpen()
+                if (startTime && currentTime - startTime > 1000 * 60 * 12) return onTimeoutOpen()
                 return
             }
         }
@@ -113,12 +133,12 @@ export function ProgressModal(props: ModalProps) {
                 setEthTxHash(mintTxHash || "")
                 return 4
             }
-            if (currentMint?.status === Status.PENDING || mintTx?.isLoading) {
+            if ((currentMint?.status === Status.PENDING && currentMint?.mint_tx_hash) || mintTx?.isLoading) {
                 setEthTxHash(mintTxHash || "")
                 return 3
             }
             if (currentMint?.status === Status.SIGNED) return 2
-            if (currentMint?.status === Status.CONFIRMED) return 1
+            if (currentMint?.status === Status.CONFIRMED || currentMint?.status === Status.PENDING) return 1
             return 0
         }
     }
@@ -150,18 +170,22 @@ export function ProgressModal(props: ModalProps) {
             console.error(error)
             setIsBurnFetchError(true)
         }
+        isTakingTooLong()
     }
 
     async function getMintInfo() {
-        try {
-            if (currentMint?.status === Status.SUCCESS) return
-            const res = await fetch(`/api/mints/hash/${poktTxHash}`)
-            const mint = await res.json()
-            console.log("Mint from DB:", mint)
-            setCurrentMint(mint)
-        } catch (error) {
-            console.error(error)
+        if (!currentMint || currentMint?.status !== Status.SUCCESS) {
+            try {
+                if (step === 0) await getPoktTxStatus()
+                const res = await fetch(`/api/mints/hash/${poktTxHash}`)
+                const mint = await res.json()
+                console.log("Mint from DB:", mint)
+                setCurrentMint(mint)
+            } catch (error) {
+                console.error(error)
+            }
         }
+        isTakingTooLong()
     }
 
     async function getInvalidMintInfo() {

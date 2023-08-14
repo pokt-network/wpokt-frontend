@@ -10,7 +10,7 @@ const getMint = async (req: NextApiRequest, res: NextApiResponse) => {
   if (typeof txhash !== 'string' || !txhash) return res.status(400).end();
 
   try {
-    const mint = getMintFromPoktTx(txhash);
+    const mint = await getMintFromPoktTx(txhash);
 
     if (!mint) return res.status(204).end();
 

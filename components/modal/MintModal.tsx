@@ -18,7 +18,7 @@ export function MintModal(props: MintModalProps) {
     const { config } = usePrepareContractWrite({
         address: MINT_CONTROLLER_ADDRESS,
         abi: MINT_CONTROLLER_ABI,
-        functionName: 'mintwrappedPocket',
+        functionName: 'mintWrappedPocket',
         args: [props.mintInfo?.data, props.mintInfo?.signatures]
     })
     const mintFunc = useContractWrite(config)
@@ -71,6 +71,7 @@ export function MintModal(props: MintModalProps) {
                             color="darkBlue"
                             mt={3}
                             onClick={mintWPokt}
+                            isLoading={mintFunc.isLoading}
                         >
                             Mint wPOKT
                         </Button>

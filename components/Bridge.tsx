@@ -25,6 +25,7 @@ export function Bridge() {
     const [insufficientPoktGas, setInsufficientPoktGas] = useState<boolean>(false)
     const [insufficientEthGas, setInsufficientEthGas] = useState<boolean>(false)
     const {
+        screenWidth,
         poktAddress,
         destination,
         setDestination,
@@ -162,6 +163,7 @@ export function Bridge() {
         } catch (error) {
             console.error(error)
             gas = BigInt(0)
+            if (dest === "eth" && poktAmount > BigInt(0)) gas = BigInt(289000) // Default estimate for minting
         }
         setEstGasCost(gas > BigInt(0) ? formatEther(gas * (feeData?.maxFeePerGas ?? BigInt(0))) : "")
     }
@@ -197,7 +199,7 @@ export function Bridge() {
     }
 
     return (
-        <VStack minWidth="580px">
+        <VStack minWidth={screenWidth && screenWidth < 580 ? screenWidth : '580px'}>
             <Button
                 bg="poktLime"
                 color="darkBlue"
@@ -292,7 +294,7 @@ export function Bridge() {
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
                                 <Flex align="center" gap={2}>
-                                    <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
+                                    <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost.substring(0,7)) : '----'} ETH</Text>
                                     {(!!ethPrice && !!estGasCost) && <Text>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
                                     <InfoIcon _hover={{ cursor: "pointer" }} onClick={onGasInfoOpen} />
                                     {(insufficientEthGas||insufficientPoktGas) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
@@ -378,9 +380,9 @@ export function Bridge() {
                         </HStack>
                     </Center>
                     {poktAddress ? (
-                        <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2}>
+                        <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2} maxW={screenWidth}>
                             <PoktIcon fill="poktBlue" width="26px" height="26px" />
-                            <Text>{poktAddress}</Text>
+                            <Text>{screenWidth && screenWidth < 400 ? poktAddress.substring(0,6) + '...' + poktAddress.substring(poktAddress.length - 6, poktAddress.length - 1) : poktAddress}</Text>
                             <CloseIcon width="22.63px" height="22.63px" fill="none" />
                         </Flex>
                     ) : (
@@ -406,7 +408,7 @@ export function Bridge() {
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
                                 <Flex align="center" gap={2}>
-                                    <Text>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost) : '----'} ETH</Text>
+                                    <Text>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost.substring(0,7)) : '----'} ETH</Text>
                                     {(!!ethPrice && !!estGasCost) && <Text>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
                                     {insufficientEthGas && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
