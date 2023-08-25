@@ -10,7 +10,7 @@ export const getBurnFromId = async (id: string): Promise<Burn | null> => {
 
     const burn = await client.collection(CollectionBurns).findOne({
       _id: new ObjectId(id),
-      wpokt_address: WPOKT_ADDRESS,
+      wpokt_address: WPOKT_ADDRESS.toLowerCase(),
     });
 
     return burn as Burn | null;
@@ -28,7 +28,7 @@ export const getAllBurns = async (): Promise<Burn[]> => {
       .collection(CollectionBurns)
       .find(
         {
-          wpokt_address: WPOKT_ADDRESS,
+          wpokt_address: WPOKT_ADDRESS.toLowerCase(),
         },
         { sort: { created_at: -1 } },
       )
@@ -49,8 +49,8 @@ export const getAllBurnsFromSender = async (ethAddress: string): Promise<Burn[]>
       .collection(CollectionBurns)
       .find(
         {
-          wpokt_address: WPOKT_ADDRESS,
-          sender_address: ethAddress,
+          wpokt_address: WPOKT_ADDRESS.toLowerCase(),
+          sender_address: ethAddress.toLowerCase(),
         },
         { sort: { created_at: -1 } },
       )
@@ -71,8 +71,8 @@ export const getBurnFromHash = async (hash: string): Promise<Burn|null> => {
       .collection(CollectionBurns)
       .findOne(
         {
-          wpokt_address: WPOKT_ADDRESS,
-          transaction_hash: hash,
+          wpokt_address: WPOKT_ADDRESS.toLowerCase(),
+          transaction_hash: hash.toLowerCase(),
         },
       )
 

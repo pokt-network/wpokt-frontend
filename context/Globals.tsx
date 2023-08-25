@@ -274,7 +274,7 @@ export function GlobalContextProvider({ children }: any) {
 
     const mintTx = useWaitForTransaction({
         hash: mintTxHash,
-        confirmations: 8
+        confirmations: 2
     })
 
     async function bridgePoktToEthereum(ethAddress: string, amount: number | bigint) {
