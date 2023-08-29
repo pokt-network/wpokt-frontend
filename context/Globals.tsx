@@ -164,7 +164,7 @@ export function GlobalContextProvider({ children }: any) {
                     position: "top-right",
                     duration: 10000,
                     render: () => (
-                        <HStack mt={'140px'} spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="poktLime" borderBottomWidth={1}>
+                        <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="poktLime" borderBottomWidth={1}>
                             <InfoIcon fill="poktLime" />
                             <Text>You have {burns.length} unwrap request{burns.length > 1 ? 's' : ''} in progress</Text>
                         </HStack>
@@ -189,7 +189,7 @@ export function GlobalContextProvider({ children }: any) {
                     position: "top-right",
                     duration: 10000,
                     render: () => (
-                        <HStack mt={'140px'} spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="poktLime" borderBottomWidth={1}>
+                        <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="poktLime" borderBottomWidth={1}>
                             <InfoIcon fill="poktLime" />
                             <Text>You have {mints.length} wrap request{mints.length > 1 ? 's' : ''} in progress</Text>
                         </HStack>

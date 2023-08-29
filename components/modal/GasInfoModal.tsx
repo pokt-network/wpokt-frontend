@@ -26,7 +26,7 @@ export function GasInfoModal(props: ModalProps) {
                             </Text>
                         </Box>
                         <Box>
-                            <Text color="poktBlue" fontSize={16} textAlign="center">Minting wPOKT costs gas</Text>
+                            <Text color="poktBlue" fontSize={16} textAlign="center">Minting wPOKT costs gas.</Text>
                             <Text>
                                 While we handle all burn orders, you need to authorize and pay for the minting of wPOKT.
                             </Text>

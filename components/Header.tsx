@@ -27,13 +27,16 @@ export function Header() {
 
     return (
         <HStack justify="space-between" align="center" paddingX={10} paddingY={5}>
-            <Image src={logo} alt="logo" width={122} height={36} />
+            <Link href="https://pokt.network" isExternal>
+                <Image src={logo} alt="logo" width={122} height={36} />
+            </Link>
             {mobile ? (
                 <>
                 <IconButton
                     aria-label="menu"
                     icon={<MenuIcon />}
                     background="none"
+                    _hover={{ bg: "none", fill: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.1)" }}
                     onClick={onOpen}
                 />
                 <Drawer
@@ -120,12 +123,12 @@ export function Header() {
                         <Button
                             color="white"
                             background="darkOverlay"
-                            leftIcon={<EthIcon fill="poktBlue" width="28px" height="28px" />}
+                            leftIcon={<EthIcon fill="poktBlue" width="24px" height="24px" />}
                             borderWidth={2}
                             borderColor="darkOverlay"
                             _hover={{ bg: "hover.darkBlue" }}
-                            padding={4}
-                            paddingY={6}
+                            padding={3}
+                            paddingY={5}
                             onClick={() => disconnect()}
                         >
                             {address.substring(0,4) + "..." + address.substring(address.length - 4)}
@@ -139,7 +142,7 @@ export function Header() {
                             _hover={{ bg: "hover.poktLime" }}
                             leftIcon={<EthIcon />}
                             padding={4}
-                            paddingY={6}
+                            paddingY={5}
                             onClick={openConnectModal}
                         >
                             Connect
@@ -149,12 +152,12 @@ export function Header() {
                         <Button
                             color="white"
                             background="darkOverlay"
-                            leftIcon={<PoktIcon fill="poktBlue" width="28px" height="28px" />}
+                            leftIcon={<PoktIcon fill="poktBlue" width="24px" height="24px" />}
                             borderWidth={2}
                             borderColor="darkOverlay"
                             _hover={{ bg: "hover.darkBlue" }}
                             padding={4}
-                            paddingY={6}
+                            paddingY={5}
                             onClick={() => setPoktAddress("")}
                         >
                             {poktAddress.substring(0,4) + "..." + poktAddress.substring(poktAddress.length - 4)}
@@ -168,7 +171,7 @@ export function Header() {
                             _hover={{ bg: "hover.poktLime" }}
                             leftIcon={<PoktIcon />}
                             padding={4}
-                            paddingY={6}
+                            paddingY={5}
                             onClick={connectSendWallet}
                         >
                             Connect

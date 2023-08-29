@@ -5,13 +5,19 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from "../theme"
 import { WagmiConfig, createConfig, configureChains } from 'wagmi'
 import { goerli, mainnet } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public'
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { RainbowKitProvider, getDefaultWallets, darkTheme } from '@rainbow-me/rainbowkit'
 import React from 'react';
+import { GlobalContextProvider } from '@/context/Globals';
  
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [goerli],
-  [publicProvider()],
+  [jsonRpcProvider({
+    rpc: (chain) => ({
+      http: `https://eth-${chain.name}.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`,
+      webSocket: `wss://eth-${chain.name}.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
+    })
+  })],
 )
 
 const { connectors } = getDefaultWallets({
@@ -44,8 +50,9 @@ export default function App({ Component, pageProps }: AppProps) {
           borderRadius: 'small'
         })}>
           <ChakraProvider theme={theme}>
-            {/* <Component {...pageProps} /> */}
-            {React.createElement(Component, pageProps)}
+            <GlobalContextProvider>
+              {React.createElement(Component, pageProps)}
+            </GlobalContextProvider>
           </ChakraProvider>
         </RainbowKitProvider>
       </WagmiConfig>

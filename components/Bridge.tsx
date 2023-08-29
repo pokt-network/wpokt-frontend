@@ -113,9 +113,9 @@ export function Bridge() {
     }, [ethBalanceData?.value, poktBalance, estGasCost, poktAmount, wPoktAmount])
 
     useEffect(() => {
-        if (burnTx?.isSuccess || currentMint?.status === "success" || currentBurn?.status === "confirmed") refetchWPoktBalance()
-        if (currentBurn?.status === "success" || currentMint?.status === "confirmed") getPoktBalance()
-    }, [burnTx?.isSuccess, currentMint?.status, currentBurn?.status])
+        if (burnTx?.isSuccess || currentMint?.status === "success" || currentBurn?.status === "confirmed" || !isProgressOpen) refetchWPoktBalance()
+        if (currentBurn?.status === "success" || currentMint?.status === "confirmed" || !isProgressOpen) getPoktBalance()
+    }, [burnTx?.isSuccess, currentMint?.status, currentBurn?.status, isProgressOpen])
 
 
     async function burn() {
@@ -225,7 +225,7 @@ export function Bridge() {
                             </HStack>
                             {poktAddress ? (
                                 <Box>
-                                    <PoktIcon fill="white" position="fixed" ml={280} mt="6px" width="26px" height="26px" />
+                                    <PoktIcon fill="white" position="absolute" ml={280} mt="6px" width="26px" height="26px" />
                                     <Input
                                         type="number"
                                         borderRadius={0}
@@ -250,6 +250,7 @@ export function Bridge() {
                                         _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                         leftIcon={<PoktIcon fill={"white"}/>}
                                         onClick={connectSendWallet}
+                                        minW={180}
                                     >
                                         Connect SendWallet
                                     </Button>
@@ -280,6 +281,7 @@ export function Bridge() {
                                     _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                     leftIcon={<EthIcon fill={"white"}/>}
                                     onClick={openConnectModal}
+                                    minW={180}
                                 >
                                     Connect Wallet
                                 </Button>
@@ -297,7 +299,7 @@ export function Bridge() {
                                     <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost.substring(0,7)) : '----'} ETH</Text>
                                     {(!!ethPrice && !!estGasCost) && <Text>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
                                     <InfoIcon _hover={{ cursor: "pointer" }} onClick={onGasInfoOpen} />
-                                    {(insufficientEthGas||insufficientPoktGas) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
+                                    {((insufficientEthGas||insufficientPoktGas) && address && poktAddress) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
                             </Box>
                             <Box>
@@ -341,7 +343,7 @@ export function Bridge() {
                             </HStack>
                             {address ? (
                                 <Box>
-                                    <EthIcon fill="white" position="fixed" ml={280} mt="6px" width="26px" height="26px" />
+                                    <EthIcon fill="white" position="absolute" ml={280} mt="6px" width="26px" height="26px" />
                                     <Input
                                         type="number"
                                         borderRadius={0}
@@ -410,7 +412,7 @@ export function Bridge() {
                                 <Flex align="center" gap={2}>
                                     <Text>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost.substring(0,7)) : '----'} ETH</Text>
                                     {(!!ethPrice && !!estGasCost) && <Text>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
-                                    {insufficientEthGas && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
+                                    {(insufficientEthGas && address) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
                             </Box>
                             <Box>

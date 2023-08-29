@@ -11,7 +11,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (typeof recipient !== 'string' || !recipient) return res.status(400).end();
 
   try {
+    console.log("Recipient: ", recipient)
     const mints = await getAllMintsFromRecipient(recipient);
+    console.log("Mints: ", mints)
 
     if (!mints) return res.status(204).end();
     const activeMints = mints.filter((mint) => mint.status !== Status.SUCCESS && mint.status !== Status.FAILED);

@@ -1,9 +1,9 @@
-import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider, useDisclosure, useTimeout, SkeletonCircle, Circle, useInterval } from "@chakra-ui/react";
+import { Box, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Link, Divider, useDisclosure, useTimeout, SkeletonCircle, Circle, useInterval, HStack, VStack } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
 import { BlueEthIcon } from "../icons/eth";
 import { BlueBridgeIcon } from "../icons/copper";
 import { BluePoktIcon } from "../icons/pokt";
-import { BlueCheckIcon } from "../icons/misc";
+import { BlueCheckIcon, InfoIcon } from "../icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { MintModal } from "./MintModal";
 import { TimeoutModal } from "./TimeoutModal";
@@ -67,11 +67,9 @@ export function ProgressModal(props: ModalProps) {
             return 60000
         }
     }, [step])
+
     useEffect(() => { readyToMintWPokt() }, [step])
-    // useEffect(() => {
-    //     if (step === 1 && destination === "pokt" && ethTxHash && burnTx?.isSuccess) getBurnInfo()
-    //     if (step === 1 && destination === "eth" && poktTxHash) getMintInfo()
-    // }, [step, destination, ethTxHash, burnTx?.isSuccess, poktTxHash, mintTx?.isSuccess])
+    
     useEffect(() => {
         if (destination === "eth" && currentMint?.status === Status.FAILED) getInvalidMintInfo()
     }, [currentMint?.status])
@@ -207,43 +205,56 @@ export function ProgressModal(props: ModalProps) {
                 <ModalHeader textAlign="center" color="poktBlue">{destination === 'pokt' && 'UN'}WRAPPING IN PROGRESS</ModalHeader>
                 <ModalCloseButton color="poktBlue" />
                 <ModalBody padding={0}>
-                    <Text paddingX={8} mb={8}>
-                        You can close this window or refresh this page without interrupting the process.
-                    </Text>
+                    {destination === "eth" && step < 3 ? (
+                        <VStack paddingX={8} mb={8} gap={0}>
+                            <HStack justify='center' gap={4} align='center'>
+                                <InfoIcon fill='warning' />
+                                <Text textColor='warning'>
+                                    Don't close this window!
+                                </Text>
+                            </HStack>
+                            <Text>There is one more transaction you need to sign.</Text>
+                        </VStack>
+                    ) : (
+                        <Text paddingX={8} mb={8}>
+                            You can close this window or refresh this page without interrupting the process.
+                        </Text>
+                    )}
+                    
                     <Flex justify="center">
                         <Flex direction="column" align="center">
                             {step > 0 ? <BlueCheckIcon/> : 
                                 <Circle>
-                                    <SkeletonCircle position="fixed" size="20" />
+                                    <SkeletonCircle position="absolute" size="20" bg="darkBlue" />
                                     {destination === "pokt" ? <BlueEthIcon zIndex={2} /> : <BluePoktIcon zIndex={2} />}
                                 </Circle>
                             }
-                            {step === 0 && <Divider borderColor="poktLime" orientation="vertical" height="50px" />}
+                            {step === 0 && <Divider borderColor="poktLime" orientation="vertical" height="40px" mt="10px" />}
                         </Flex>
-                        <Divider borderColor="poktLime" height="25px" maxWidth="50px" />
+                        <Divider borderColor="poktLime" height="25px" maxWidth={step <= 1 ? "40px" : "50px"} ml={step === 0 ? "10px" : 0} mr={step === 1 ? "10px" : 0} />
                         <Flex direction="column" align="center">
                             {step > 1 ? <BlueCheckIcon/> : step === 1 ? (
                                 <Circle>
-                                    <SkeletonCircle position="fixed" size="20" />
+                                    <SkeletonCircle position="absolute" size="20" />
                                     <BlueBridgeIcon zIndex={2} />
                                 </Circle>
                             ) : <BlueBridgeIcon/>}
-                            {step === 1 && <Divider borderColor="poktLime" orientation="vertical" height="50px" />}
+                            {step === 1 && <Divider borderColor="poktLime" orientation="vertical" height="40px" mt="10px" />}
                         </Flex>
-                        <Divider borderColor="poktLime" height="25px" maxWidth="50px" />
+                        <Divider borderColor="poktLime" height="25px" maxWidth={step >= 1 ? "40px" : "50px"} ml={step === 1 || (step === 2 && destination === "eth") ? "10px" : 0} mr={step > 2 || (step === 2 && destination === "pokt") ? "10px" : 0} />
                         <Flex direction="column" align="center">
                             {destination === "pokt" ? step > 2 ? <BlueCheckIcon/> : <>{step === 2 ? (
                                 <Circle>
-                                    <SkeletonCircle position="fixed" size="20" />
+                                    <SkeletonCircle position="absolute" size="20" />
                                     <BluePoktIcon zIndex={2} />
                                 </Circle>
                             ) : <BluePoktIcon />}</> : step > 3 ? <BlueCheckIcon/> : <>{step >= 2 ? (
                                 <Circle>
-                                    <SkeletonCircle position="fixed" size="20" />
+                                    <SkeletonCircle position="absolute" size="20" />
                                     <BlueEthIcon zIndex={2} />
                                 </Circle>
                             ): <BlueEthIcon />}</>}
-                            {step >= 2 && <Divider borderColor="poktLime" orientation="vertical" height="50px" />}
+                            {step >= 2 && <Divider borderColor="poktLime" orientation="vertical" height="40px" mt="10px" />}
                         </Flex>
                     </Flex>
                     <ProgressModalStatusDescription step={step} destination={destination} poktTxHash={poktTxHash} ethTxHash={ethTxHash} />
@@ -302,8 +313,8 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                     <Text color="poktBlue">
                         {step === 0 && "Sending your POKT to the vault"}
                         {step === 1 && "Bridging your order"}
-                        {step === 2 && "Minting wPOKT"}
-                        {step > 2 && "Transaction Complete!"}
+                        {(step === 2 || step === 3) && "Minting wPOKT"}
+                        {step > 3 && "Transaction Complete!"}
                     </Text>
                     <Text>
                         {step === 0 && "This may take several blocks to confirm. Pocket blocks complete every 15 minutes."}
