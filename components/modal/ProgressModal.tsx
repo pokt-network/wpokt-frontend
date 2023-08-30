@@ -210,7 +210,7 @@ export function ProgressModal(props: ModalProps) {
                             <HStack justify='center' gap={4} align='center'>
                                 <InfoIcon fill='warning' />
                                 <Text textColor='warning'>
-                                    Don't close this window!
+                                    Don&apos;t close this window!
                                 </Text>
                             </HStack>
                             <Text>There is one more transaction you need to sign.</Text>
