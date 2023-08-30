@@ -31,13 +31,6 @@ export function ProgressModal(props: ModalProps) {
         setCurrentBurn
     } = useGlobalContext()
 
-    // STEPS
-    // 0. Sending POKT to vault
-    // 1. Vault is validating order
-    // 2. Waiting for user to mint wPOKT
-    // 3. Minting wPOKT
-    // 4. wPOKT minted
-    // const [step, setStep] = useState<number>(getCurrentStep())
     const [isBurnFetchError, setIsBurnFetchError] = useState<boolean>(false)
     const [isMintFetchError, setIsMintFetchError] = useState<boolean>(false)
     const [invalidMint, setInvalidMint] = useState<InvalidMint|undefined>(undefined)
@@ -47,7 +40,7 @@ export function ProgressModal(props: ModalProps) {
     const { isOpen: isTimeoutOpen, onOpen: onTimeoutOpen, onClose: onTimeoutClose } = useDisclosure()
     const { isOpen: isRefundOpen, onOpen: onRefundOpen, onClose: onRefundClose } = useDisclosure()
 
-    const step = useMemo(() => getCurrentStep(), [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, mintTx?.status, currentMint?.status])
+    const step = useMemo(() => getCurrentStep(), [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, currentBurn?.return_tx_hash, mintTx?.status, currentMint?.status])
     const timeInterval = useMemo(() => {
         if (destination === "eth") {
             if (step === 0) return 1000 * 60 * 5
@@ -114,19 +107,32 @@ export function ProgressModal(props: ModalProps) {
         }
     }
 
+    // STEPS
+    // POKT => ETH
+    // 0. Sending POKT to vault
+    // 1. Vault is validating order
+    // 2. Waiting for user to mint wPOKT
+    // 3. Minting wPOKT
+    // 4. wPOKT minted
+    // ETH => POKT
+    // 0. Burning wPOKT
+    // 1. Vault is validating order
+    // 2. Vault sends POKT to user
+    // 3. POKT transaction confirmed
     function getCurrentStep(): number {
         if (destination === "pokt") {
-            if (currentBurn?.status === Status.SUCCESS) return 3
+            if (currentBurn?.status === Status.SUCCESS) {
+                setPoktTxHash(currentBurn?.return_tx_hash)
+                return 3
+            }
             if (currentBurn?.status === Status.SIGNED || currentBurn?.status === Status.SUMBITTED) {
-                setPoktTxHash(currentBurn?.return_tx_hash || "")
+                if (!currentBurn?.return_tx_hash) return 1
+                setPoktTxHash(currentBurn?.return_tx_hash)
                 return 2
             }
             if (currentBurn?.status === Status.CONFIRMED) return 1
             return 0
         } else {
-            // if done, return 4
-            // if minting, return 3
-            // if ready to mint, return 2
             if (currentMint?.status === Status.SUCCESS || mintTx?.isSuccess) {
                 setEthTxHash(mintTxHash || "")
                 return 4
@@ -179,8 +185,10 @@ export function ProgressModal(props: ModalProps) {
                 const mint = await res.json()
                 console.log("Mint from DB:", mint)
                 setCurrentMint(mint)
+                setIsMintFetchError(false)
             } catch (error) {
                 console.error(error)
+                setIsMintFetchError(true)
             }
         }
         isTakingTooLong()
@@ -241,7 +249,7 @@ export function ProgressModal(props: ModalProps) {
                             ) : <BlueBridgeIcon/>}
                             {step === 1 && <Divider borderColor="poktLime" orientation="vertical" height="40px" mt="10px" />}
                         </Flex>
-                        <Divider borderColor="poktLime" height="25px" maxWidth={step >= 1 ? "40px" : "50px"} ml={step === 1 || (step === 2 && destination === "eth") ? "10px" : 0} mr={step > 2 || (step === 2 && destination === "pokt") ? "10px" : 0} />
+                        <Divider borderColor="poktLime" height="25px" maxWidth={step >= 1 && ((step <= 3 && destination === 'eth') || (step <= 2 && destination === 'pokt')) ? "40px" : "50px"} ml={step === 1 || (step === 2 && destination === "eth") ? "10px" : 0} mr={(step === 3 && destination === 'eth') || (step === 2 && destination === "pokt") ? "10px" : 0} />
                         <Flex direction="column" align="center">
                             {destination === "pokt" ? step > 2 ? <BlueCheckIcon/> : <>{step === 2 ? (
                                 <Circle>
@@ -254,7 +262,7 @@ export function ProgressModal(props: ModalProps) {
                                     <BlueEthIcon zIndex={2} />
                                 </Circle>
                             ): <BlueEthIcon />}</>}
-                            {step >= 2 && <Divider borderColor="poktLime" orientation="vertical" height="40px" mt="10px" />}
+                            {step >= 2 && <Divider borderColor="poktLime" orientation="vertical" height={(step === 2 && destination === 'pokt')||(step === 3 && destination === 'eth') ? "40px" : "50px"} mt={(step === 2 && destination === 'pokt')||(step === 3 && destination === 'eth') ? "10px" : "0px"} />}
                         </Flex>
                     </Flex>
                     <ProgressModalStatusDescription step={step} destination={destination} poktTxHash={poktTxHash} ethTxHash={ethTxHash} />
