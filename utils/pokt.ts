@@ -5,3 +5,5 @@ export function parsePokt(amount: string | number): bigint {
 export function formatPokt(amount: string | bigint): string {
     return (BigInt(amount) / BigInt(1e6)).toString()
 }
+
+export const UPOKT = 1000000;
