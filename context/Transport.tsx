@@ -1,7 +1,7 @@
 import React, { createContext, useState, useCallback, useContext } from "react";
 import WebHIDTransport from "@ledgerhq/hw-transport-webhid";
 import WebUSBTransport from "@ledgerhq/hw-transport-webusb";
-import AppPokt from "hw-app-pokt";
+import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "../utils/ledger";
 import { Config } from "../utils/config";
 import { getDataSource } from "../utils/datasource";
