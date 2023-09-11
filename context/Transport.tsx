@@ -3,12 +3,12 @@ import WebHIDTransport from "@ledgerhq/hw-transport-webhid";
 import WebUSBTransport from "@ledgerhq/hw-transport-webusb";
 import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "../utils/ledger";
-import { Config } from "../utils/config";
+// import { Config } from "../utils/config";
 import { getDataSource } from "../utils/datasource";
 import { typeGuard } from "@pokt-network/pocket-js";
-import { GlobalContext } from "./Globals";
+import { useGlobalContext } from "./Globals";
 
-const dataSource = getDataSource();
+// const dataSource = getDataSource();
 const PUBLIC_KEY_TYPE = "crypto/ed25519_public_key";
 
 const DEFAULT_TRANSPORT_STATE = {
@@ -44,9 +44,10 @@ declare global {
 }
 
 export const TransportContext = createContext<TransportContextProps>(DEFAULT_TRANSPORT_STATE);
+export const useTransport = () => useContext(TransportContext)
 
 export function TransportProvider({ children }: any) {
-  const { poktAddress } = useContext(GlobalContext);
+  const { poktAddress } = useGlobalContext();
   const [pocketApp, setPocketApp] = useState<any>();
   const [isHardwareWalletLoading, setIsHardwareWalletLoading] = useState<boolean>(false);
   const isUsingHardwareWallet = pocketApp?.transport ? true : false;
@@ -99,57 +100,57 @@ export function TransportProvider({ children }: any) {
     amount: bigint,
     memo: any
   ) => {
-    setIsHardwareWalletLoading(true);
-    /* global BigInt */
-    const entropy = Number(
-      BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)).toString()
-    ).toString();
+    // setIsHardwareWalletLoading(true);
+    // /* global BigInt */
+    // const entropy = Number(
+    //   BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)).toString()
+    // ).toString();
 
-    const tx = {
-      chain_id: Config.CHAIN_ID,
-      entropy: entropy.toString(),
-      fee: [
-        {
-          amount: Config.TX_FEE || "10000",
-          denom: "upokt",
-        },
-      ],
-      memo: memo || "",
-      msg: {
-        type: "pos/Send",
-        value: {
-          amount: amount.toString(),
-          from_address: poktAddress,
-          to_address: toAddress,
-        },
-      },
-    };
+    // const tx = {
+    //   chain_id: Config.CHAIN_ID,
+    //   entropy: entropy.toString(),
+    //   fee: [
+    //     {
+    //       amount: Config.TX_FEE || "10000",
+    //       denom: "upokt",
+    //     },
+    //   ],
+    //   memo: memo || "",
+    //   msg: {
+    //     type: "pos/Send",
+    //     value: {
+    //       amount: amount.toString(),
+    //       from_address: poktAddress,
+    //       to_address: toAddress,
+    //     },
+    //   },
+    // };
 
-    try {
-      const stringifiedTx = JSON.stringify(tx);
-      const hexTx = Buffer.from(stringifiedTx, "utf-8").toString("hex");
-      const sig = await pocketApp.signTransaction(
-        LEDGER_CONFIG.derivationPath,
-        hexTx
-      );
+    // try {
+    //   const stringifiedTx = JSON.stringify(tx);
+    //   const hexTx = Buffer.from(stringifiedTx, "utf-8").toString("hex");
+    //   const sig = await pocketApp.signTransaction(
+    //     LEDGER_CONFIG.derivationPath,
+    //     hexTx
+    //   );
 
-      const ledgerTxResponse = await dataSource.sendTransactionFromLedger(
-        await pocketApp.getPublicKey(LEDGER_CONFIG.derivationPath), // publicKey,
-        sig.signature,
-        tx
-      );
-      if (typeGuard(ledgerTxResponse, Error)) {
-        setIsHardwareWalletLoading(false);
-        return ledgerTxResponse;
-      }
+    //   const ledgerTxResponse = await dataSource.sendTransactionFromLedger(
+    //     await pocketApp.getPublicKey(LEDGER_CONFIG.derivationPath), // publicKey,
+    //     sig.signature,
+    //     tx
+    //   );
+    //   if (typeGuard(ledgerTxResponse, Error)) {
+    //     setIsHardwareWalletLoading(false);
+    //     return ledgerTxResponse;
+    //   }
 
-      setIsHardwareWalletLoading(false);
-      return ledgerTxResponse;
-    } catch (e) {
-      console.error("error: ", e);
-      setIsHardwareWalletLoading(false);
-      return e;
-    }
+    //   setIsHardwareWalletLoading(false);
+    //   return ledgerTxResponse;
+    // } catch (e) {
+    //   console.error("error: ", e);
+    //   setIsHardwareWalletLoading(false);
+    //   return e;
+    // }
   };
 
   return (

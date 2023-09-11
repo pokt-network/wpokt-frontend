@@ -15,10 +15,12 @@ import { useGlobalContext } from "@/context/Globals";
 import { CloseIcon, MenuIcon } from "./icons/misc";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect } from "wagmi";
+import { useTransport } from "@/context/Transport";
 
 
 export function Header() {
     const { mobile, poktAddress, ethAddress, setPoktAddress, connectSendWallet } = useGlobalContext()
+    const { onSelectDevice } = useTransport()
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { openConnectModal } = useConnectModal()
     const { address } = useAccount()
@@ -119,6 +121,19 @@ export function Header() {
                 </>
             ) : (
                 <ButtonGroup>
+                    <Button
+                        color="darkBlue"
+                        background="poktLime"
+                        borderWidth={2}
+                        borderColor="poktLime"
+                        _hover={{ bg: "hover.poktLime" }}
+                        leftIcon={<PoktIcon />}
+                        padding={4}
+                        paddingY={5}
+                        onClick={onSelectDevice}
+                    >
+                        Ledger
+                    </Button>
                     {address ? (
                         <Button
                             color="white"
