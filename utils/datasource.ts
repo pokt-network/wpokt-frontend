@@ -10,8 +10,8 @@ import {
 } from "@pokt-network/pocket-js";
 import { getGatewayClient } from "./gateway";
 import axios from "axios";
-import { UPOKT } from "./pokt";
-import { Config } from "./config";
+import { UPOKT, parsePokt } from "./pokt";
+// import { Config } from "./config";
 
 export const PoktErrors = {
   ConfigErrors: {
@@ -19,16 +19,28 @@ export const PoktErrors = {
   }
 }
 
+// export const dataSourceConfig = {
+//   gatewayUrl: Config.GATEWAY_BASE_URL,
+//   http: {
+//     timeout: Config.HTTP_TIMEOUT,
+//     headers: Config.HTTP_HEADERS !== "" ? JSON.parse(Config.HTTP_HEADERS) : {},
+//   },
+//   chainId: Config.CHAIN_ID,
+//   txFee: Config.TX_FEE,
+//   maxTransactionListCount: Config.MAX_TRANSACTION_LIST_COUNT,
+//   useLegacyCodec: Config.USE_LEGACY_CODEC === "false" ? false : true
+// }
+
 export const dataSourceConfig = {
-  gatewayUrl: Config.GATEWAY_BASE_URL,
+  gatewayUrl: `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`,
   http: {
-    timeout: Config.HTTP_TIMEOUT,
-    headers: Config.HTTP_HEADERS !== "" ? JSON.parse(Config.HTTP_HEADERS) : {},
+    timeout: 30000,
+    headers: {},
   },
-  chainId: Config.CHAIN_ID,
-  txFee: Config.TX_FEE,
-  maxTransactionListCount: Config.MAX_TRANSACTION_LIST_COUNT,
-  useLegacyCodec: Config.USE_LEGACY_CODEC === "false" ? false : true
+  chainId: 'mainnet',
+  txFee: Number(parsePokt('0.01').toString()),
+  maxTransactionListCount: 15,
+  useLegacyCodec: true
 }
 
 export const getDataSource = () => new DataSource(dataSourceConfig);
@@ -59,14 +71,14 @@ export class DataSource {
       20000,
       undefined,
       undefined,
-      Number(config.blockTime),
+      Number(config.blockTime || 0),
       undefined,
       false,
       false,
       config.useLegacyCodec
     );
 
-    this.__pocket = new Pocket([""], undefined, pocketClientConfiguration);
+    this.__pocket = new Pocket([new URL(gatewayUrl)], undefined, pocketClientConfiguration);
 
     this.config = config;
   }
@@ -185,7 +197,7 @@ export class DataSource {
       console.log(
         `Failed to process transaction with error: ${unsignedTransaction}`
       );
-      return new Error(unsignedTransaction);
+      return new Error(unsignedTransaction.message);
     }
 
     const { bytesToSign, stdTxMsgObj } = unsignedTransaction;

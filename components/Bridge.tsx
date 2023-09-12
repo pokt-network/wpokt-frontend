@@ -15,6 +15,8 @@ import { createPublicClient, formatEther, formatUnits, getAddress, http, parseUn
 import { goerli } from "wagmi/chains";
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
 import { GasInfoModal } from "./modal/GasInfoModal";
+import { useTransport } from "@/context/Transport";
+import { ConnectPoktModal } from "./modal/ConnectPoktModal";
 
 
 export function Bridge() {
@@ -45,6 +47,7 @@ export function Bridge() {
         currentMint,
         getPoktBalance
     } = useGlobalContext()
+    const { connectLedgerDevice, isUsingHardwareWallet, removeTransport } = useTransport()
 
     const { address } = useAccount()
     const { openConnectModal } = useConnectModal()
@@ -66,6 +69,7 @@ export function Bridge() {
     const { isOpen: isTimeInfoOpen, onOpen: onTimeInfoOpen, onClose: onTimeInfoClose } = useDisclosure()
     const { isOpen: isGasInfoOpen, onOpen: onGasInfoOpen, onClose: onGasInfoClose } = useDisclosure()
     const { isOpen: isResumeMintOpen, onOpen: onResumeMintOpen, onClose: onResumeMintClose } = useDisclosure()
+    const { isOpen: isConnectPoktModalOpen, onOpen: onConnectPoktModalOpen, onClose: onConnectPoktModalClose } = useDisclosure()
 
     const toast = useToast()
 
@@ -249,10 +253,10 @@ export function Bridge() {
                                         color="white"
                                         _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                         leftIcon={<PoktIcon fill={"white"}/>}
-                                        onClick={connectSendWallet}
+                                        onClick={onConnectPoktModalOpen}
                                         minW={180}
                                     >
-                                        Connect SendWallet
+                                        Connect POKT Wallet
                                     </Button>
                                 </Center>
                             )}
@@ -283,7 +287,7 @@ export function Bridge() {
                                     onClick={openConnectModal}
                                     minW={180}
                                 >
-                                    Connect Wallet
+                                    Connect ETH Wallet
                                 </Button>
                             </Center>
                         )}
@@ -369,7 +373,7 @@ export function Bridge() {
                                         leftIcon={<EthIcon fill={"white"}/>}
                                         onClick={openConnectModal}
                                     >
-                                        Connect Wallet
+                                        Connect ETH Wallet
                                     </Button>
                                 </Center>
                             )}
@@ -396,9 +400,9 @@ export function Bridge() {
                                 color="white"
                                 _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                 leftIcon={<PoktIcon fill={"white"}/>}
-                                onClick={connectSendWallet}
+                                onClick={onConnectPoktModalOpen}
                             >
-                                Connect SendWallet
+                                Connect POKT Wallet
                             </Button>
                         </Center>
                     )}
@@ -444,6 +448,7 @@ export function Bridge() {
             )}
             <GasInfoModal isOpen={isGasInfoOpen} onClose={onGasInfoClose}><></></GasInfoModal>
             <TimeInfoModal isOpen={isTimeInfoOpen} onClose={onTimeInfoClose}><></></TimeInfoModal>
+            <ConnectPoktModal isOpen={isConnectPoktModalOpen} onClose={onConnectPoktModalClose}><></></ConnectPoktModal>
         </VStack>
     )
 }

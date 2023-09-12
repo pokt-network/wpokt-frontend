@@ -111,6 +111,9 @@ export class PocketQueriesController {
   };
 
   perform = async (requestName: string, ...args: any) => {
+    if (!this.provider) {
+      throw new Error("No provider set");
+    }
     const reqConfig =
       typeof this.requests[requestName] === "function"
         ? this.requests[requestName](...args)

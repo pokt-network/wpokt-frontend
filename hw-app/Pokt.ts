@@ -81,7 +81,7 @@ export class LedgerPoktSigner extends AbstractSigner {
 export default class Pokt extends Common {
   
   constructor(transport: Transport) {
-    super(transport, "PKT");
+    super(transport, "PKT", "Pocket");
     this.sendChunks = this.sendWithBlocks;
   }
 
