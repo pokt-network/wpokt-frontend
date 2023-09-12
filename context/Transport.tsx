@@ -4,9 +4,11 @@ import WebUSBTransport from "@ledgerhq/hw-transport-webusb";
 import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "../utils/ledger";
 // import { Config } from "../utils/config";
-import { getDataSource } from "../utils/datasource";
+// import { getDataSource } from "../utils/datasource";
 import { typeGuard } from "@pokt-network/pocket-js";
 import { useGlobalContext } from "./Globals";
+// import { getGatewayClient } from "@/utils/gateway";
+import { UPOKT } from "@/utils/pokt";
 
 // const dataSource = getDataSource();
 const PUBLIC_KEY_TYPE = "crypto/ed25519_public_key";
@@ -216,6 +218,31 @@ export function TransportProvider({ children }: any) {
       return e;
     }
   };
+
+  const poktGatewayUrl = `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
+
+  async function getPoktBalanceFromLedger(address: string): Promise<number> {
+    let balanceResponse;
+    try {
+      const res = await fetch(`${poktGatewayUrl}/v1/query/balance`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address,
+          height: 0,
+        }),
+      })
+      balanceResponse = await res.json()
+    } catch (error) {
+      console.log(error);
+      return 0;
+    }
+
+    const uPOKT = Number(balanceResponse?.balance?.toString());
+    return (uPOKT ? uPOKT : 0) / UPOKT;
+  }
 
   return (
     <TransportContext.Provider

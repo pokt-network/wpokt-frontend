@@ -254,7 +254,7 @@ export function Bridge() {
                                         _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                         leftIcon={<PoktIcon fill={"white"}/>}
                                         onClick={onConnectPoktModalOpen}
-                                        minW={180}
+                                        minW={200}
                                     >
                                         Connect POKT Wallet
                                     </Button>
@@ -285,7 +285,7 @@ export function Bridge() {
                                     _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                     leftIcon={<EthIcon fill={"white"}/>}
                                     onClick={openConnectModal}
-                                    minW={180}
+                                    minW={200}
                                 >
                                     Connect ETH Wallet
                                 </Button>
@@ -372,6 +372,7 @@ export function Bridge() {
                                         _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                         leftIcon={<EthIcon fill={"white"}/>}
                                         onClick={openConnectModal}
+                                        minW={200}
                                     >
                                         Connect ETH Wallet
                                     </Button>
@@ -401,6 +402,7 @@ export function Bridge() {
                                 _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                 leftIcon={<PoktIcon fill={"white"}/>}
                                 onClick={onConnectPoktModalOpen}
+                                minW={200}
                             >
                                 Connect POKT Wallet
                             </Button>

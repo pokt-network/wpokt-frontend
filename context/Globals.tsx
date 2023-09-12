@@ -238,20 +238,43 @@ export function GlobalContextProvider({ children }: any) {
     async function getPoktBalance() {
         if (poktAddress) {
             try {
-                // Get uPokt Balance
-                let balance = await window.pocketNetwork
-                    .send("pokt_balance", [{ address: poktAddress }])
-                    .then(({ balance }: any) => {
-                        console.log("POKT Balance:", {
-                            balanceInUpokt: balance,
-                            balanceInPokt: balance / 1e6,
+                let balance = BigInt(0)
+                if (window.pocketNetwork === undefined) {
+                    let balanceResponse;
+                    try {
+                        const poktGatewayUrl = `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
+                        const res = await fetch(`${poktGatewayUrl}/v1/query/balance`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                address: poktAddress,
+                                height: 0,
+                            }),
+                        })
+                        balanceResponse = await res.json()
+                    } catch (error) {
+                        console.log(error);
+                        return 0;
+                    }
+                    balance = balanceResponse?.balance?.toString();
+                } else {
+                    // Get uPokt Balance
+                    balance = await window.pocketNetwork
+                        .send("pokt_balance", [{ address: poktAddress }])
+                        .then(({ balance }: any) => {
+                            console.log("POKT Balance:", {
+                                balanceInUpokt: balance,
+                                balanceInPokt: balance / 1e6,
+                            });
+                            return balance;
+                        })
+                        .catch((e: any) => {
+                            console.error("Error getting POKT balance:", e);
+                            return null;
                         });
-                        return balance;
-                    })
-                    .catch((e: any) => {
-                        console.error("Error getting POKT balance:", e);
-                        return null;
-                    });
+                }
                 setPoktBalance(BigInt(balance))
             } catch (error) {
                 console.error(error)
