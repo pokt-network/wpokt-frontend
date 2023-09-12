@@ -71,7 +71,7 @@ export function TransportProvider({ children }: any) {
       if (app?.transport) {
         const { address } = await app?.getPublicKey(LEDGER_CONFIG.generateDerivationPath(0));
         if (!address) throw Error("No address found")
-        return setPoktAddress(Buffer.from(address).toString("hex"));
+        return setPoktAddress(address);
       }
     } catch (error) {
       console.error(error)
@@ -150,8 +150,13 @@ export function TransportProvider({ children }: any) {
   }, [pocketApp]);
 
   async function getPoktAddressFromLedger() {
-    const { address } = await pocketApp?.getPublicKey(LEDGER_CONFIG.generateDerivationPath(0));
-    return Buffer.from(address).toString("hex");
+    try {
+      if (!pocketApp?.transport) throw Error("No transport found")
+      const { address } = await pocketApp?.getPublicKey(LEDGER_CONFIG.generateDerivationPath(0));
+      return address
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const sendTransaction = async (

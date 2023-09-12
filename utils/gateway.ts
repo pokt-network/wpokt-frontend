@@ -18,6 +18,10 @@ export class AxiosProvider {
   }
 }
 
+type Requests = {
+  [key: string]: any;
+}
+
 /**
  * Http Control Layer.
  * Throw your http control logic in here, i.e: if error, if data, if 201.
@@ -25,7 +29,7 @@ export class AxiosProvider {
 export class PocketQueriesController {
   provider: any = undefined;
 
-  requests = {
+  requests: Requests = {
     getBalance: (address: string, height: number) => ({
       url: "/v1/query/balance",
       method: "post",
@@ -131,7 +135,7 @@ export class PocketQueriesController {
   // arguments explicit forwardong for clear signature lookup, avoid using `...args`
   _getBalance = (address: string, height: number) =>
     this.perform.call(this, "getBalance", address, height);
-  _getTransaction = (id) => this.perform.call(this, "getTransaction", id);
+  _getTransaction = (id: any) => this.perform.call(this, "getTransaction", id);
   _getApp = (address: string, height: number) =>
     this.perform.call(this, "getApp", address, height);
   _getNode = (address: string, height: number) =>
@@ -143,7 +147,7 @@ export class PocketQueriesController {
 
   // For semantic separation, and for "ease of middlewaring" when necessary.
   // hook your processors to your cals in here
-  query = {
+  query: Requests = {
     getBalance: this._getBalance,
     getTransaction: this._getTransaction,
     getApp: this._getApp,

@@ -72,32 +72,32 @@ const configEnvVars = [
   'NEXT_PUBLIC_USE_LEGACY_CODEC'
 ]
 
-const loadEnvFromList = (list: any[]) => list.reduce(
-  (cfg, k) => {
-     return { ...cfg, [k.replace(/NEXT_PUBLIC_/g, '')]: import.meta.env[k] }
-  },
-  {},
-)
+// const loadEnvFromList = (list: any[]) => list.reduce(
+//   (cfg, k) => {
+//      return { ...cfg, [k.replace(/NEXT_PUBLIC_/g, '')]: import.meta.env[k] }
+//   },
+//   {},
+// )
 
-/**
- * For now the config is literraly = env variables
- * keep this piece of code if we want to do config gymnastics
- * */
-const loadConfigFromEnv = () => {
-  const configObj = loadEnvFromList(configEnvVars);
+// /**
+//  * For now the config is literraly = env variables
+//  * keep this piece of code if we want to do config gymnastics
+//  * */
+// const loadConfigFromEnv = () => {
+//   const configObj = loadEnvFromList(configEnvVars);
 
-  // order of values matters!
-  const validatedEnvVars = ['CHAIN_ID', 'GATEWAY_BASE_URL']
+//   // order of values matters!
+//   const validatedEnvVars = ['CHAIN_ID', 'GATEWAY_BASE_URL']
 
-  validatedEnvVars.forEach(
-    (envVarKey) => {
-      console.log({ envVarKey, envVarVal: configObj[envVarKey] })
-      const v = validators[envVarKey](configObj[envVarKey], configObj); // as long as it does not through we are good
-      configObj[envVarKey] = v;
-    }
-  );
+//   validatedEnvVars.forEach(
+//     (envVarKey) => {
+//       console.log({ envVarKey, envVarVal: configObj[envVarKey] })
+//       const v = validators[envVarKey](configObj[envVarKey], configObj); // as long as it does not through we are good
+//       configObj[envVarKey] = v;
+//     }
+//   );
 
-  return configObj;
-}
+//   return configObj;
+// }
 
-export const Config = loadConfigFromEnv();
+// export const Config = loadConfigFromEnv();

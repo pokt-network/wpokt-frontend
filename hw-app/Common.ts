@@ -17,14 +17,14 @@
 import type Transport from "@ledgerhq/hw-transport";
 import sha256 from "fast-sha256";
 
-export type GetPublicKeyResult = {
+export interface GetPublicKeyResult {
   publicKey: Uint8Array;
-  address: Uint8Array | null;
+  address: string;
 };
-export type SignTransactionResult = {
+export interface SignTransactionResult {
   signature: Uint8Array;
 };
-export type GetVersionResult = {
+export interface GetVersionResult {
   major: number;
   minor: number;
   patch: number;
@@ -96,7 +96,7 @@ export class Common {
     }
     const res: GetPublicKeyResult = {
       publicKey: publicKey,
-      address: address,
+      address:  address ? Buffer.from(address).toString('hex') : "",
     };
     return res;
   }
