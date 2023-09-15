@@ -6,7 +6,7 @@ import { LEDGER_CONFIG } from "../utils/ledger";
 // import { Config } from "../utils/config";
 // import { getDataSource } from "../utils/datasource";
 import { typeGuard } from "@pokt-network/pocket-js";
-import { useGlobalContext } from "./Globals";
+import { useGlobalContext, dataSource } from "./Globals";
 // import { getGatewayClient } from "@/utils/gateway";
 import { UPOKT } from "@/utils/pokt";
 
@@ -55,10 +55,14 @@ export const TransportContext = createContext<TransportContextProps>(DEFAULT_TRA
 export const useTransport = () => useContext(TransportContext)
 
 export function TransportProvider({ children }: any) {
-  const { poktAddress, setPoktAddress } = useGlobalContext();
-  const [pocketApp, setPocketApp] = useState<AppPokt>();
+  const { poktAddress, setPoktAddress, pocketApp, setPocketApp, setIsUsingHardwareWallet } = useGlobalContext();
   const [isHardwareWalletLoading, setIsHardwareWalletLoading] = useState<boolean>(false);
   const isUsingHardwareWallet = pocketApp?.transport ? true : false;
+
+  useEffect(() => {
+    if (pocketApp?.transport) setIsUsingHardwareWallet(true)
+    else setIsUsingHardwareWallet(false)
+  }, [pocketApp, isUsingHardwareWallet])
 
   const initializePocketApp = useCallback(async (transport: any) => {
     console.log("initializing pokt app..")
@@ -200,18 +204,20 @@ export function TransportProvider({ children }: any) {
         hexTx
       );
 
-      // const ledgerTxResponse = await dataSource.sendTransactionFromLedger(
-      //   await pocketApp.getPublicKey(LEDGER_CONFIG.derivationPath), // publicKey,
-      //   sig.signature,
-      //   tx
-      // );
-      // if (typeGuard(ledgerTxResponse, Error)) {
-      //   setIsHardwareWalletLoading(false);
-      //   return ledgerTxResponse;
-      // }
+      const pk = await pocketApp?.getPublicKey(LEDGER_CONFIG.derivationPath)
+      if (!pk || !sig) throw Error("No public key or signature found")
+      const ledgerTxResponse = await dataSource.sendTransactionFromLedger(
+        Buffer.from(pk?.publicKey).toString("hex"),
+        Buffer.from(sig?.signature).toString("hex"),
+        tx
+      );
+      if (typeGuard(ledgerTxResponse, Error)) {
+        setIsHardwareWalletLoading(false);
+        return ledgerTxResponse;
+      }
 
-      // setIsHardwareWalletLoading(false);
-      // return ledgerTxResponse;
+      setIsHardwareWalletLoading(false);
+      return ledgerTxResponse;
     } catch (e) {
       console.error("error: ", e);
       setIsHardwareWalletLoading(false);
@@ -252,7 +258,7 @@ export function TransportProvider({ children }: any) {
         setPocketApp,
         removeTransport,
         isUsingHardwareWallet,
-        sendTransaction,
+        sendTransaction: sendTransaction,
         isHardwareWalletLoading,
         setIsHardwareWalletLoading,
         getPoktAddressFromLedger,

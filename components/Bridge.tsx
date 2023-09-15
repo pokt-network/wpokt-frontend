@@ -45,9 +45,9 @@ export function Bridge() {
         allPendingMints,
         currentBurn,
         currentMint,
-        getPoktBalance
+        getPoktBalance,
+        isSigningTx,
     } = useGlobalContext()
-    const { connectLedgerDevice, isUsingHardwareWallet, removeTransport } = useTransport()
 
     const { address } = useAccount()
     const { openConnectModal } = useConnectModal()
@@ -331,6 +331,7 @@ export function Bridge() {
                                 // onProgressOpen()
                             }}
                             isDisabled={!poktAddress||!address||!poktAmount}
+                            isLoading={isSigningTx}
                         >
                             Wrap
                         </Button>

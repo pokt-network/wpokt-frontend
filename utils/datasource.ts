@@ -8,8 +8,8 @@ import {
   TransactionSender,
   ProtoTransactionSigner,
 } from "@pokt-network/pocket-js";
-import { getGatewayClient } from "./gateway";
-import axios from "axios";
+// import { getGatewayClient } from "./gateway";
+// import axios from "axios";
 import { UPOKT, parsePokt } from "./pokt";
 // import { Config } from "./config";
 
@@ -47,6 +47,7 @@ export const getDataSource = () => new DataSource(dataSourceConfig);
 
 export class DataSource {
   gwClient: any;
+  _gatewayUrl: string;
   __pocket: Pocket;
   config: any;
 
@@ -62,7 +63,8 @@ export class DataSource {
       console.warn(PoktErrors.ConfigErrors.RequiredParam("http"));
     }
 
-    this.gwClient = getGatewayClient(gatewayUrl, httpConfig);
+    // this.gwClient = getGatewayClient(gatewayUrl, httpConfig);
+    this._gatewayUrl = gatewayUrl;
 
     const pocketClientConfiguration = new Configuration(
       1,
@@ -86,81 +88,81 @@ export class DataSource {
   /**
    * @returns {Number}
    */
-  async getBalance(address: string): Promise<number> {
-    let balanceResponse;
-    try {
-      balanceResponse = await this.gwClient.makeQuery("getBalance", address, 0);
-    } catch (error) {
-      console.log(error);
-      return 0;
-    }
+  // async getBalance(address: string): Promise<number> {
+  //   let balanceResponse;
+  //   try {
+  //     balanceResponse = await this.gwClient.makeQuery("getBalance", address, 0);
+  //   } catch (error) {
+  //     console.log(error);
+  //     return 0;
+  //   }
 
-    const uPOKT = Number(balanceResponse?.balance?.toString());
-    return (uPOKT ? uPOKT : 0) / UPOKT;
-  }
+  //   const uPOKT = Number(balanceResponse?.balance?.toString());
+  //   return (uPOKT ? uPOKT : 0) / UPOKT;
+  // }
 
-  /**
-   * @returns {Float}
-   */
-  async getPrice(): Promise<any> {
-    const response = await axios.get(
-      "https://supply.research.pokt.network:8192/price"
-    );
-    const data = response["data"];
-    if (response["status"] === 200 && data) {
-      return data;
-    } else {
-      return -1;
-    }
-  }
+  // /**
+  //  * @returns {Float}
+  //  */
+  // async getPrice(): Promise<any> {
+  //   const response = await axios.get(
+  //     "https://supply.research.pokt.network:8192/price"
+  //   );
+  //   const data = response["data"];
+  //   if (response["status"] === 200 && data) {
+  //     return data;
+  //   } else {
+  //     return -1;
+  //   }
+  // }
 
-  /**
-   * @returns {Object}
-   */
-  async getTx(txHash: string): Promise<any> {
-    let txResponse;
-    try {
-      txResponse = await this.gwClient.makeQuery("getTransaction", txHash);
-    } catch (error) {
-      console.log(error);
-      return undefined;
-    }
+  // /**
+  //  * @returns {Object}
+  //  */
+  // async getTx(txHash: string): Promise<any> {
+  //   let txResponse;
+  //   try {
+  //     txResponse = await this.gwClient.makeQuery("getTransaction", txHash);
+  //   } catch (error) {
+  //     console.log(error);
+  //     return undefined;
+  //   }
 
-    return txResponse;
-  }
+  //   return txResponse;
+  // }
 
-  /**
-   * @returns {Object | undefined}
-   */
-  async getApp(address: string): Promise<any> {
-    let app;
+  // /**
+  //  * @returns {Object | undefined}
+  //  */
+  // async getApp(address: string): Promise<any> {
+  //   let app;
 
-    try {
-      app = await this.gwClient.makeQuery("getApp", address, 0);
-    } catch (error) {
-      console.log(error);
-      return undefined;
-    }
+  //   try {
+  //     app = await this.gwClient.makeQuery("getApp", address, 0);
+  //   } catch (error) {
+  //     console.log(error);
+  //     return undefined;
+  //   }
 
-    return app;
-  }
+  //   return app;
+  // }
 
-  /**
-   * @returns {Object | undefined}
-   */
-  async getNode(address: string): Promise<any> {
-    let node;
-    try {
-      node = await this.gwClient.makeQuery("getNode", address, 0);
-    } catch (error) {
-      console.log(error);
-      return undefined;
-    }
+  // /**
+  //  * @returns {Object | undefined}
+  //  */
+  // async getNode(address: string): Promise<any> {
+  //   let node;
+  //   try {
+  //     node = await this.gwClient.makeQuery("getNode", address, 0);
+  //   } catch (error) {
+  //     console.log(error);
+  //     return undefined;
+  //   }
 
-    return node;
-  }
+  //   return node;
+  // }
 
-  async sendTransactionFromLedger(publicKey: string, signature: string, tx: any) {
+  async sendTransactionFromLedger(publicKey: string, signature: string, tx: any): Promise<Response | Error> {
     const {
       chain_id: chainID,
       entropy,
@@ -212,11 +214,22 @@ export class DataSource {
     }
     let rawTxResponse;
     try {
-      rawTxResponse = await this.gwClient.makeQuery(
-        "sendRawTx",
-        rawTxOrError.address,
-        rawTxOrError.txHex
-      );
+      // rawTxResponse = await this.gwClient.makeQuery(
+      //   "sendRawTx",
+      //   rawTxOrError.address,
+      //   rawTxOrError.txHex
+      // );
+      
+      rawTxResponse = await fetch(`${this._gatewayUrl}/v1/client/rawtx`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: rawTxOrError.address,
+          raw_hex_bytes: rawTxOrError.txHex,
+        })
+      })
     } catch (error) {
       console.log(`Failed to send transaction with error: ${error}`);
       return new Error((error as Error).toString());

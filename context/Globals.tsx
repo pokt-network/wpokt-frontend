@@ -2,11 +2,15 @@ import { InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { ETH_CHAIN_ID, POKT_MULTISIG_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
+import { getDataSource } from "@/utils/datasource";
 import { isValidEthAddress } from "@/utils/misc";
 import { HStack, Text, useToast } from "@chakra-ui/react";
+import { typeGuard } from "@pokt-network/pocket-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAddress } from "viem";
 import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import AppPokt from "../hw-app/Pokt";
+import { LEDGER_CONFIG } from "@/utils/ledger";
 
 declare global {
     interface Window {
@@ -65,6 +69,11 @@ export interface GlobalContextProps {
     setMintTxHash: (hash: `0x${string}`|undefined) => void
     getPoktBalance: () => void
     screenWidth?: number
+    isUsingHardwareWallet: boolean
+    setIsUsingHardwareWallet: (value: boolean) => void
+    pocketApp?: AppPokt
+    setPocketApp: (value: AppPokt|undefined) => void
+    isSigningTx: boolean
 }
 
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -105,9 +114,16 @@ export const GlobalContext = createContext<GlobalContextProps>({
     mintTxHash: undefined,
     setMintTxHash: () => {},
     getPoktBalance: () => {},
-    screenWidth: undefined
+    screenWidth: undefined,
+    isUsingHardwareWallet: false,
+    setIsUsingHardwareWallet: () => {},
+    pocketApp: undefined,
+    setPocketApp: () => {},
+    isSigningTx: false
 })
 
+
+export const dataSource = getDataSource();
 export const useGlobalContext = () => useContext(GlobalContext)
 
 export function GlobalContextProvider({ children }: any) {
@@ -128,6 +144,9 @@ export function GlobalContextProvider({ children }: any) {
     const [currentBurn, setCurrentBurn] = useState<Burn|undefined>(undefined)
     const [allPendingMints, setAllPendingMints] = useState<Mint[]>([])
     const [allPendingBurns, setAllPendingBurns] = useState<Burn[]>([])
+    const [isUsingHardwareWallet, setIsUsingHardwareWallet] = useState<boolean>(false)
+    const [pocketApp, setPocketApp] = useState<AppPokt>();
+    const [isSigningTx, setIsSigningTx] = useState<boolean>(false)
     
     const [mintTxHash, setMintTxHash] = useState<`0x${string}`|undefined>(undefined)
     
@@ -307,23 +326,102 @@ export function GlobalContextProvider({ children }: any) {
         if (!isValidEthAddress(ethAddress)) return console.error("Please enter a valid Ethereum address")
         // Send Transaction
         try {
-            const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
-                {
-                    amount: amount.toString(), // in uPOKT
-                    from: poktAddress,
-                    to: POKT_MULTISIG_ADDRESS,
-                    memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
-                },
-            ])
+            let txHash;
+            setIsSigningTx(true)
+            if (isUsingHardwareWallet) {
+                const toastId = 'tx-signing-in-progress'
+                if (!toast.isActive(toastId)) toast({
+                    id: toastId,
+                    position: "top-right",
+                    duration: 10000,
+                    render: () => (
+                        <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="poktLime" borderBottomWidth={1}>
+                            <InfoIcon fill="poktLime" />
+                            <Text>Please confirm the transaction on your Ledger device.</Text>
+                        </HStack>
+                    )
+                })
+                const res = await sendTransactionFromLedger(
+                    POKT_MULTISIG_ADDRESS,
+                    BigInt(amount),
+                    `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`
+                )
+                if (typeGuard(res, Error)) throw res
+                const response = await res.json()
+                console.log("Ledger response:", response)
+                txHash = response?.txHash
+            } else {
+                const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
+                    {
+                        amount: amount.toString(), // in uPOKT
+                        from: poktAddress,
+                        to: POKT_MULTISIG_ADDRESS,
+                        memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
+                    },
+                ])
+                txHash = hash;
+            }
             console.log("Sent POKT:", {
-                txHash: hash,
+                txHash
             });
-            setPoktTxHash(hash)
+            setPoktTxHash(txHash)
             setPoktTxOngoing(true)
         } catch (error) {
             console.error("Failed sending POKT:", error);
         }
+        setIsSigningTx(false)
     }
+
+    const sendTransactionFromLedger = async (
+        toAddress: string,
+        amount: bigint,
+        memo: any
+    ) => {
+        /* global BigInt */
+        const entropy = Number(
+            BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)).toString()
+        ).toString();
+    
+        const tx = {
+            chain_id: 'mainnet',
+            entropy: entropy.toString(),
+            fee: [
+                {
+                    amount: "10000",
+                    denom: "upokt",
+                },
+            ],
+            memo: memo || "",
+            msg: {
+                type: "pos/Send",
+                value: {
+                    amount: amount.toString(),
+                    from_address: poktAddress,
+                    to_address: toAddress,
+                },
+            },
+        };
+    
+        const stringifiedTx = JSON.stringify(tx);
+        const hexTx = Buffer.from(stringifiedTx, "utf-8").toString("hex");
+        const sig = await pocketApp?.signTransaction(
+            LEDGER_CONFIG.derivationPath,
+            hexTx
+        );
+    
+        const pk = await pocketApp?.getPublicKey(LEDGER_CONFIG.derivationPath)
+        if (!pk || !sig) throw Error("No public key or signature found")
+        const ledgerTxResponse = await dataSource.sendTransactionFromLedger(
+            Buffer.from(pk?.publicKey).toString("hex"),
+            Buffer.from(sig?.signature).toString("hex"),
+            tx
+        );
+        if (typeGuard(ledgerTxResponse, Error)) {
+            return ledgerTxResponse;
+        }
+    
+        return ledgerTxResponse;
+    };
 
     return (
         <GlobalContext.Provider value={{
@@ -364,7 +462,12 @@ export function GlobalContextProvider({ children }: any) {
             mintTxHash,
             setMintTxHash,
             getPoktBalance,
-            screenWidth
+            screenWidth,
+            isUsingHardwareWallet,
+            setIsUsingHardwareWallet,
+            pocketApp,
+            setPocketApp,
+            isSigningTx
         }}>
             {children}
         </GlobalContext.Provider>
