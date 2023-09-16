@@ -162,7 +162,7 @@ export class DataSource {
   //   return node;
   // }
 
-  async sendTransactionFromLedger(publicKey: string, signature: string, tx: any): Promise<Response | Error> {
+  async sendTransactionFromLedger(publicKey: Buffer, signature: Buffer, tx: any): Promise<Response | Error> {
     const {
       chain_id: chainID,
       entropy,
@@ -174,8 +174,10 @@ export class DataSource {
     } = tx;
 
     const txSignature = new TxSignature(
-      Buffer.from(publicKey, "hex"),
-      Buffer.from(signature, "hex")
+      publicKey,
+      signature
+      // Buffer.from(publicKey, "hex"),
+      // Buffer.from(signature, "hex")
     );
 
     const transactionSender = new TransactionSender(

@@ -375,7 +375,7 @@ export function GlobalContextProvider({ children }: any) {
     const sendTransactionFromLedger = async (
         toAddress: string,
         amount: bigint,
-        memo: any
+        memo: string
     ) => {
         /* global BigInt */
         const entropy = Number(
@@ -384,7 +384,7 @@ export function GlobalContextProvider({ children }: any) {
     
         const tx = {
             chain_id: 'mainnet',
-            entropy: entropy.toString(),
+            entropy: entropy,
             fee: [
                 {
                     amount: "10000",
@@ -412,11 +412,12 @@ export function GlobalContextProvider({ children }: any) {
         const pk = await pocketApp?.getPublicKey(LEDGER_CONFIG.derivationPath)
         if (!pk || !sig) throw Error("No public key or signature found")
         const ledgerTxResponse = await dataSource.sendTransactionFromLedger(
-            Buffer.from(pk?.publicKey).toString("hex"),
-            Buffer.from(sig?.signature).toString("hex"),
+            Buffer.from(pk.publicKey),
+            Buffer.from(sig.signature),
             tx
         );
         if (typeGuard(ledgerTxResponse, Error)) {
+            console.log("Error sending transaction from ledger:", ledgerTxResponse)
             return ledgerTxResponse;
         }
     
