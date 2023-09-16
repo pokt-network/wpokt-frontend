@@ -349,7 +349,7 @@ export function GlobalContextProvider({ children }: any) {
                 if (typeGuard(res, Error)) throw res
                 const response = await res.json()
                 console.log("Ledger response:", response)
-                txHash = response?.txHash
+                txHash = response?.txhash
             } else {
                 const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
                     {
@@ -395,9 +395,9 @@ export function GlobalContextProvider({ children }: any) {
             msg: {
                 type: "pos/Send",
                 value: {
-                    amount: amount.toString(),
                     from_address: poktAddress,
                     to_address: toAddress,
+                    amount: amount.toString(),
                 },
             },
         };
