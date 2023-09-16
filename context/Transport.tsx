@@ -207,8 +207,8 @@ export function TransportProvider({ children }: any) {
       const pk = await pocketApp?.getPublicKey(LEDGER_CONFIG.derivationPath)
       if (!pk || !sig) throw Error("No public key or signature found")
       const ledgerTxResponse = await dataSource.sendTransactionFromLedger(
-        Buffer.from(pk?.publicKey).toString("hex"),
-        Buffer.from(sig?.signature).toString("hex"),
+        Buffer.from(pk.publicKey),
+        Buffer.from(sig.signature),
         tx
       );
       if (typeGuard(ledgerTxResponse, Error)) {
