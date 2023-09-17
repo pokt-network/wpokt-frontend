@@ -22,7 +22,7 @@ export default function Home() {
       <Center paddingX={10} paddingBottom={1}>
         <Divider borderColor={"poktLime"} />
       </Center>
-      <Flex flexGrow={1} justify="center" align="center">
+      <Flex flexGrow={1} justify="center" align="center" paddingY={10}>
         <Bridge />
       </Flex>
       <Footer />
