@@ -8,7 +8,7 @@ import { Button, ButtonGroup, HStack, IconButton, useDisclosure, Drawer,
     Link,
     VStack, } from "@chakra-ui/react";
 import Image from "next/image";
-import { BlueEthIcon, EthIcon } from "./icons/eth";
+import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
 import logo from "../public/logo/full_white.png";
 import { useGlobalContext } from "@/context/Globals";
@@ -27,9 +27,12 @@ export function Header() {
 
     return (
         <HStack justify="space-between" align="center" paddingX={10} paddingY={5}>
-            <Link href="https://pokt.network" isExternal>
-                <Image src={logo} alt="logo" width={122} height={36} />
-            </Link>
+            <Flex gap={1} align="end">
+                <Link href="https://pokt.network" isExternal>
+                    <Image src={logo} alt="logo" width={122} height={36} />
+                </Link>
+                <Text fontSize={18} fontWeight={700}>Bridge</Text>
+            </Flex>
             {mobile ? (
                 <>
                 <IconButton
@@ -67,7 +70,7 @@ export function Header() {
                             ) : (
                                 <VStack spacing={1}>
                                     <Text fontSize={14}>Connect Ethereum Wallet</Text>
-                                    <Button
+                                    {/* <Button
                                         color="darkBlue"
                                         background="poktLime"
                                         borderWidth={2}
@@ -75,6 +78,19 @@ export function Header() {
                                         leftIcon={<EthIcon />}
                                         onClick={openConnectModal}
                                         _hover={{ bg: "hover.poktLime" }}
+                                    >
+                                        Connect
+                                    </Button> */}
+                                    <Button
+                                        variant="outline"
+                                        borderColor="poktLime"
+                                        bg="transparent"
+                                        color="white"
+                                        paddingX={8}
+                                        height={8}
+                                        _hover={{ bg: "rgba(255,255,255,0.1)" }}
+                                        leftIcon={<EthIcon fill={"white"}/>}
+                                        onClick={openConnectModal}
                                     >
                                         Connect
                                     </Button>
@@ -99,8 +115,8 @@ export function Header() {
                                 </VStack>
                             ) : (
                                 <VStack spacing={1} mt={10}>
-                                    <Text fontSize={14}>Connect SendWallet</Text>
-                                    <Button
+                                    <Text fontSize={14}>Connect Pocket Wallet</Text>
+                                    {/* <Button
                                         color="darkBlue"
                                         background="poktLime"
                                         borderWidth={2}
@@ -108,6 +124,19 @@ export function Header() {
                                         leftIcon={<PoktIcon />}
                                         onClick={connectSendWallet}
                                         _hover={{ bg: "hover.poktLime" }}
+                                    >
+                                        Connect
+                                    </Button> */}
+                                    <Button
+                                        variant="outline"
+                                        borderColor="poktLime"
+                                        bg="transparent"
+                                        color="white"
+                                        paddingX={8}
+                                        height={8}
+                                        _hover={{ bg: "rgba(255,255,255,0.1)" }}
+                                        leftIcon={<PoktIcon fill={"white"}/>}
+                                        onClick={connectSendWallet}
                                     >
                                         Connect
                                     </Button>
@@ -127,22 +156,38 @@ export function Header() {
                             borderWidth={2}
                             borderColor="darkOverlay"
                             _hover={{ bg: "hover.darkBlue" }}
-                            padding={3}
-                            paddingY={5}
+                            // padding={3}
+                            paddingX={3}
+                            width="140px"
+                            height={8}
                             onClick={() => disconnect()}
                         >
                             {address.substring(0,4) + "..." + address.substring(address.length - 4)}
                         </Button>
                     ) : (
+                        // <Button
+                        //     color="darkBlue"
+                        //     background="poktLime"
+                        //     borderWidth={2}
+                        //     borderColor="poktLime"
+                        //     _hover={{ bg: "hover.poktLime" }}
+                        //     leftIcon={<EthIcon />}
+                        //     padding={4}
+                        //     paddingY={5}
+                        //     onClick={openConnectModal}
+                        // >
+                        //     Connect
+                        // </Button>
                         <Button
-                            color="darkBlue"
-                            background="poktLime"
-                            borderWidth={2}
+                            variant="outline"
                             borderColor="poktLime"
-                            _hover={{ bg: "hover.poktLime" }}
-                            leftIcon={<EthIcon />}
-                            padding={4}
-                            paddingY={5}
+                            bg="transparent"
+                            color="white"
+                            paddingX={8}
+                            width="140px"
+                            height={8}
+                            _hover={{ bg: "rgba(255,255,255,0.1)" }}
+                            leftIcon={<EthIcon fill={"white"}/>}
                             onClick={openConnectModal}
                         >
                             Connect
@@ -156,22 +201,38 @@ export function Header() {
                             borderWidth={2}
                             borderColor="darkOverlay"
                             _hover={{ bg: "hover.darkBlue" }}
-                            padding={4}
-                            paddingY={5}
+                            // padding={4}
+                            paddingX={3}
+                            width="140px"
+                            height={8}
                             onClick={() => setPoktAddress("")}
                         >
                             {poktAddress.substring(0,4) + "..." + poktAddress.substring(poktAddress.length - 4)}
                         </Button>
                     ) : (
+                        // <Button
+                        //     color="darkBlue"
+                        //     background="poktLime"
+                        //     borderWidth={2}
+                        //     borderColor="poktLime"
+                        //     _hover={{ bg: "hover.poktLime" }}
+                        //     leftIcon={<PoktIcon />}
+                        //     padding={4}
+                        //     paddingY={5}
+                        //     onClick={connectSendWallet}
+                        // >
+                        //     Connect
+                        // </Button>
                         <Button
-                            color="darkBlue"
-                            background="poktLime"
-                            borderWidth={2}
+                            variant="outline"
                             borderColor="poktLime"
-                            _hover={{ bg: "hover.poktLime" }}
-                            leftIcon={<PoktIcon />}
-                            padding={4}
-                            paddingY={5}
+                            bg="transparent"
+                            color="white"
+                            paddingX={8}
+                            width="140px"
+                            height={8}
+                            _hover={{ bg: "rgba(255,255,255,0.1)" }}
+                            leftIcon={<PoktIcon fill={"white"}/>}
                             onClick={connectSendWallet}
                         >
                             Connect
