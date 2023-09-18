@@ -384,20 +384,20 @@ export function GlobalContextProvider({ children }: any) {
     
         const tx = {
             chain_id: 'mainnet',
-            entropy: entropy,
+            entropy,
             fee: [
                 {
                     amount: "10000",
                     denom: "upokt",
                 },
             ],
-            memo: memo || "",
+            memo,
             msg: {
                 type: "pos/Send",
                 value: {
+                    amount: amount.toString(),
                     from_address: poktAddress,
                     to_address: toAddress,
-                    amount: amount.toString(),
                 },
             },
         };
