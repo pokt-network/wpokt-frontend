@@ -8,9 +8,10 @@ import {
   TransactionSender,
   ProtoTransactionSigner,
 } from "@pokt-network/pocket-js";
-// import { getGatewayClient } from "./gateway";
+import { getGatewayClient } from "./gateway";
 // import axios from "axios";
 import { UPOKT, parsePokt } from "./pokt";
+// import { createPocket } from './pocket';
 // import { Config } from "./config";
 
 export const PoktErrors = {
@@ -47,7 +48,7 @@ export const getDataSource = () => new DataSource(dataSourceConfig);
 
 export class DataSource {
   gwClient: any;
-  _gatewayUrl: string;
+  _gatewayUrl?: string;
   __pocket: Pocket;
   config: any;
 
@@ -63,8 +64,8 @@ export class DataSource {
       console.warn(PoktErrors.ConfigErrors.RequiredParam("http"));
     }
 
-    // this.gwClient = getGatewayClient(gatewayUrl, httpConfig);
-    this._gatewayUrl = gatewayUrl;
+    this.gwClient = getGatewayClient(gatewayUrl, httpConfig);
+    // this._gatewayUrl = gatewayUrl;
 
     const pocketClientConfiguration = new Configuration(
       1,
@@ -81,6 +82,7 @@ export class DataSource {
     );
 
     this.__pocket = new Pocket([new URL(gatewayUrl)], undefined, pocketClientConfiguration);
+    // this.__pocket = createPocket(config);
 
     this.config = config;
   }
@@ -216,25 +218,25 @@ export class DataSource {
     }
     let rawTxResponse;
     try {
-      // rawTxResponse = await this.gwClient.makeQuery(
-      //   "sendRawTx",
-      //   rawTxOrError.address,
-      //   rawTxOrError.txHex
-      // );
+      rawTxResponse = await this.gwClient.makeQuery(
+        "sendRawTx",
+        rawTxOrError.address,
+        rawTxOrError.txHex
+      );
       
-      rawTxResponse = await fetch(`${this._gatewayUrl}/v1/client/rawtx`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address: rawTxOrError.address,
-          raw_hex_bytes: rawTxOrError.txHex,
-        })
-      })
-    } catch (error) {
-      console.log(`Failed to send transaction with error: ${error}`);
-      return new Error((error as Error).toString());
+      // rawTxResponse = await fetch(`${this._gatewayUrl}/v1/client/rawtx`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     address: rawTxOrError.address,
+      //     raw_hex_bytes: rawTxOrError.txHex,
+      //   })
+      // })
+    } catch (error: any) {
+      console.log(`Failed to send transaction with error: ${error.raw_log}`);
+      return new Error(error.raw_log);
     }
 
     return rawTxResponse;

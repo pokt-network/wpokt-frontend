@@ -417,7 +417,6 @@ export function GlobalContextProvider({ children }: any) {
             tx
         );
         if (typeGuard(ledgerTxResponse, Error)) {
-            console.log("Error sending transaction from ledger:", ledgerTxResponse)
             return ledgerTxResponse;
         }
     
