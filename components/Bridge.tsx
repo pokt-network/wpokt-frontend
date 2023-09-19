@@ -187,7 +187,7 @@ export function Bridge() {
             position: "top-right",
             duration: 5000,
             render: () => (
-                <HStack mt={'140px'} spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
+                <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
                     <ErrorIcon />
                     <Text color="error">You may not have enough gas in your wallet.</Text>
                 </HStack>
@@ -202,7 +202,7 @@ export function Bridge() {
             position: "top-right",
             duration: 5000,
             render: () => (
-                <HStack mt={'140px'} spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
+                <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
                     <ErrorIcon />
                     <Text color="error">Insufficient token balance.</Text>
                 </HStack>
@@ -210,16 +210,23 @@ export function Bridge() {
         })
     }
 
+    function displayMissingInputsToast() {
+        const toastId = 'missing-inputs'
+        if (!toast.isActive(toastId)) toast({
+            id: toastId,
+            position: "top-right",
+            duration: 5000,
+            render: () => (
+                <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
+                    <ErrorIcon />
+                    <Text color="error">Select wallets and an amount to bridge first.</Text>
+                </HStack>
+            )
+        })
+    }
+
     return (
         <VStack minWidth={screenWidth && screenWidth < 580 ? screenWidth : '580px'}>
-            {/* <Button
-                bg="poktLime"
-                color="darkBlue"
-                _hover={{ bg: "hover.poktLime" }}
-                onClick={() => setDestination(destination === "pokt" ? "eth" : "pokt")}
-            >
-                {destination === "eth" ? "POKT" : "wPOKT"} &rarr; {destination === "eth" ? "wPOKT" : "POKT"}
-            </Button> */}
             <ResumeWrapModal
                 isOpen={isResumeMintOpen}
                 onClose={onResumeMintClose}
@@ -228,7 +235,7 @@ export function Bridge() {
             ><></>
             </ResumeWrapModal>
             {destination === "eth" ? (
-                <Container bg="darkOverlay" paddingY={4}>
+                <Container bg="darkOverlay" paddingY={4} borderRadius={4}>
                     <Center>
                         <Box width={320}>
                             <ButtonGroup spacing={0} mb={6}>
@@ -268,11 +275,11 @@ export function Bridge() {
                                     <PoktIcon fill="white" position="absolute" ml={270} mt="12px" width="21px" height="21px" />
                                     <Input
                                         type="number"
-                                        borderRadius={0}
                                         fontWeight={700}
                                         fontSize={16}
                                         paddingY={6}
                                         paddingX={8}
+                                        borderRadius={4}
                                         borderColor={poktAmount + parsePokt(0.01) > poktBalance && poktAmount !== BigInt(0) ? "error" : poktAmount === BigInt(0) ? 'poktLime' : 'none'}
                                         _focus={{ borderColor: poktAmount + parsePokt(0.01) > poktBalance && poktAmount !== BigInt(0) ? "error" : poktAmount === BigInt(0) ? 'poktLime' : 'none' }}
                                         _hover={{ borderColor: poktAmount === BigInt(0) ? 'poktLime' : 'none' }}
@@ -370,7 +377,7 @@ export function Bridge() {
                     <Center mt={6}>
                         <Box width={320}>
                             <Text>Estimated wPOKT received</Text>
-                            <HStack justify="space-between" paddingX={10} paddingY={4} bg="darkBlue" height="52px">
+                            <HStack justify="space-between" paddingX={10} paddingY={4} bg="darkBlue" height="52px" borderRadius={4}>
                                 <Text
                                     fontWeight={700}
                                     fontSize={18}
@@ -434,7 +441,7 @@ export function Bridge() {
                                 width="100px"
                                 paddingY={6}
                                 _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                isDisabled={!poktAddress||!address||!poktAmount}
+                                onClick={displayMissingInputsToast}
                             >
                                 Wrap
                             </Button>
@@ -443,7 +450,7 @@ export function Bridge() {
                     <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose}><></></ProgressModal>
                 </Container>
             ) : (
-                <Container bg="darkOverlay" paddingY={4}>
+                <Container bg="darkOverlay" paddingY={4} borderRadius={4}>
                     <Center>
                         <Box width={320}>
                         <ButtonGroup spacing={0} mb={6}>
@@ -483,11 +490,11 @@ export function Bridge() {
                                     <EthIcon fill="white" position="absolute" ml={270} mt="12px" width="21px" height="21px" />
                                     <Input
                                         type="number"
-                                        borderRadius={0}
                                         fontWeight={700}
                                         fontSize={16}
                                         paddingY={6}
                                         paddingX={8}
+                                        borderRadius={4}
                                         borderColor={wPoktBalanceData && wPoktAmount > wPoktBalanceData?.value && wPoktAmount !== BigInt(0) ? "error" : wPoktAmount === BigInt(0) ? 'poktLime' : 'none'}
                                         _focus={{ borderColor: wPoktBalanceData && wPoktAmount > wPoktBalanceData?.value && wPoktAmount !== BigInt(0) ? "error" : wPoktAmount === BigInt(0) ? 'poktLime' : 'none' }}
                                         _hover={{ borderColor: wPoktAmount === BigInt(0) ? 'poktLime' : 'none' }}
@@ -583,7 +590,7 @@ export function Bridge() {
                     <Center mt={6}>
                         <Box width={320}>
                             <Text>Estimated POKT received</Text>
-                            <HStack justify="space-between" paddingX={10} paddingY={4} bg="darkBlue" height="52px">
+                            <HStack justify="space-between" paddingX={10} paddingY={4} bg="darkBlue" height="52px" borderRadius={4}>
                                 <Text
                                     fontWeight={700}
                                     fontSize={18}
@@ -641,8 +648,7 @@ export function Bridge() {
                                 width="100px"
                                 paddingY={6}
                                 _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                onClick={burn}
-                                isDisabled={!poktAddress||!address||!wPoktAmount}
+                                onClick={displayMissingInputsToast}
                             >
                                 Unwrap
                             </Button>
