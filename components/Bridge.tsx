@@ -396,8 +396,8 @@ export function Bridge() {
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
                                 <Flex align="center" gap={2}>
-                                    <Text>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost.substring(0,7)) : '----'} ETH</Text>
-                                    {(!!ethPrice && !!estGasCost) && <Text>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
+                                    <Text fontWeight={500} fontSize={16}>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost.substring(0,7)) : '----'} ETH</Text>
+                                    {(!!ethPrice && !!estGasCost) && <Text fontWeight={500} fontSize={16}>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
                                     <InfoIcon _hover={{ cursor: "pointer" }} onClick={onGasInfoOpen} />
                                     {((insufficientEthGas||insufficientPoktGas) && address && poktAddress) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
@@ -405,7 +405,7 @@ export function Bridge() {
                             <Box>
                                 <Text>Estimated time for bridge:</Text>
                                 <Flex align="center" gap={2}>
-                                    <Text>~30 Minutes</Text>
+                                    <Text fontWeight={500} fontSize={16}>~30 Minutes</Text>
                                     <InfoIcon _hover={{ cursor: "pointer" }} onClick={onTimeInfoOpen} />
                                 </Flex>
                             </Box>
@@ -609,15 +609,15 @@ export function Bridge() {
                             <Box>
                                 <Text>Estimated Gas Cost:</Text>
                                 <Flex align="center" gap={2}>
-                                    <Text>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost.substring(0,7)) : '----'} ETH</Text>
-                                    {(!!ethPrice && !!estGasCost) && <Text>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
+                                    <Text fontWeight={500} fontSize={16}>{estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost.substring(0,7)) : '----'} ETH</Text>
+                                    {(!!ethPrice && !!estGasCost) && <Text fontWeight={500} fontSize={16}>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
                                     {(insufficientEthGas && address) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
                             </Box>
                             <Box>
                                 <Text>Estimated time for bridge:</Text>
                                 <Flex align="center" gap={2}>
-                                    <Text>~30 Minutes</Text>
+                                    <Text fontWeight={500} fontSize={16}>~30 Minutes</Text>
                                     <InfoIcon _hover={{ cursor: "pointer" }} onClick={onTimeInfoOpen} />
                                 </Flex>
                             </Box>
