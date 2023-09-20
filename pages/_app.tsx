@@ -41,6 +41,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="description" content="Bridge POKT between the Pocket and Ethereum networks" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/icons/pokt_blue.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet"></link>
       </Head>
       <WagmiConfig config={config}>
         <RainbowKitProvider chains={chains} theme={darkTheme({
