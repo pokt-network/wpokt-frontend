@@ -155,14 +155,14 @@ export function Bridge() {
                     account: getAddress(address ?? '')
                 })
             } else {
-                console.log("estimating gas...")
-                gas = await pubClient.estimateContractGas({
-                    address: getAddress(MINT_CONTROLLER_ADDRESS),
-                    abi: MINT_CONTROLLER_ABI,
-                    functionName: 'mintWrappedPocket',
-                    args: [poktAmount, getAddress(address ?? '')],
-                    account: getAddress(address ?? '')
-                })
+                gas = poktAmount > BigInt(0) ? BigInt(289000) : BigInt(0)
+                // gas = await pubClient.estimateContractGas({
+                //     address: getAddress(MINT_CONTROLLER_ADDRESS),
+                //     abi: MINT_CONTROLLER_ABI,
+                //     functionName: 'mintWrappedPocket',
+                //     args: [poktAmount, getAddress(address ?? '')],
+                //     account: getAddress(address ?? '')
+                // })
             }
         } catch (error) {
             console.error(error)
@@ -215,7 +215,7 @@ export function Bridge() {
             <ResumeWrapModal
                 isOpen={isResumeMintOpen}
                 onClose={onResumeMintClose}
-                mintInfo={allPendingMints.length > 0 ? allPendingMints[0] : undefined}
+                mintInfo={allPendingMints.length > 0 ? allPendingMints[allPendingMints.length - 1] : undefined}
                 openProgressModal={onProgressOpen}
             ><></>
             </ResumeWrapModal>

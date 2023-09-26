@@ -1,36 +1,30 @@
-import Axios, { AxiosInstance } from "axios";
-import { PoktErrors } from "./datasource";
+import Axios from "axios";
+import { PoktErrors } from "./datasource_2";
 
 /**
  * Http Adapter.
  * Configure your headers and what not in here.
  * Interceptors and Network Layer middlewares should come in here.
  */
-export class AxiosProvider {
-  http: AxiosInstance;
-
-  constructor(baseURL: string, config: any) {
+class AxiosProvider {
+  constructor(baseURL, config) {
     this.http = Axios.create({
       baseURL,
-      timeout: config.timeout || 0,
+      timeout: config.timeout || 100000,
       headers: config.headers,
     });
   }
-}
-
-type Requests = {
-  [key: string]: any;
 }
 
 /**
  * Http Control Layer.
  * Throw your http control logic in here, i.e: if error, if data, if 201.
  */
-export class PocketQueriesController {
-  provider: any = undefined;
+class PocketQueriesController {
+  provider = null;
 
-  requests: Requests = {
-    getBalance: (address: string, height: number) => ({
+  requests = {
+    getBalance: (address, height) => ({
       url: "/v1/query/balance",
       method: "post",
       data: {
@@ -38,14 +32,14 @@ export class PocketQueriesController {
         height,
       },
     }),
-    getTransaction: (id: string) => ({
+    getTransaction: (id) => ({
       url: "/v1/query/tx",
       method: "post",
       data: {
         hash: id,
       },
     }),
-    getApp: (address: string, height: number) => ({
+    getApp: (address, height) => ({
       url: "/v1/query/app",
       method: "post",
       data: {
@@ -53,7 +47,7 @@ export class PocketQueriesController {
         height,
       },
     }),
-    getNode: (address: string, height: number) => ({
+    getNode: (address, height) => ({
       url: "/v1/query/node",
       method: "post",
       data: {
@@ -61,7 +55,19 @@ export class PocketQueriesController {
         height,
       },
     }),
-    sendRawTx: (fromAddress: string, tx: any) => ({
+    getAccountTxs: (address, received, prove, page, per_page, order) => ({
+      url: "/v1/query/accounttxs",
+      method: "post",
+      data: {
+        address,
+        prove,
+        received,
+        page,
+        per_page,
+        order,
+      },
+    }),
+    sendRawTx: (fromAddress, tx) => ({
       url: "/v1/client/rawtx",
       method: "post",
       data: {
@@ -69,7 +75,7 @@ export class PocketQueriesController {
         raw_hex_bytes: tx,
       },
     }),
-    getSupportedChains: (height: number) => ({
+    getSupportedChains: (height) => ({
       url: "/v1/query/supportedchains",
       method: "post",
       data: {
@@ -78,7 +84,7 @@ export class PocketQueriesController {
     }),
   };
 
-  use(provider: any) {
+  use(provider) {
     this.provider = provider;
     return this;
   }
@@ -87,7 +93,7 @@ export class PocketQueriesController {
   // but the gateway constantly responds with 200
   // and responds with errors in response.data
   // in a non-consistent form.
-  parseSuccessfulResponse = (response: any) => {
+  parseSuccessfulResponse = (response) => {
     if (
       typeof response.data === "string" &&
       response.data.indexOf("Method Not Allowed") > -1
@@ -102,7 +108,7 @@ export class PocketQueriesController {
     return response.data;
   };
 
-  parseErrorResponse = (error: any) => {
+  parseErrorResponse = (error) => {
     if (error.response && error.response.data && error.response.data.error) {
       throw error.response.data.error;
     }
@@ -114,10 +120,7 @@ export class PocketQueriesController {
     throw error;
   };
 
-  perform = async (requestName: string, ...args: any) => {
-    if (!this.provider) {
-      throw new Error("No provider set");
-    }
+  perform = async (requestName, ...args) => {
     const reqConfig =
       typeof this.requests[requestName] === "function"
         ? this.requests[requestName](...args)
@@ -133,26 +136,43 @@ export class PocketQueriesController {
 
   // does not really need to be bound to `this`, but keeping it for semantics' sake.
   // arguments explicit forwardong for clear signature lookup, avoid using `...args`
-  _getBalance = (address: string, height: number) =>
+  _getBalance = (address, height) =>
     this.perform.call(this, "getBalance", address, height);
-  _getTransaction = (id: any) => this.perform.call(this, "getTransaction", id);
-  _getApp = (address: string, height: number) =>
+  _getTransaction = (id) => this.perform.call(this, "getTransaction", id);
+  _getApp = (address, height) =>
     this.perform.call(this, "getApp", address, height);
-  _getNode = (address: string, height: number) =>
+  _getNode = (address, height) =>
     this.perform.call(this, "getNode", address, height);
-  _sendRawTx = (fromAddress: string, tx: any) =>
+  _getAccountTxs = (address, received, prove, page, per_page, order) =>
+    this.perform.call(
+      this,
+      "getAccountTxs",
+      address,
+      received,
+      prove,
+      page,
+      per_page,
+      order
+    );
+  _sendRawTx = (fromAddress, tx) =>
     this.perform.call(this, "sendRawTx", fromAddress, tx);
-  _getSupportedchains = (height: number) =>
+  _getSupportedchains = (height) =>
     this.perform.call(this, "getSupportedChains", height);
 
   // For semantic separation, and for "ease of middlewaring" when necessary.
   // hook your processors to your cals in here
-  query: Requests = {
+  query = {
     getBalance: this._getBalance,
     getTransaction: this._getTransaction,
     getApp: this._getApp,
     getNode: this._getNode,
-    sendRawTx: async (fromAddress: string, tx: any) => {
+    getAccountTxs: async (...args) => {
+      const rawResponse = await this._getAccountTxs(...args);
+      const response = this.processors.accountTxs.processResponse(rawResponse);
+
+      return response;
+    },
+    sendRawTx: async (fromAddress, tx) => {
       const request = this.processors.rawTx.processRequest({ fromAddress, tx });
       const rawResponse = await this._sendRawTx(
         request.addressHex,
@@ -168,22 +188,22 @@ export class PocketQueriesController {
   // request/response processors
   processors = {
     rawTx: {
-      processRequest: ({ fromAddress, tx }: any) => ({
+      processRequest: ({ fromAddress, tx }) => ({
         addressHex: fromAddress.toString("hex"),
         rawTxBytes: tx.toString("hex"),
       }),
-      processResponse: (response: any) => response,
+      processResponse: (response) => response,
     },
 
     accountTxs: {
-      processResponse: (response: any) => {
-        const base64ToStr = (v: any) => Buffer.from(v, "base64").toString();
-        const kvToStr = (kvObj: any) => ({
+      processResponse: (response) => {
+        const base64ToStr = (v) => Buffer.from(v, "base64").toString();
+        const kvToStr = (kvObj) => ({
           key: base64ToStr(kvObj.key),
           value: base64ToStr(kvObj.value),
         });
 
-        const mapEvents = (events: any[]) =>
+        const mapEvents = (events) =>
           events
             ? events.map((e) => ({
                 ...e,
@@ -191,7 +211,7 @@ export class PocketQueriesController {
               }))
             : [];
 
-        const txs = response.txs.map((tx: any) => ({
+        const txs = response.txs.map((tx) => ({
           ...tx,
           tx_result: {
             ...tx.tx_result,
@@ -209,9 +229,12 @@ export class PocketQueriesController {
  * Exposes registered/allowed gateway queries.
  * This layer is added for gateway level logic control. i.e: custom errors and responses.
  */
-export class GatewayClient {
-  config: any;
-  controller: PocketQueriesController;
+class GatewayClient {
+  constructor(httpProvider, requestsController, config) {
+    this.controller = requestsController.use(httpProvider);
+    this.config = config;
+  }
+
   queries = [
     "getBalance",
     "getTransaction",
@@ -222,25 +245,18 @@ export class GatewayClient {
     "getSupportedChains",
   ];
 
-
-  constructor(httpProvider: any, requestsController: any, config: any) {
-    this.controller = requestsController.use(httpProvider);
-    this.config = config;
-  }
-
-
   /**
    * @returns {BigInt}
    */
-  async makeQuery(queryName: string, ...args: any) {
-    if (!this.queries.includes(queryName)) {
+  async makeQuery(queryName, ...args) {
+    if (!(this.queries.includes(queryName) > -1)) {
       throw PoktErrors;
     }
     return await this.controller.query[queryName](...args);
   }
 }
 
-export const getGatewayClient = (baseUrl: string, config: any) => {
+const getGatewayClient = (baseUrl, config) => {
   const httpProvider = new AxiosProvider(baseUrl, config);
   const requestsCtrl = new PocketQueriesController();
   const gwClient = new GatewayClient(httpProvider, requestsCtrl, {
@@ -251,3 +267,9 @@ export const getGatewayClient = (baseUrl: string, config: any) => {
   return gwClient;
 };
 
+export {
+  AxiosProvider,
+  PocketQueriesController,
+  GatewayClient,
+  getGatewayClient,
+};

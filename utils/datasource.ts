@@ -35,12 +35,14 @@ export const PoktErrors = {
 export const dataSourceConfig = {
   gatewayUrl: `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`,
   http: {
-    timeout: 30000,
-    headers: {},
+    timeout: 15000,
+    headers: {"Content-Type": "application/json", "Blockchain-Subdomain": "mainnet"},
   },
+  chain: '0001',
   chainId: 'mainnet',
+  blockTime: 900000,
   txFee: Number(parsePokt('0.01').toString()),
-  maxTransactionListCount: 15,
+  maxTransactionListCount: 100,
   useLegacyCodec: true
 }
 
@@ -48,7 +50,7 @@ export const getDataSource = () => new DataSource(dataSourceConfig);
 
 export class DataSource {
   gwClient: any;
-  _gatewayUrl?: string;
+  _gatewayUrl: string;
   __pocket: Pocket;
   config: any;
 
@@ -65,7 +67,7 @@ export class DataSource {
     }
 
     this.gwClient = getGatewayClient(gatewayUrl, httpConfig);
-    // this._gatewayUrl = gatewayUrl;
+    this._gatewayUrl = gatewayUrl;
 
     const pocketClientConfiguration = new Configuration(
       1,
@@ -225,6 +227,18 @@ export class DataSource {
       );
       
       // rawTxResponse = await fetch(`${this._gatewayUrl}/v1/client/rawtx`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "Blockchain-Subdomain": "mainnet"
+      //   },
+      //   body: JSON.stringify({
+      //     address: rawTxOrError.address,
+      //     raw_hex_bytes: rawTxOrError.txHex,
+      //   })
+      // })
+
+      // rawTxResponse = await fetch(`/api/tx`, {
       //   method: "POST",
       //   headers: {
       //     "Content-Type": "application/json",

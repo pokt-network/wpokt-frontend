@@ -77,7 +77,7 @@ export function TransportProvider({ children }: any) {
       if (app?.transport) {
         const { address } = await app?.getPublicKey(LEDGER_CONFIG.generateDerivationPath(0));
         if (!address) throw Error("No address found")
-        return setPoktAddress(address);
+        return setPoktAddress(Buffer.from(address).toString("hex"));
       }
     } catch (error) {
       console.error(error)

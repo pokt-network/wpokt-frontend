@@ -1,5 +1,5 @@
 const validators = {
-  GATEWAY_BASE_URL: (value: any, config: any) => {
+  GATEWAY_BASE_URL: (value, config) => {
     const isEmpty = value === "";
 
     if (isEmpty) {
@@ -30,7 +30,7 @@ const validators = {
 
     return value;
   },
-  CHAIN_ID: (value: any) => {
+  CHAIN_ID: (value) => {
     const isEmpty = value === "";
 
     if (isEmpty) {
@@ -43,23 +43,10 @@ const validators = {
 
 
 const configEnvVars = [
-  'NEXT_PUBLIC_CLIENT_PASSPHRASE',
-  'NEXT_PUBLIC_CLIENT_PUBLIC_KEY',
-  'NEXT_PUBLIC_CLIENT_PRIVATE_KEY',
-  'NEXT_PUBLIC_WALLET_APP_PUBLIC_KEY',
-  'NEXT_PUBLIC_WALLET_APP_AAT_SIGNATURE',
-  'NEXT_PUBLIC_POKT_USD_VALUE',
-  'NEXT_PUBLIC_SECURE_LS_ENCRYPTION_SECRET',
-  'NEXT_PUBLIC_SECURE_LS_ENCODING_TYPE',
-  'NEXT_PUBLIC_SECURE_LS_IS_COMPRESSION',
-  'NEXT_PUBLIC_DISPATCHERS',
-  'NEXT_PUBLIC_HTTP_PROVIDER',
   'NEXT_PUBLIC_AAT_VERSION',
   'NEXT_PUBLIC_MAX_DISPATCHERS',
-  'NEXT_PUBLIC_PROVIDER_TYPE',
   'NEXT_PUBLIC_BLOCK_EXPLORER_BASE_URL',
   'NEXT_PUBLIC_DASHBOARD_BASE_URL',
-  'NEXT_PUBLIC_BUY_POKT_BASE_URL',
   'NEXT_PUBLIC_CHAIN',
   'NEXT_PUBLIC_CHAIN_ID',
   'NEXT_PUBLIC_BLOCK_TIME',
@@ -72,7 +59,7 @@ const configEnvVars = [
   'NEXT_PUBLIC_USE_LEGACY_CODEC'
 ]
 
-// const loadEnvFromList = (list: any[]) => list.reduce(
+// const loadEnvFromList = (list) => list.reduce(
 //   (cfg, k) => {
 //      return { ...cfg, [k.replace(/NEXT_PUBLIC_/g, '')]: import.meta.env[k] }
 //   },
@@ -101,3 +88,19 @@ const configEnvVars = [
 // }
 
 // export const Config = loadConfigFromEnv();
+export const Config = {
+  AAT_VERSION: '1.0',
+  MAX_DISPATCHERS: '1',
+  BLOCK_EXPLORER_BASE_URL: 'https://explorer.pokt.network',
+  DASHBOARD_BASE_URL: 'https://mainnet.dashboard.pokt.network',
+  CHAIN: '0001',
+  CHAIN_ID: 'mainnet',
+  BLOCK_TIME: '900000',
+  MAX_TRANSACTION_LIST_COUNT: '100',
+  TX_FEE: '10000',
+  SESSION_LENGTH: '30',
+  GATEWAY_BASE_URL: `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`,
+  HTTP_TIMEOUT: '0',
+  HTTP_HEADERS: '{"Content-Type": "application/json", "Blockchain-Subdomain": "mainnet"}',
+  USE_LEGACY_CODEC: 'true',
+}

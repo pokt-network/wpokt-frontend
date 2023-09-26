@@ -19,7 +19,7 @@ import sha256 from "fast-sha256";
 
 export interface GetPublicKeyResult {
   publicKey: Uint8Array;
-  address: string;
+  address: Uint8Array | null;
 };
 export interface SignTransactionResult {
   signature: Uint8Array;
@@ -96,7 +96,7 @@ export class Common {
     }
     const res: GetPublicKeyResult = {
       publicKey: publicKey,
-      address:  address ? Buffer.from(address).toString('hex') : "",
+      address:  address,
     };
     return res;
   }
