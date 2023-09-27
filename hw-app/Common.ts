@@ -140,7 +140,14 @@ export class Common {
     */
 
   async getVersion(): Promise<GetVersionResult> {
-    const [major, minor, patch, ...appName] = await this.sendChunks(
+    // const [major, minor, patch, ...appName] = await this.sendChunks(
+    //   0x00,
+    //   0x00,
+    //   0x00,
+    //   0x00,
+    //   Buffer.alloc(1)
+    // );
+    const chunks = await this.sendChunks(
       0x00,
       0x00,
       0x00,
@@ -148,9 +155,9 @@ export class Common {
       Buffer.alloc(1)
     );
     return {
-      major,
-      minor,
-      patch
+      major: chunks[0],
+      minor: chunks[1],
+      patch: chunks[2],
     };
   }
   

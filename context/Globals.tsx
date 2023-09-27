@@ -2,7 +2,7 @@ import { InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { ETH_CHAIN_ID, POKT_MULTISIG_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
-import { getDataSource } from "@/utils/datasource";
+import { getDataSource } from "@/datasource";
 import { isValidEthAddress } from "@/utils/misc";
 import { HStack, Text, useToast } from "@chakra-ui/react";
 import { typeGuard } from "@pokt-network/pocket-js";
@@ -359,9 +359,10 @@ export function GlobalContextProvider({ children }: any) {
                     `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`
                 )
                 if (typeGuard(res, Error)) throw res
-                // console.log("Ledger response:", res)
-                const response = await res.json()
-                txHash = response?.txhash
+                console.log("Ledger res:", res)
+                // const response = await res.json()
+                // console.log("Ledger response:", response)
+                txHash = res?.txhash
             } else {
                 const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
                     {
@@ -384,11 +385,11 @@ export function GlobalContextProvider({ children }: any) {
         setIsSigningTx(false)
     }
 
-    const sendTransactionFromLedger = async (
+    async function sendTransactionFromLedger(
         toAddress: string,
         amount: bigint,
         memo: string
-    ) => {
+    ): Promise<Error | any> {
         /* global BigInt */
         const entropy = Number(
             BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)).toString()
@@ -408,8 +409,8 @@ export function GlobalContextProvider({ children }: any) {
                 type: STDX_MSG_TYPES.send,
                 value: {
                     amount: amount.toString(),
-                    from_address: poktAddress,
-                    to_address: toAddress,
+                    from_address: poktAddress.toLowerCase(),
+                    to_address: toAddress.toLowerCase(),
                 },
             },
         };
@@ -424,8 +425,8 @@ export function GlobalContextProvider({ children }: any) {
         const pk = await pocketApp?.getPublicKey(LEDGER_CONFIG.derivationPath)
         if (!pk || !sig) throw Error("No public key or signature found")
         const ledgerTxResponse = await dataSource.sendTransactionFromLedger(
-            Buffer.from(pk.publicKey),
-            Buffer.from(sig.signature),
+            pk.publicKey,
+            sig.signature,
             tx
         );
         if (typeGuard(ledgerTxResponse, Error)) {

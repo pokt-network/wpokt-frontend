@@ -34,17 +34,16 @@ export const PoktErrors = {
 // }
 
 export const dataSourceConfig = {
-  gatewayUrl: `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`,
+  gatewayUrl: `https://mainnet.gateway.pokt.network/v1/${process.env.POKT_RPC_KEY}`,
   http: {
-    timeout: 15000,
-    headers: {"Content-Type": "application/json", "Blockchain-Subdomain": "mainnet"},
+    timeout: '0',
+    headers: {"Content-Type": "application/json"},
   },
-  chain: '0001',
   chainId: 'mainnet',
-  blockTime: 900000,
-  txFee: Number(parsePokt('0.01').toString()),
-  maxTransactionListCount: 100,
-  useLegacyCodec: true
+  blockTime: '900000',
+  txFee: parsePokt('0.01').toString(),
+  maxTransactionListCount: '100',
+  useLegacyCodec: false
 }
 
 export const getDataSource = () => new DataSource(dataSourceConfig);
@@ -149,17 +148,16 @@ export class DataSource {
     }
     let rawTxResponse;
     try {
-      // rawTxResponse = await this.gwClient.makeQuery(
-      //   "sendRawTx",
-      //   rawTxOrError.address,
-      //   rawTxOrError.txHex
-      // );
+      rawTxResponse = await this.gwClient.makeQuery(
+        "sendRawTx",
+        rawTxOrError.address,
+        rawTxOrError.txHex
+      );
       
       // rawTxResponse = await fetch(`${this._gatewayUrl}/v1/client/rawtx`, {
       //   method: "POST",
       //   headers: {
-      //     "Content-Type": "application/json",
-      //     "Blockchain-Subdomain": "mainnet"
+      //     "Content-Type": "application/json"
       //   },
       //   body: JSON.stringify({
       //     address: rawTxOrError.address,
@@ -167,16 +165,16 @@ export class DataSource {
       //   })
       // })
 
-      rawTxResponse = await fetch(`/api/tx`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address: rawTxOrError.address,
-          raw_hex_bytes: rawTxOrError.txHex,
-        })
-      })
+      // rawTxResponse = await fetch(`/api/tx`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     address: rawTxOrError.address,
+      //     raw_hex_bytes: rawTxOrError.txHex,
+      //   })
+      // })
     } catch (error: any) {
       console.log(`Failed to send transaction with error: ${error.raw_log}`);
       return new Error(error.raw_log);

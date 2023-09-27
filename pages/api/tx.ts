@@ -25,7 +25,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   console.log({ address, raw_hex_bytes })
 
   try {
-    const response = await fetch(`https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}/v1/client/rawtx`, {
+    const poktGatewayUrl = `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
+    const response = await fetch(`${poktGatewayUrl}/v1/client/rawtx`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
