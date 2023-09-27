@@ -3,15 +3,9 @@ import WebHIDTransport from "@ledgerhq/hw-transport-webhid";
 import WebUSBTransport from "@ledgerhq/hw-transport-webusb";
 import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "../utils/ledger";
-// import { Config } from "../utils/config";
-// import { getDataSource } from "../utils/datasource";
 import { typeGuard } from "@pokt-network/pocket-js";
 import { useGlobalContext, dataSource } from "./Globals";
-// import { getGatewayClient } from "@/utils/gateway";
-import { UPOKT } from "@/utils/pokt";
 
-// const dataSource = getDataSource();
-const PUBLIC_KEY_TYPE = "crypto/ed25519_public_key";
 
 const DEFAULT_TRANSPORT_STATE = {
   pocketApp: undefined,
@@ -77,7 +71,7 @@ export function TransportProvider({ children }: any) {
       if (app?.transport) {
         const { address } = await app?.getPublicKey(LEDGER_CONFIG.generateDerivationPath(0));
         if (!address) throw Error("No address found")
-        return setPoktAddress(address);
+        return setPoktAddress(Buffer.from(address).toString("hex"));
       }
     } catch (error) {
       console.error(error)
@@ -225,31 +219,6 @@ export function TransportProvider({ children }: any) {
     }
   };
 
-  const poktGatewayUrl = `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
-
-  async function getPoktBalanceFromLedger(address: string): Promise<number> {
-    let balanceResponse;
-    try {
-      const res = await fetch(`${poktGatewayUrl}/v1/query/balance`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address,
-          height: 0,
-        }),
-      })
-      balanceResponse = await res.json()
-    } catch (error) {
-      console.log(error);
-      return 0;
-    }
-
-    const uPOKT = Number(balanceResponse?.balance?.toString());
-    return (uPOKT ? uPOKT : 0) / UPOKT;
-  }
-
   return (
     <TransportContext.Provider
       value={{
@@ -258,7 +227,7 @@ export function TransportProvider({ children }: any) {
         setPocketApp,
         removeTransport,
         isUsingHardwareWallet,
-        sendTransaction: sendTransaction,
+        sendTransaction,
         isHardwareWalletLoading,
         setIsHardwareWalletLoading,
         getPoktAddressFromLedger,
