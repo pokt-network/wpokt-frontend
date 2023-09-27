@@ -8,7 +8,7 @@ import { HStack, Text, useToast } from "@chakra-ui/react";
 import { typeGuard } from "@pokt-network/pocket-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAddress } from "viem";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "@/utils/ledger";
 import { STDX_MSG_TYPES } from "@/utils/pokt";
@@ -74,7 +74,8 @@ export interface GlobalContextProps {
     setIsUsingHardwareWallet: (value: boolean) => void
     pocketApp?: AppPokt
     setPocketApp: (value: AppPokt|undefined) => void
-    isSigningTx: boolean
+    isSigningTx: boolean,
+    resetProgress: () => void
 }
 
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -120,7 +121,8 @@ export const GlobalContext = createContext<GlobalContextProps>({
     setIsUsingHardwareWallet: () => {},
     pocketApp: undefined,
     setPocketApp: () => {},
-    isSigningTx: false
+    isSigningTx: false,
+    resetProgress: () => {}
 })
 
 
@@ -167,6 +169,17 @@ export function GlobalContextProvider({ children }: any) {
             getActiveBridgeRequests(address)
         }
     }, [address])
+
+    function resetProgress() {
+        setPoktTxHash("")
+        setEthTxHash("")
+        setPoktTxOngoing(false)
+        setPoktTxSuccess(false)
+        setPoktTxError(false)
+        setCurrentMint(undefined)
+        setCurrentBurn(undefined)
+        setMintTxHash(undefined)
+    }
 
     async function getActiveBridgeRequests(address: string) {
         await getActiveBurns(address)
@@ -342,26 +355,12 @@ export function GlobalContextProvider({ children }: any) {
                         </HStack>
                     )
                 })
-                const pk = await pocketApp?.getPublicKey(LEDGER_CONFIG.derivationPath)
-                if (!pk) throw Error("No public key or signature found")
-                // const res = await sendTransaction(
-                //     pocketApp,
-                //     dataSource,
-                //     Buffer.from(pk.publicKey).toString("hex"),
-                //     poktAddress,
-                //     POKT_MULTISIG_ADDRESS,
-                //     BigInt(amount),
-                //     `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`
-                // )
                 const res = await sendTransactionFromLedger(
                     POKT_MULTISIG_ADDRESS,
                     BigInt(amount),
                     `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`
                 )
                 if (typeGuard(res, Error)) throw res
-                console.log("Ledger res:", res)
-                // const response = await res.json()
-                // console.log("Ledger response:", response)
                 txHash = res?.txhash
             } else {
                 const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
@@ -480,7 +479,8 @@ export function GlobalContextProvider({ children }: any) {
             setIsUsingHardwareWallet,
             pocketApp,
             setPocketApp,
-            isSigningTx
+            isSigningTx,
+            resetProgress
         }}>
             {children}
         </GlobalContext.Provider>

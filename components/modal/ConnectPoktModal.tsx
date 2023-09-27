@@ -3,7 +3,6 @@ import { useTransport } from "@/context/Transport";
 import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Box } from "@chakra-ui/react";
 import { useEffect } from "react";
 import sendwalletLogo from "../../public/logo/sendnodes_logo.svg"
-import Image from "next/image";
 
 
 export function ConnectPoktModal(props: ModalProps) {

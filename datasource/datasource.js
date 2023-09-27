@@ -334,11 +334,6 @@ export class DataSource {
       txSignature
     );
 
-    console.log({
-      stdTxMsgObj,
-      bytesToSign,
-      txSignature
-    })
     if (typeGuard(rawTxOrError, RpcError)) {
       console.log(`Failed to process transaction with error: ${rawTxOrError}`);
       return new Error(rawTxOrError.message);
@@ -350,16 +345,6 @@ export class DataSource {
         rawTxOrError.address,
         rawTxOrError.txHex
       );
-      // rawTxResponse = await fetch(`http://localhost:3000/api/tx`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     address: rawTxOrError.address,
-      //     raw_hex_bytes: rawTxOrError.txHex,
-      //   })
-      // })
     } catch (error) {
       console.log(`Failed to send transaction with error: ${error.raw_log}`);
       return new Error(error.raw_log);
