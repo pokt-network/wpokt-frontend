@@ -1,20 +1,21 @@
-import { Box, Button, Center, Container, Divider, Flex, HStack, Input, Link, Text, VStack, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, Center, Container, Divider, Flex, HStack, Input, Text, VStack, useDisclosure, useToast } from "@chakra-ui/react";
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ProgressModal } from "./modal/ProgressModal";
 import { CloseIcon, ErrorIcon, InfoIcon } from "./icons/misc";
 import { useGlobalContext } from "@/context/Globals";
 import { TimeInfoModal } from "./modal/TimeInfoModal";
-import { useAccount, useBalance, useContractRead, useContractWrite, useFeeData, usePrepareContractWrite } from "wagmi";
+import { useAccount, useBalance, useContractRead, useFeeData } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { formatPokt, parsePokt } from "@/utils/pokt";
-import { CHAINLINK_ETH_USD_ADDRESS, MINT_CONTROLLER_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
-import { CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI, MINT_CONTROLLER_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
+import { CHAINLINK_ETH_USD_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
+import { CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { createPublicClient, formatEther, formatUnits, getAddress, http, parseUnits } from "viem";
 import { goerli } from "wagmi/chains";
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
 import { GasInfoModal } from "./modal/GasInfoModal";
+import { ConnectPoktModal } from "./modal/ConnectPoktModal";
 
 
 export function Bridge() {
@@ -29,7 +30,6 @@ export function Bridge() {
         poktAddress,
         destination,
         setDestination,
-        connectSendWallet,
         poktBalance,
         bridgePoktToEthereum,
         poktTxOngoing,
@@ -43,7 +43,9 @@ export function Bridge() {
         allPendingMints,
         currentBurn,
         currentMint,
-        getPoktBalance
+        getPoktBalance,
+        isSigningTx,
+        resetProgress,
     } = useGlobalContext()
 
     const { address } = useAccount()
@@ -66,6 +68,7 @@ export function Bridge() {
     const { isOpen: isTimeInfoOpen, onOpen: onTimeInfoOpen, onClose: onTimeInfoClose } = useDisclosure()
     const { isOpen: isGasInfoOpen, onOpen: onGasInfoOpen, onClose: onGasInfoClose } = useDisclosure()
     const { isOpen: isResumeMintOpen, onOpen: onResumeMintOpen, onClose: onResumeMintClose } = useDisclosure()
+    const { isOpen: isConnectPoktModalOpen, onOpen: onConnectPoktModalOpen, onClose: onConnectPoktModalClose } = useDisclosure()
 
     const toast = useToast()
 
@@ -151,14 +154,7 @@ export function Bridge() {
                     account: getAddress(address ?? '')
                 })
             } else {
-                console.log("estimating gas...")
-                gas = await pubClient.estimateContractGas({
-                    address: getAddress(MINT_CONTROLLER_ADDRESS),
-                    abi: MINT_CONTROLLER_ABI,
-                    functionName: 'mintWrappedPocket',
-                    args: [poktAmount, getAddress(address ?? '')],
-                    account: getAddress(address ?? '')
-                })
+                gas = poktAmount > BigInt(0) ? BigInt(289000) : BigInt(0) // Default estimate for minting
             }
         } catch (error) {
             console.error(error)
@@ -208,13 +204,6 @@ export function Bridge() {
             >
                 {destination === "eth" ? "POKT" : "wPOKT"} &rarr; {destination === "eth" ? "wPOKT" : "POKT"}
             </Button>
-            <ResumeWrapModal
-                isOpen={isResumeMintOpen}
-                onClose={onResumeMintClose}
-                mintInfo={allPendingMints.length > 0 ? allPendingMints[0] : undefined}
-                openProgressModal={onProgressOpen}
-            ><></>
-            </ResumeWrapModal>
             {destination === "eth" ? (
                 <Container bg="darkOverlay" paddingY={4}>
                     <Center>
@@ -249,10 +238,10 @@ export function Bridge() {
                                         color="white"
                                         _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                         leftIcon={<PoktIcon fill={"white"}/>}
-                                        onClick={connectSendWallet}
-                                        minW={180}
+                                        onClick={onConnectPoktModalOpen}
+                                        minW={200}
                                     >
-                                        Connect SendWallet
+                                        Connect POKT Wallet
                                     </Button>
                                 </Center>
                             )}
@@ -281,9 +270,9 @@ export function Bridge() {
                                     _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                     leftIcon={<EthIcon fill={"white"}/>}
                                     onClick={openConnectModal}
-                                    minW={180}
+                                    minW={200}
                                 >
-                                    Connect Wallet
+                                    Connect ETH Wallet
                                 </Button>
                             </Center>
                         )}
@@ -324,14 +313,13 @@ export function Bridge() {
                                 if (poktAmount + parsePokt(0.01) > poktBalance) return displayInsufficientTokenBalanceToast()
                                 const recipient = address ?? ""
                                 await bridgePoktToEthereum(recipient, poktAmount)
-                                // onProgressOpen()
                             }}
                             isDisabled={!poktAddress||!address||!poktAmount}
+                            isLoading={isSigningTx}
                         >
                             Wrap
                         </Button>
                     </Center>
-                    <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose}><></></ProgressModal>
                 </Container>
             ) : (
                 <Container bg="darkOverlay" paddingY={4}>
@@ -368,8 +356,9 @@ export function Bridge() {
                                         _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                         leftIcon={<EthIcon fill={"white"}/>}
                                         onClick={openConnectModal}
+                                        minW={200}
                                     >
-                                        Connect Wallet
+                                        Connect ETH Wallet
                                     </Button>
                                 </Center>
                             )}
@@ -396,9 +385,10 @@ export function Bridge() {
                                 color="white"
                                 _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                 leftIcon={<PoktIcon fill={"white"}/>}
-                                onClick={connectSendWallet}
+                                onClick={onConnectPoktModalOpen}
+                                minW={200}
                             >
-                                Connect SendWallet
+                                Connect POKT Wallet
                             </Button>
                         </Center>
                     )}
@@ -439,11 +429,21 @@ export function Bridge() {
                             Unwrap
                         </Button>
                     </Center>
-                    <ProgressModal isOpen={isProgressOpen} onClose={onProgressClose}><></></ProgressModal>
                 </Container>
             )}
+            <ResumeWrapModal
+                isOpen={isResumeMintOpen}
+                onClose={onResumeMintClose}
+                mintInfo={allPendingMints.length > 0 ? allPendingMints[allPendingMints.length - 1] : undefined}
+                openProgressModal={onProgressOpen}
+            ><></></ResumeWrapModal>
+            <ProgressModal isOpen={isProgressOpen} onClose={() => {
+                onProgressClose()
+                resetProgress()
+            }}><></></ProgressModal>
             <GasInfoModal isOpen={isGasInfoOpen} onClose={onGasInfoClose}><></></GasInfoModal>
             <TimeInfoModal isOpen={isTimeInfoOpen} onClose={onTimeInfoClose}><></></TimeInfoModal>
+            <ConnectPoktModal isOpen={isConnectPoktModalOpen} onClose={onConnectPoktModalClose}><></></ConnectPoktModal>
         </VStack>
     )
 }

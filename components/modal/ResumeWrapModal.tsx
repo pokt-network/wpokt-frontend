@@ -24,7 +24,8 @@ export function ResumeWrapModal({ mintInfo, openProgressModal, ...props }: Resum
 
     async function mintWPokt() {
         try {
-            console.log(mintFunc)
+            console.log("Mint Info: ", mintInfo)
+            console.log("Mint Function: ", mintFunc)
             if (!mintFunc.writeAsync) throw new Error("No writeAsync function")
             const tx = await mintFunc.writeAsync()
             setMintTxHash(tx.hash)

@@ -28,7 +28,8 @@ export function ProgressModal(props: ModalProps) {
         mintTx,
         mintTxHash,
         currentBurn,
-        setCurrentBurn
+        setCurrentBurn,
+        isUsingHardwareWallet
     } = useGlobalContext()
 
     const [isBurnFetchError, setIsBurnFetchError] = useState<boolean>(false)
@@ -149,8 +150,24 @@ export function ProgressModal(props: ModalProps) {
 
     async function getPoktTxStatus() {
         try {
-            const tx = await window.pocketNetwork.send("pokt_tx", [{ hash: poktTxHash }])
-            console.log("Pokt Tx Status:", tx)
+            if (isUsingHardwareWallet) {
+                const poktGatewayUrl = `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
+                const res = await fetch(`${poktGatewayUrl}/v1/query/tx`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        hash: poktTxHash,
+                        prove: false
+                    })
+                })
+                const tx = await res.json()
+                console.log("Pokt Tx Status:", tx)
+            } else {
+                const tx = await window.pocketNetwork.send("pokt_tx", [{ hash: poktTxHash }])
+                console.log("Pokt Tx Status:", tx)
+            }
         } catch (error) {
             console.error(error)
         }

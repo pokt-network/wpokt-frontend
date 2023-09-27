@@ -9,6 +9,7 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { RainbowKitProvider, getDefaultWallets, darkTheme } from '@rainbow-me/rainbowkit'
 import React from 'react';
 import { GlobalContextProvider } from '@/context/Globals';
+import { TransportProvider } from '@/context/Transport';
  
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [goerli],
@@ -51,7 +52,9 @@ export default function App({ Component, pageProps }: AppProps) {
         })}>
           <ChakraProvider theme={theme}>
             <GlobalContextProvider>
-              {React.createElement(Component, pageProps)}
+              <TransportProvider>
+                {React.createElement(Component, pageProps)}
+              </TransportProvider>
             </GlobalContextProvider>
           </ChakraProvider>
         </RainbowKitProvider>
