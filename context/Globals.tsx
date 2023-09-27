@@ -2,7 +2,7 @@ import { InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { ETH_CHAIN_ID, POKT_MULTISIG_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
-import { getDataSource, sendTransaction } from "@/utils/datasource_2";
+import { getDataSource } from "@/utils/datasource";
 import { isValidEthAddress } from "@/utils/misc";
 import { HStack, Text, useToast } from "@chakra-ui/react";
 import { typeGuard } from "@pokt-network/pocket-js";
@@ -11,6 +11,7 @@ import { getAddress } from "viem";
 import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "@/utils/ledger";
+import { STDX_MSG_TYPES } from "@/utils/pokt";
 
 declare global {
     interface Window {
@@ -343,24 +344,24 @@ export function GlobalContextProvider({ children }: any) {
                 })
                 const pk = await pocketApp?.getPublicKey(LEDGER_CONFIG.derivationPath)
                 if (!pk) throw Error("No public key or signature found")
-                const res = await sendTransaction(
-                    pocketApp,
-                    dataSource,
-                    Buffer.from(pk.publicKey).toString("hex"),
-                    poktAddress,
-                    POKT_MULTISIG_ADDRESS,
-                    BigInt(amount),
-                    `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`
-                )
-                // const res = await sendTransactionFromLedger(
+                // const res = await sendTransaction(
+                //     pocketApp,
+                //     dataSource,
+                //     Buffer.from(pk.publicKey).toString("hex"),
+                //     poktAddress,
                 //     POKT_MULTISIG_ADDRESS,
                 //     BigInt(amount),
                 //     `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`
                 // )
+                const res = await sendTransactionFromLedger(
+                    POKT_MULTISIG_ADDRESS,
+                    BigInt(amount),
+                    `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`
+                )
                 if (typeGuard(res, Error)) throw res
-                // const response = await res.json()
-                console.log("Ledger response:", res)
-                // txHash = response?.txhash
+                // console.log("Ledger response:", res)
+                const response = await res.json()
+                txHash = response?.txhash
             } else {
                 const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
                     {
@@ -404,11 +405,11 @@ export function GlobalContextProvider({ children }: any) {
             ],
             memo,
             msg: {
-                type: "pos/Send",
+                type: STDX_MSG_TYPES.send,
                 value: {
                     amount: amount.toString(),
-                    to_address: toAddress.toLowerCase(),
-                    from_address: poktAddress.toLowerCase(),
+                    from_address: poktAddress,
+                    to_address: toAddress,
                 },
             },
         };
@@ -423,9 +424,8 @@ export function GlobalContextProvider({ children }: any) {
         const pk = await pocketApp?.getPublicKey(LEDGER_CONFIG.derivationPath)
         if (!pk || !sig) throw Error("No public key or signature found")
         const ledgerTxResponse = await dataSource.sendTransactionFromLedger(
-            // Buffer.from(pk.publicKey, "hex").toString("hex"),
-            pk.publicKey,
-            sig.signature,
+            Buffer.from(pk.publicKey),
+            Buffer.from(sig.signature),
             tx
         );
         if (typeGuard(ledgerTxResponse, Error)) {

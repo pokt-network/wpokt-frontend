@@ -17,14 +17,14 @@
 import type Transport from "@ledgerhq/hw-transport";
 import sha256 from "fast-sha256";
 
-export interface GetPublicKeyResult {
+export type GetPublicKeyResult = {
   publicKey: Uint8Array;
   address: Uint8Array | null;
 };
-export interface SignTransactionResult {
+export type SignTransactionResult = {
   signature: Uint8Array;
 };
-export interface GetVersionResult {
+export type GetVersionResult = {
   major: number;
   minor: number;
   patch: number;
@@ -96,7 +96,7 @@ export class Common {
     }
     const res: GetPublicKeyResult = {
       publicKey: publicKey,
-      address:  address,
+      address: address,
     };
     return res;
   }
@@ -140,19 +140,7 @@ export class Common {
     */
 
   async getVersion(): Promise<GetVersionResult> {
-    // const [major, minor, patch, ...appName] = await this.sendChunks(
-    //   0x00,
-    //   0x00,
-    //   0x00,
-    //   0x00,
-    //   Buffer.alloc(1)
-    // );
-    // return {
-    //   major,
-    //   minor,
-    //   patch
-    // };
-    const obj = await this.sendChunks(
+    const [major, minor, patch, ...appName] = await this.sendChunks(
       0x00,
       0x00,
       0x00,
@@ -160,9 +148,9 @@ export class Common {
       Buffer.alloc(1)
     );
     return {
-      major: obj[0],
-      minor: obj[1],
-      patch: obj[2]
+      major,
+      minor,
+      patch
     };
   }
   
