@@ -15,17 +15,29 @@ import { useGlobalContext } from "@/context/Globals";
 import { CloseIcon, MenuIcon } from "./icons/misc";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect } from "wagmi";
+import { useTransport } from "@/context/Transport";
+import { ConnectPoktModal } from "./modal/ConnectPoktModal";
 
 
 export function Header() {
     const { mobile, poktAddress, ethAddress, setPoktAddress, connectSendWallet } = useGlobalContext()
+    const { connectLedgerDevice, isUsingHardwareWallet, removeTransport } = useTransport()
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen: isConnectPoktModalOpen, onOpen: onConnectPoktModalOpen, onClose: onConnectPoktModalClose } = useDisclosure()
     const { openConnectModal } = useConnectModal()
     const { address } = useAccount()
     const { disconnect } = useDisconnect()
     const width = 220
 
+    async function disconnectPokt() {
+        if (isUsingHardwareWallet) {
+            return removeTransport()
+        }
+        return setPoktAddress("")
+    }
+
     return (
+        <>
         <HStack justify="space-between" align="center" paddingX={10} paddingY={5}>
             <Flex gap={1} align="end">
                 <Link href="https://pokt.network" isExternal>
@@ -108,7 +120,7 @@ export function Header() {
                                         color="poktLime"
                                         textAlign="center"
                                         textDecoration="underline"
-                                        onClick={() => setPoktAddress("")}
+                                        onClick={disconnectPokt}
                                     >
                                         Disconnect
                                     </Link>
@@ -122,7 +134,7 @@ export function Header() {
                                         borderWidth={2}
                                         borderColor="poktLime"
                                         leftIcon={<PoktIcon />}
-                                        onClick={connectSendWallet}
+                                        onClick={onConnectPoktModalOpen}
                                         _hover={{ bg: "hover.poktLime" }}
                                     >
                                         Connect
@@ -205,7 +217,7 @@ export function Header() {
                             paddingX={3}
                             width="140px"
                             height={8}
-                            onClick={() => setPoktAddress("")}
+                            onClick={disconnectPokt}
                         >
                             {poktAddress.substring(0,4) + "..." + poktAddress.substring(poktAddress.length - 4)}
                         </Button>
@@ -233,7 +245,7 @@ export function Header() {
                             height={8}
                             _hover={{ bg: "rgba(255,255,255,0.1)" }}
                             leftIcon={<PoktIcon fill={"white"}/>}
-                            onClick={connectSendWallet}
+                            onClick={onConnectPoktModalOpen}
                         >
                             Connect
                         </Button>
@@ -241,5 +253,7 @@ export function Header() {
                 </ButtonGroup>
             )}
         </HStack>
+        <ConnectPoktModal isOpen={isConnectPoktModalOpen} onClose={onConnectPoktModalClose}><></></ConnectPoktModal>
+        </>
     )
 }
