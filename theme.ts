@@ -1,5 +1,6 @@
 import { ChakraProps, extendTheme } from "@chakra-ui/react"
 import { modalTheme } from "./components/theme/modal"
+import { PoktButton } from "./components/theme/button"
 
 export const colors = {
     poktBlue: "rgba(29, 138, 237, 1)",
@@ -17,12 +18,18 @@ export const colors = {
 
 export const theme = extendTheme({
     colors,
+    fonts: {
+        body: `Manrope, system-ui, sans-serif`,
+        heading: "Georgia, serif",
+        mono: "Menlo, monospace",
+    },
     configs: {
         initialColorMode: "dark",
         useSystemColorMode: false,
     },
     components: {
-        Modal: modalTheme
+        Modal: modalTheme,
+        Button: PoktButton
     },
     styles: {
         global: {
