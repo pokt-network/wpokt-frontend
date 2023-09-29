@@ -1,4 +1,16 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# wPOKT Bridge
+A frontend application for bridging POKT between Pocket Network and Ethereum mainnet.
+
+## Configurations
+### Environment Variables
+The env variables are stored in `.env.local` file. You can copy the relevant variables from `.env.example` file. The variables are as follows:
+- `APP_PROJECT_ID`: The Wallet Connect app ID key.
+- `MONGODB_URI`: The connection URI for Mongo DB.
+- `MONGODB_DATABASE`: The name of the database to use.
+- `POKT_RPC_KEY`: API key for Pocket Network RPC gateway.
+
+### Constants
+These are public constant values that are chain dependent. They can be found in `utils/constants.ts` file. There are also POKT gateway configs found in `datasource/config.js`. It is hardcoded for Pocket mainnet and only used for those connecting to the dapp and bridging from their Ledger hardware wallet. None of the values in those files should be altered unless one of the chains is changed or doing testnet/local development.
 
 ## Getting Started
 
@@ -14,13 +26,7 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
 ## Learn More
 
