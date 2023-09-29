@@ -9,6 +9,7 @@ import { MintModal } from "./MintModal";
 import { TimeoutModal } from "./TimeoutModal";
 import { InvalidMint, Status } from "@/types";
 import { RefundModal } from "./RefundModal";
+import { CHAIN } from "@/utils/constants";
 
 
 export function ProgressModal(props: ModalProps) {
@@ -325,7 +326,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         {step > 2 && "Your wPOKT is in your destination wallet."}
                     </Text>
                 </Box>
-                <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://goerli.etherscan.io/tx/${ethTxHash}` : `https://poktscan.com/tx/${poktTxHash}`} isExternal>
+                <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://${Number(CHAIN.id) !== 1 ? CHAIN.network + "." : ""}etherscan.io/tx/${ethTxHash}` : `https://poktscan.com/tx/${poktTxHash}`} isExternal>
                     {step === 0 && "View this transaction on Etherscan"}
                     {step === 1 && "View last transaction on Etherscan"}
                     {step === 2 && "View this transaction on PoktScan"}
@@ -348,7 +349,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         {step > 3 && "Your wPOKT is in your destination wallet."}
                     </Text>
                 </Box>
-                <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://poktscan.com/tx/${poktTxHash}` : `https://goerli.etherscan.io/tx/${ethTxHash}`} isExternal>
+                <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://poktscan.com/tx/${poktTxHash}` : `https://${Number(CHAIN.id) !== 1 ? CHAIN.network + "." : ""}etherscan.io/tx/${ethTxHash}`} isExternal>
                     {step === 0 && "View this transaction on PoktScan"}
                     {step === 1 && "View last transaction on PoktScan"}
                     {step === 2 && "View this transaction on Etherscan"}

@@ -1,3 +1,6 @@
+import { goerli } from "wagmi/chains";
+
+export const CHAIN = goerli;
 export const ETH_CHAIN_ID = 5;
 export const POKT_CHAIN_ID = 'mainnet';
 export const WPOKT_ADDRESS = "0xe8452CeE4bfa69F858E0F99c8401F3AD9365AE61";

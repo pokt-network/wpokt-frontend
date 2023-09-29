@@ -9,10 +9,9 @@ import { TimeInfoModal } from "./modal/TimeInfoModal";
 import { useAccount, useBalance, useContractRead, useFeeData } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { formatPokt, parsePokt } from "@/utils/pokt";
-import { CHAINLINK_ETH_USD_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
+import { CHAIN, CHAINLINK_ETH_USD_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
 import { CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { createPublicClient, formatEther, formatUnits, getAddress, http, parseUnits } from "viem";
-import { goerli } from "wagmi/chains";
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
 import { GasInfoModal } from "./modal/GasInfoModal";
 import { ConnectPoktModal } from "./modal/ConnectPoktModal";
@@ -57,7 +56,7 @@ export function Bridge() {
     const { data: ethBalanceData, isSuccess } = useBalance({
         address,
     })
-    const { data: feeData } = useFeeData({ chainId: goerli.id })
+    const { data: feeData } = useFeeData({ chainId: CHAIN.id })
     const { data: priceData, isSuccess: isPriceSuccess } = useContractRead({
         address: CHAINLINK_ETH_USD_ADDRESS,
         abi: CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI,
@@ -154,7 +153,7 @@ export function Bridge() {
         let gas: bigint
         try {
             const pubClient = createPublicClient({
-                chain: goerli,
+                chain: CHAIN,
                 transport: http()
             })
             if (dest === "pokt") {

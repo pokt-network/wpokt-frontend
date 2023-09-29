@@ -4,15 +4,15 @@ import Head from 'next/head'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from "../theme"
 import { WagmiConfig, createConfig, configureChains } from 'wagmi'
-import { goerli, mainnet } from 'wagmi/chains';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { RainbowKitProvider, getDefaultWallets, darkTheme } from '@rainbow-me/rainbowkit'
 import React from 'react';
 import { GlobalContextProvider } from '@/context/Globals';
 import { TransportProvider } from '@/context/Transport';
+import { CHAIN } from '@/utils/constants';
  
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [goerli],
+  [CHAIN],
   [jsonRpcProvider({
     rpc: (chain) => ({
       http: `https://eth-${chain.name}.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`,

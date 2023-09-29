@@ -1,6 +1,7 @@
 import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, Link, ModalProps } from "@chakra-ui/react";
 import { BluePoktIcon } from "../icons/pokt";
 import { useGlobalContext } from "@/context/Globals";
+import { CHAIN } from "@/utils/constants";
 
 
 export function TimeoutModal(props: ModalProps) {
@@ -37,7 +38,7 @@ export function TimeoutModal(props: ModalProps) {
                             textDecor="underline"
                             color="poktLime"
                             mt={3}
-                            href={destination === "pokt" ? (poktTxHash ? `https://poktscan.com/tx/${poktTxHash}` : `https://goerli.etherscan.io/tx/${ethTxHash}`) : (ethTxHash ? `https://goerli.etherscan.io/tx/${ethTxHash}` : `https://poktscan.com/tx/${poktTxHash}`)}
+                            href={destination === "pokt" ? (poktTxHash ? `https://poktscan.com/tx/${poktTxHash}` : `https://${Number(CHAIN.id) !== 1 ? CHAIN.network + "." : ""}etherscan.io/tx/${ethTxHash}`) : (ethTxHash ? `https://${Number(CHAIN.id) !== 1 ? CHAIN.network + "." : ""}etherscan.io/tx/${ethTxHash}` : `https://poktscan.com/tx/${poktTxHash}`)}
                             isExternal
                         >
                             {destination === "pokt" ? (poktTxHash ? "View this transaction on PoktScan" : "View this transaction on Etherscan") : (ethTxHash ? "View this transaction on Etherscan" : "View this transaction on PoktScan")}
