@@ -10,7 +10,7 @@ export const Config = {
   MAX_TRANSACTION_LIST_COUNT: '100',
   TX_FEE: '10000',
   SESSION_LENGTH: '30',
-  GATEWAY_BASE_URL: `https://mainnet.gateway.pokt.network/v1/${process.env.POKT_RPC_KEY}`,
+  GATEWAY_BASE_URL: `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`,
   HTTP_TIMEOUT: '0',
   HTTP_HEADERS: '{"Content-Type": "application/json"}',
   USE_LEGACY_CODEC: 'false',

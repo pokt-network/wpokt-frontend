@@ -13,8 +13,8 @@ export interface ResumeWrapModalProps extends ModalProps {
 }
 
 export function ResumeWrapModal({ mintInfo, openProgressModal, ...props }: ResumeWrapModalProps) {
-    const { setMintTxHash, setCurrentMint } = useGlobalContext()
-    const { config } = usePrepareContractWrite({
+    const { setMintTxHash, setCurrentMint, allPendingMints, setAllPendingMints } = useGlobalContext()
+    const { config, refetch } = usePrepareContractWrite({
         address: MINT_CONTROLLER_ADDRESS,
         abi: MINT_CONTROLLER_ABI,
         functionName: 'mintWrappedPocket',
@@ -24,13 +24,18 @@ export function ResumeWrapModal({ mintInfo, openProgressModal, ...props }: Resum
 
     async function mintWPokt() {
         try {
-            console.log("Mint Info: ", mintInfo)
-            console.log("Mint Function: ", mintFunc)
+            if (!mintFunc.writeAsync) {
+                const refetched = await refetch()
+                if (refetched.isError) throw new Error("No writeAsync function and error refetching")
+            }
             if (!mintFunc.writeAsync) throw new Error("No writeAsync function")
             const tx = await mintFunc.writeAsync()
             setMintTxHash(tx.hash)
             setCurrentMint(mintInfo)
             openProgressModal()
+            mintFunc.reset()
+            const remainingMintsPending = allPendingMints.slice(0, -1)
+            setAllPendingMints(remainingMintsPending)
             props.onClose()
         } catch (error) {
             console.error(error)

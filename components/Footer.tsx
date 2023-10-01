@@ -1,5 +1,5 @@
 import { Box, Center, Flex, HStack, Heading, Link, Text, VStack } from "@chakra-ui/react";
-import { DiscordIcon, GithubIcon, TelegramIcon, TwitterIcon } from "./icons/socials";
+import { DiscordIcon, GithubIcon, TwitterIcon } from "./icons/socials";
 import { useEffect, useState } from "react";
 
 export function Footer() {
@@ -30,7 +30,7 @@ export function Footer() {
                             <DiscordIcon width={8} height={8} href="https://discord.com/invite/pokt" />
                         </Link>
                         <Link href="https://github.com/pokt-network/pocket" isExternal>
-                            <GithubIcon width={8} height={8} href="https://github.com/pokt-network/pocket" />
+                            <GithubIcon width={8} height={8} href="https://github.com/pokt-network" />
                         </Link>
                         <Link href="https://twitter.com/POKTnetwork" isExternal>
                             <TwitterIcon width={8} height={8} href="https://twitter.com/POKTnetwork" />
@@ -57,11 +57,11 @@ export function Footer() {
             <HStack alignSelf="center" mb={4}>
                 {!mobileFooter && <Text>© 2023 Pocket Network</Text>}
                 {!mobileFooter && <Text>|</Text>}
-                <Link href="https://www.pokt.network/privacy-policy" isExternal>
+                <Link href="https://www.pokt.network/terms-of-use" isExternal>
                     Terms of Use
                 </Link>
                 <Text>|</Text>
-                <Link href="https://www.pokt.network/terms-of-use" isExternal>
+                <Link href="https://www.pokt.network/privacy-policy" isExternal>
                     Privacy Policy
                 </Link>
             </HStack>

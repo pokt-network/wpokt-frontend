@@ -47,11 +47,17 @@ export interface GlobalContextProps {
     setPoktAmount: (amount: bigint) => void
     wPoktAmount: bigint
     setWPoktAmount: (amount: bigint) => void
+    poktAmountInput: string
+    setPoktAmountInput: (amount: string) => void
+    wPoktAmountInput: string
+    setWPoktAmountInput: (amount: string) => void
     bridgePoktToEthereum: (ethAddress: string, amount: number | bigint) => Promise<void>
     poktTxHash: string
     setPoktTxHash: (hash: string) => void
     poktTxOngoing: boolean
+    setPoktTxOngoing: (ongoing: boolean) => void
     poktTxSuccess: boolean
+    setPoktTxSuccess: (success: boolean) => void
     poktTxError: boolean
     ethTxHash: string
     setEthTxHash: (hash: string) => void
@@ -75,6 +81,7 @@ export interface GlobalContextProps {
     pocketApp?: AppPokt
     setPocketApp: (value: AppPokt|undefined) => void
     isSigningTx: boolean,
+    setIsSigningTx: (value: boolean) => void
     resetProgress: () => void
 }
 
@@ -94,11 +101,17 @@ export const GlobalContext = createContext<GlobalContextProps>({
     setPoktAmount: () => {},
     wPoktAmount: BigInt(0),
     setWPoktAmount: () => {},
+    poktAmountInput: "",
+    setPoktAmountInput: () => {},
+    wPoktAmountInput: "",
+    setWPoktAmountInput: () => {},
     bridgePoktToEthereum: async () => {},
     poktTxHash: "",
     setPoktTxHash: () => {},
     poktTxOngoing: false,
+    setPoktTxOngoing: () => {},
     poktTxSuccess: false,
+    setPoktTxSuccess: () => {},
     poktTxError: false,
     ethTxHash: "",
     setEthTxHash: () => {},
@@ -122,6 +135,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
     pocketApp: undefined,
     setPocketApp: () => {},
     isSigningTx: false,
+    setIsSigningTx: () => {},
     resetProgress: () => {}
 })
 
@@ -138,6 +152,8 @@ export function GlobalContextProvider({ children }: any) {
     const [destination, setDestination] = useState<string>("eth") // eth = pokt -> wpokt, pokt = wpokt -> pokt
     const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
     const [wPoktAmount, setWPoktAmount] = useState<bigint>(BigInt(0))
+    const [poktAmountInput, setPoktAmountInput] = useState<string>("")
+    const [wPoktAmountInput, setWPoktAmountInput] = useState<string>("")
     const [poktTxHash, setPoktTxHash] = useState<string>("")
     const [ethTxHash, setEthTxHash] = useState<string>("")
     const [poktTxOngoing, setPoktTxOngoing] = useState<boolean>(false)
@@ -179,6 +195,10 @@ export function GlobalContextProvider({ children }: any) {
         setCurrentMint(undefined)
         setCurrentBurn(undefined)
         setMintTxHash(undefined)
+        setPoktAmount(BigInt(0))
+        setWPoktAmount(BigInt(0))
+        setPoktAmountInput("")
+        setWPoktAmountInput("")
     }
 
     async function getActiveBridgeRequests(address: string) {
@@ -247,7 +267,6 @@ export function GlobalContextProvider({ children }: any) {
 
     async function connectSendWallet() {
         if (window.pocketNetwork === undefined) {
-            // uh oh no SendWallet found, request that the user install it first.
             return alert("SendWallet not found! Please visit https://sendwallet.net to install");
         }
         try {
@@ -325,7 +344,7 @@ export function GlobalContextProvider({ children }: any) {
 
     const burnTx = useWaitForTransaction({
         hash: burnFunc.data?.hash,
-        confirmations: 8
+        confirmations: 4
     })
 
     const mintTx = useWaitForTransaction({
@@ -339,9 +358,9 @@ export function GlobalContextProvider({ children }: any) {
         if (!poktAddress) return console.error("Please connect your POKT wallet first")
         if (!isValidEthAddress(ethAddress)) return console.error("Please enter a valid Ethereum address")
         // Send Transaction
+        setIsSigningTx(true)
         try {
             let txHash;
-            setIsSigningTx(true)
             if (isUsingHardwareWallet) {
                 const toastId = 'tx-signing-in-progress'
                 if (!toast.isActive(toastId)) toast({
@@ -452,11 +471,17 @@ export function GlobalContextProvider({ children }: any) {
             setPoktAmount,
             wPoktAmount,
             setWPoktAmount,
+            poktAmountInput,
+            setPoktAmountInput,
+            wPoktAmountInput,
+            setWPoktAmountInput,
             bridgePoktToEthereum,
             poktTxHash,
             setPoktTxHash,
             poktTxOngoing,
+            setPoktTxOngoing,
             poktTxSuccess,
+            setPoktTxSuccess,
             poktTxError,
             ethTxHash,
             setEthTxHash,
@@ -480,6 +505,7 @@ export function GlobalContextProvider({ children }: any) {
             pocketApp,
             setPocketApp,
             isSigningTx,
+            setIsSigningTx,
             resetProgress
         }}>
             {children}

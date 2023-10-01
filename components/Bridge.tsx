@@ -18,8 +18,6 @@ import { ConnectPoktModal } from "./modal/ConnectPoktModal";
 
 
 export function Bridge() {
-    const [poktAmountInput, setPoktAmountInput] = useState<string>("")
-    const [wPoktAmountInput, setWPoktAmountInput] = useState<string>("")
     const [estGasCost, setEstGasCost] = useState<string>("")
     const [ethPrice, setEthPrice] = useState<bigint|undefined>(undefined)
     const [insufficientPoktGas, setInsufficientPoktGas] = useState<boolean>(false)
@@ -37,6 +35,10 @@ export function Bridge() {
         wPoktAmount,
         setPoktAmount,
         setWPoktAmount,
+        poktAmountInput,
+        wPoktAmountInput,
+        setPoktAmountInput,
+        setWPoktAmountInput,
         burnFunc,
         burnTx,
         allPendingMints,
@@ -44,6 +46,7 @@ export function Bridge() {
         currentMint,
         getPoktBalance,
         isSigningTx,
+        setIsSigningTx,
         resetProgress,
     } = useGlobalContext()
 
@@ -84,7 +87,6 @@ export function Bridge() {
     }, [address, poktAddress, destination, poktAmount, wPoktAmount])
 
     useEffect(() => {
-        console.log("Price Data:", priceData)
         if (priceData) {
             const data = priceData as bigint[]
             setEthPrice(data[1])
@@ -104,8 +106,8 @@ export function Bridge() {
     },[address, poktAddress, destination])
 
     useEffect(() => {
-        if (allPendingMints.length > 0) onResumeMintOpen()
-    }, [allPendingMints])
+        if (allPendingMints.length > 0 && !isProgressOpen) onResumeMintOpen()
+    }, [allPendingMints, isProgressOpen])
 
     useEffect(() => {
         if (poktAmount || wPoktAmount) getGasCost(destination)
@@ -137,15 +139,15 @@ export function Bridge() {
             return displayInsufficientTokenBalanceToast()
         }
         if (burnFunc.writeAsync) {
+            setIsSigningTx(true)
             try {
                 const tx = await burnFunc.writeAsync()
-                console.log("Burn Data:", burnFunc.data)
-                console.log("Burn Tx:", tx)
                 setEthTxHash(tx.hash)
                 onProgressOpen()
             } catch (error) {
                 console.error(error)
             }
+            setIsSigningTx(false)
         }
     }
 
@@ -622,6 +624,7 @@ export function Bridge() {
                                 _hover={{ bg: "hover.poktLime" }}
                                 onClick={burn}
                                 isDisabled={!poktAddress||!address||!wPoktAmount}
+                                isLoading={isSigningTx}
                             >
                                 Unwrap
                             </Button>

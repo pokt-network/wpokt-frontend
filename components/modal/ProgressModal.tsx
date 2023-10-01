@@ -4,12 +4,13 @@ import { BlueEthIcon } from "../icons/eth";
 import { BlueBridgeIcon } from "../icons/copper";
 import { BluePoktIcon } from "../icons/pokt";
 import { BlueCheckIcon, InfoIcon } from "../icons/misc";
-import { useGlobalContext } from "@/context/Globals";
+import { fetchActiveMints, useGlobalContext } from "@/context/Globals";
 import { MintModal } from "./MintModal";
 import { TimeoutModal } from "./TimeoutModal";
 import { InvalidMint, Status } from "@/types";
 import { RefundModal } from "./RefundModal";
 import { CHAIN } from "@/utils/constants";
+import { useAccount } from "wagmi";
 
 
 export function ProgressModal(props: ModalProps) {
@@ -20,7 +21,9 @@ export function ProgressModal(props: ModalProps) {
         poktTxHash,
         setPoktTxHash,
         poktTxOngoing,
+        setPoktTxOngoing,
         poktTxSuccess,
+        setPoktTxSuccess,
         poktTxError,
         burnFunc,
         burnTx,
@@ -30,7 +33,8 @@ export function ProgressModal(props: ModalProps) {
         mintTxHash,
         currentBurn,
         setCurrentBurn,
-        isUsingHardwareWallet
+        isUsingHardwareWallet,
+        setAllPendingMints
     } = useGlobalContext()
 
     const [isBurnFetchError, setIsBurnFetchError] = useState<boolean>(false)
@@ -41,6 +45,7 @@ export function ProgressModal(props: ModalProps) {
     const { isOpen: isMintOpen, onOpen: onMintOpen, onClose: onMintClose } = useDisclosure()
     const { isOpen: isTimeoutOpen, onOpen: onTimeoutOpen, onClose: onTimeoutClose } = useDisclosure()
     const { isOpen: isRefundOpen, onOpen: onRefundOpen, onClose: onRefundClose } = useDisclosure()
+    const { address } = useAccount()
 
     const step = useMemo(() => getCurrentStep(), [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, currentBurn?.return_tx_hash, mintTx?.status, currentMint?.status])
     const timeInterval = useMemo(() => {
@@ -53,11 +58,8 @@ export function ProgressModal(props: ModalProps) {
             if (step === 3) return 1000 * 60
             return 60000
         } else {
-            if (step === 0) return 1000 * 60
-            if (step === 1) {
-                if (currentMint?.status === Status.CONFIRMED) return 1000 * 60
-                else return 1000 * 60 * 3
-            }
+            if (step === 0) return 1000 * 15
+            if (step === 1) return 1000 * 60
             if (step === 2) return 1000 * 60 * 5
             return 60000
         }
@@ -125,14 +127,15 @@ export function ProgressModal(props: ModalProps) {
         if (destination === "pokt") {
             if (currentBurn?.status === Status.SUCCESS) {
                 setPoktTxHash(currentBurn?.return_tx_hash)
-                return 3
+                if (poktTxSuccess) return 3
+                return 2
             }
             if (currentBurn?.status === Status.SIGNED || currentBurn?.status === Status.SUMBITTED) {
                 if (!currentBurn?.return_tx_hash) return 1
                 setPoktTxHash(currentBurn?.return_tx_hash)
                 return 2
             }
-            if (currentBurn?.status === Status.CONFIRMED) return 1
+            if (currentBurn?.status === Status.CONFIRMED || currentBurn?.status === Status.PENDING || burnTx?.isSuccess) return 1
             return 0
         } else {
             if (currentMint?.status === Status.SUCCESS || mintTx?.isSuccess) {
@@ -149,7 +152,7 @@ export function ProgressModal(props: ModalProps) {
         }
     }
 
-    async function getPoktTxStatus() {
+    async function getPoktTxStatus(txHash: string = poktTxHash) {
         try {
             if (isUsingHardwareWallet) {
                 const poktGatewayUrl = `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
@@ -159,30 +162,61 @@ export function ProgressModal(props: ModalProps) {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        hash: poktTxHash,
+                        hash: txHash,
                         prove: false
                     })
                 })
                 const tx = await res.json()
                 console.log("Pokt Tx Status:", tx)
+                if (!tx.hash) throw new Error("Tx hash is pending or invalid")
+                setPoktTxSuccess(true)
+                return tx
             } else {
-                const tx = await window.pocketNetwork.send("pokt_tx", [{ hash: poktTxHash }])
+                const tx = await window.pocketNetwork.send("pokt_tx", [{ hash: txHash }])
                 console.log("Pokt Tx Status:", tx)
+                if (!tx.hash) throw new Error("Tx hash is pending or invalid")
+                setPoktTxSuccess(true)
+                return tx
+            }
+        } catch (error) {
+            console.error(error)
+            return undefined
+        }
+    }
+
+    async function checkOtherMints() {
+        let otherMintsPending = false
+        try {
+            if (!address) throw new Error("No address")
+            const mints = await fetchActiveMints(address)
+            if (mints && mints.length > 0) {
+                const allPending = mints.filter(mint => mint.status === "signed")
+                const previous = allPending.filter(mint => mint.transaction_hash.toLowerCase() !== poktTxHash.toLowerCase())
+                if (previous.length > 0) otherMintsPending = true
+                setAllPendingMints(allPending)
             }
         } catch (error) {
             console.error(error)
         }
+        return otherMintsPending
     }
 
-    function readyToMintWPokt() {
+    async function readyToMintWPokt() {
         if (step === 2 && destination !== "pokt") {
+            const prevMintsReady = await checkOtherMints()
+            if (prevMintsReady) {
+                return props.onClose()
+            }
             onMintOpen()
         }
     }
 
     async function getBurnInfo() {
         try {
-            if (currentBurn?.status === "success") return
+            if (currentBurn?.status === "success") {
+                if (!poktTxSuccess) return await getPoktTxStatus()
+                else return
+            }
             const res = await fetch(`/api/burns/hash/${ethTxHash}`)
             const burn = await res.json()
             console.log("Burn from DB:", burn)
@@ -219,6 +253,8 @@ export function ProgressModal(props: ModalProps) {
             console.log("Invalid Mint from DB:", invalidMint)
             setInvalidMint(invalidMint)
             setPoktRefundTxHash(invalidMint?.return_tx_hash || "")
+            onRefundOpen()
+            props.onClose()
         } catch (error) {
             console.error(error)
         }
