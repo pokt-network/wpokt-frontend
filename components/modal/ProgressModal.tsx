@@ -192,8 +192,10 @@ export function ProgressModal(props: ModalProps) {
             if (mints && mints.length > 0) {
                 const allPending = mints.filter(mint => mint.status === "signed")
                 const previous = allPending.filter(mint => mint.transaction_hash.toLowerCase() !== poktTxHash.toLowerCase())
-                if (previous.length > 0) otherMintsPending = true
-                setAllPendingMints(allPending)
+                if (previous.length > 0) {
+                    otherMintsPending = true
+                    setAllPendingMints(allPending)
+                }
             }
         } catch (error) {
             console.error(error)

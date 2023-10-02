@@ -310,8 +310,7 @@ export class DataSource {
     );
 
     const itxSender = transactionSender.send(fromAddress, toAddress, amount);
-    console.log({ itxSender })
-
+    
     const unsignedTransaction = itxSender.createUnsignedTransaction(
       chainID,
       fee[0].amount,

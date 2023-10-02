@@ -6,7 +6,8 @@ import { Button, ButtonGroup, HStack, IconButton, useDisclosure, Drawer,
     Flex,
     Text,
     Link,
-    VStack, } from "@chakra-ui/react";
+    VStack,
+} from "@chakra-ui/react";
 import Image from "next/image";
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
@@ -17,17 +18,21 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useDisconnect } from "wagmi";
 import { useTransport } from "@/context/Transport";
 import { ConnectPoktModal } from "./modal/ConnectPoktModal";
+import { useState } from "react";
 
 
 export function Header() {
-    const { mobile, poktAddress, ethAddress, setPoktAddress, connectSendWallet } = useGlobalContext()
-    const { connectLedgerDevice, isUsingHardwareWallet, removeTransport } = useTransport()
+    const { mobile, poktAddress, setPoktAddress } = useGlobalContext()
+    const { isUsingHardwareWallet, removeTransport } = useTransport()
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { isOpen: isConnectPoktModalOpen, onOpen: onConnectPoktModalOpen, onClose: onConnectPoktModalClose } = useDisclosure()
     const { openConnectModal } = useConnectModal()
     const { address } = useAccount()
     const { disconnect } = useDisconnect()
     const width = 220
+
+    const [isEthConnectBtnHovered, setIsEthConnectBtnHovered] = useState<boolean>(false)
+    const [isPoktConnectBtnHovered, setIsPoktConnectBtnHovered] = useState<boolean>(false)
 
     async function disconnectPokt() {
         if (isUsingHardwareWallet) {
@@ -82,17 +87,6 @@ export function Header() {
                             ) : (
                                 <VStack spacing={1}>
                                     <Text fontSize={14}>Connect Ethereum Wallet</Text>
-                                    {/* <Button
-                                        color="darkBlue"
-                                        background="poktLime"
-                                        borderWidth={2}
-                                        borderColor="poktLime"
-                                        leftIcon={<EthIcon />}
-                                        onClick={openConnectModal}
-                                        _hover={{ bg: "hover.poktLime" }}
-                                    >
-                                        Connect
-                                    </Button> */}
                                     <Button
                                         variant="outline"
                                         borderColor="poktLime"
@@ -128,17 +122,6 @@ export function Header() {
                             ) : (
                                 <VStack spacing={1} mt={10}>
                                     <Text fontSize={14}>Connect Pocket Wallet</Text>
-                                    {/* <Button
-                                        color="darkBlue"
-                                        background="poktLime"
-                                        borderWidth={2}
-                                        borderColor="poktLime"
-                                        leftIcon={<PoktIcon />}
-                                        onClick={onConnectPoktModalOpen}
-                                        _hover={{ bg: "hover.poktLime" }}
-                                    >
-                                        Connect
-                                    </Button> */}
                                     <Button
                                         variant="outline"
                                         borderColor="poktLime"
@@ -148,7 +131,7 @@ export function Header() {
                                         height={8}
                                         _hover={{ bg: "rgba(255,255,255,0.1)" }}
                                         leftIcon={<PoktIcon fill={"white"}/>}
-                                        onClick={connectSendWallet}
+                                        onClick={onConnectPoktModalOpen}
                                     >
                                         Connect
                                     </Button>
@@ -168,28 +151,19 @@ export function Header() {
                             borderWidth={2}
                             borderColor="darkOverlay"
                             _hover={{ bg: "hover.darkBlue" }}
-                            // padding={3}
                             paddingX={3}
                             width="140px"
                             height={8}
-                            onClick={() => disconnect()}
+                            onClick={() => {
+                                disconnect()
+                                setIsEthConnectBtnHovered(false)
+                            }}
+                            onPointerOverCapture={() => setIsEthConnectBtnHovered(true)}
+                            onPointerOutCapture={() => setIsEthConnectBtnHovered(false)}
                         >
-                            {address.substring(0,4) + "..." + address.substring(address.length - 4)}
+                            {isEthConnectBtnHovered ? "disconnect?" : address.substring(0,4) + "..." + address.substring(address.length - 4)}
                         </Button>
                     ) : (
-                        // <Button
-                        //     color="darkBlue"
-                        //     background="poktLime"
-                        //     borderWidth={2}
-                        //     borderColor="poktLime"
-                        //     _hover={{ bg: "hover.poktLime" }}
-                        //     leftIcon={<EthIcon />}
-                        //     padding={4}
-                        //     paddingY={5}
-                        //     onClick={openConnectModal}
-                        // >
-                        //     Connect
-                        // </Button>
                         <Button
                             variant="outline"
                             borderColor="poktLime"
@@ -213,28 +187,19 @@ export function Header() {
                             borderWidth={2}
                             borderColor="darkOverlay"
                             _hover={{ bg: "hover.darkBlue" }}
-                            // padding={4}
                             paddingX={3}
                             width="140px"
                             height={8}
-                            onClick={disconnectPokt}
+                            onClick={() => {
+                                disconnectPokt()
+                                setIsPoktConnectBtnHovered(false)
+                            }}
+                            onPointerOverCapture={() => setIsPoktConnectBtnHovered(true)}
+                            onPointerOutCapture={() => setIsPoktConnectBtnHovered(false)}
                         >
-                            {poktAddress.substring(0,4) + "..." + poktAddress.substring(poktAddress.length - 4)}
+                            {isPoktConnectBtnHovered ? "disconnect?" : poktAddress.substring(0,4) + "..." + poktAddress.substring(poktAddress.length - 4)}
                         </Button>
                     ) : (
-                        // <Button
-                        //     color="darkBlue"
-                        //     background="poktLime"
-                        //     borderWidth={2}
-                        //     borderColor="poktLime"
-                        //     _hover={{ bg: "hover.poktLime" }}
-                        //     leftIcon={<PoktIcon />}
-                        //     padding={4}
-                        //     paddingY={5}
-                        //     onClick={connectSendWallet}
-                        // >
-                        //     Connect
-                        // </Button>
                         <Button
                             variant="outline"
                             borderColor="poktLime"

@@ -23,13 +23,13 @@ export function Footer() {
             <Flex direction={mobileFooter ? "column" : "row"} justify="space-between" padding={10} gap={mobileFooter ? 10 : 4}>
                 <Flex direction="column" gap={4}>
                     <Box>
-                        <Heading size="sm">Connect With Us</Heading>
+                        <Heading size="md">Connect With Us</Heading>
                     </Box>
                     <Flex gap={8}>
                         <Link href="https://discord.com/invite/pokt" isExternal>
                             <DiscordIcon width={8} height={8} href="https://discord.com/invite/pokt" />
                         </Link>
-                        <Link href="https://github.com/pokt-network/pocket" isExternal>
+                        <Link href="https://github.com/pokt-network" isExternal>
                             <GithubIcon width={8} height={8} href="https://github.com/pokt-network" />
                         </Link>
                         <Link href="https://twitter.com/POKTnetwork" isExternal>
@@ -38,7 +38,7 @@ export function Footer() {
                     </Flex>
                 </Flex>
                 <VStack align="left" spacing={1}>
-                    <Heading size="sm">Resources</Heading>
+                    <Heading size="md">Resources</Heading>
                     <Link href="https://docs.pokt.network" isExternal>
                         Documentation
                     </Link>
@@ -57,7 +57,7 @@ export function Footer() {
             <HStack alignSelf="center" mb={4}>
                 {!mobileFooter && <Text>© 2023 Pocket Network</Text>}
                 {!mobileFooter && <Text>|</Text>}
-                <Link href="https://www.pokt.network/terms-of-use" isExternal>
+                <Link href="https://docs.google.com/document/d/1xXMSvnh7UhrROAMkAgTgRAzzRc6C57Sr3ptoSvUqe7Q/edit?usp=sharing" isExternal>
                     Terms of Use
                 </Link>
                 <Text>|</Text>
