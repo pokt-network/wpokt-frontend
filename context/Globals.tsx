@@ -1,7 +1,7 @@
 import { InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
-import { ETH_CHAIN_ID, POKT_MULTISIG_ADDRESS, POKT_RPC_URL, WPOKT_ADDRESS } from "@/utils/constants";
+import { ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_MULTISIG_ADDRESS, POKT_RPC_URL, WPOKT_ADDRESS } from "@/utils/constants";
 import { getDataSource } from "@/datasource";
 import { isValidEthAddress } from "@/utils/misc";
 import { HStack, Text, useToast } from "@chakra-ui/react";
@@ -414,7 +414,7 @@ export function GlobalContextProvider({ children }: any) {
         ).toString();
     
         const tx = {
-            chain_id: 'mainnet',
+            chain_id: POKT_CHAIN_ID,
             entropy,
             fee: [
                 {
