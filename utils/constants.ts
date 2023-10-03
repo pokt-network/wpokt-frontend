@@ -111,3 +111,5 @@ export const WALLET_CONNECT_PROJECT_ID =
 if (!WALLET_CONNECT_PROJECT_ID) {
   throw new Error(`Missing env variable NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID`);
 }
+
+export const POKT_RPC_URL = POKT_CHAIN_ID === "testnet" ? "https://node2.testnet.pokt.network" : `https://mainnet.gateway.pokt.network/v1/lb/${POKT_RPC_KEY}`
