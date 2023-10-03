@@ -9,21 +9,16 @@ import { RainbowKitProvider, getDefaultWallets, darkTheme } from '@rainbow-me/ra
 import React from 'react';
 import { GlobalContextProvider } from '@/context/Globals';
 import { TransportProvider } from '@/context/Transport';
-import { CHAIN } from '@/utils/constants';
+import { CHAIN, ETH_RPC_CONFIG, WALLET_CONNECT_PROJECT_ID } from '@/utils/constants';
  
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [CHAIN],
-  [jsonRpcProvider({
-    rpc: (chain) => ({
-      http: `https://eth-${chain.name}.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`,
-      webSocket: `wss://eth-${chain.name}.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
-    })
-  })],
+  [jsonRpcProvider(ETH_RPC_CONFIG)],
 )
 
 const { connectors } = getDefaultWallets({
   appName: 'wPOKT Bridge',
-  projectId: `${process.env.APP_PROJECT_ID}`,
+  projectId: WALLET_CONNECT_PROJECT_ID,
   chains
 })
  

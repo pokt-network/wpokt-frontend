@@ -1,11 +1,14 @@
 import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, Link, ModalProps } from "@chakra-ui/react";
 import { BluePoktIcon } from "../icons/pokt";
 import { useGlobalContext } from "@/context/Globals";
-import { CHAIN } from "@/utils/constants";
+import { CHAIN, ETH_CHAIN_ID, POKT_CHAIN_ID } from "@/utils/constants";
 
 
 export function TimeoutModal(props: ModalProps) {
     const { destination, poktTxHash, ethTxHash } = useGlobalContext()
+    const ethTxUrl = Number(ETH_CHAIN_ID) !== 1 ? `https://${CHAIN.name}.etherscan.io/tx/${ethTxHash}` : `https://etherscan.io/tx/${ethTxHash}`
+    const poktTxUrl = POKT_CHAIN_ID !== "mainnet" ? `https://poktscan.com/testnet/tx/${poktTxHash}` : `https://poktscan.com/tx/${poktTxHash}`
+    const txUrl = destination === "pokt" ? (poktTxHash ? poktTxUrl : ethTxUrl) : (ethTxHash ? ethTxUrl : poktTxUrl)
 
     return (
         <Modal {...props} size="md" isCentered>
@@ -38,7 +41,7 @@ export function TimeoutModal(props: ModalProps) {
                             textDecor="underline"
                             color="poktLime"
                             mt={3}
-                            href={destination === "pokt" ? (poktTxHash ? `https://poktscan.com/tx/${poktTxHash}` : `https://${Number(CHAIN.id) !== 1 ? CHAIN.network + "." : ""}etherscan.io/tx/${ethTxHash}`) : (ethTxHash ? `https://${Number(CHAIN.id) !== 1 ? CHAIN.network + "." : ""}etherscan.io/tx/${ethTxHash}` : `https://poktscan.com/tx/${poktTxHash}`)}
+                            href={txUrl}
                             isExternal
                         >
                             {destination === "pokt" ? (poktTxHash ? "View this transaction on PoktScan" : "View this transaction on Etherscan") : (ethTxHash ? "View this transaction on Etherscan" : "View this transaction on PoktScan")}

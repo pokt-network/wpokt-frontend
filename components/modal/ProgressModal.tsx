@@ -9,7 +9,7 @@ import { MintModal } from "./MintModal";
 import { TimeoutModal } from "./TimeoutModal";
 import { InvalidMint, Status } from "@/types";
 import { RefundModal } from "./RefundModal";
-import { CHAIN } from "@/utils/constants";
+import { CHAIN, ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_RPC_URL } from "@/utils/constants";
 import { useAccount } from "wagmi";
 
 
@@ -60,7 +60,7 @@ export function ProgressModal(props: ModalProps) {
         } else {
             if (step === 0) return 1000 * 15
             if (step === 1) return 1000 * 60
-            if (step === 2) return 1000 * 60 * 5
+            if (step === 2) return 1000 * 60 * 3
             return 60000
         }
     }, [step])
@@ -155,7 +155,7 @@ export function ProgressModal(props: ModalProps) {
     async function getPoktTxStatus(txHash: string = poktTxHash) {
         try {
             if (isUsingHardwareWallet) {
-                const poktGatewayUrl = `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
+                const poktGatewayUrl = POKT_RPC_URL;
                 const res = await fetch(`${poktGatewayUrl}/v1/query/tx`, {
                     method: "POST",
                     headers: {
@@ -224,6 +224,9 @@ export function ProgressModal(props: ModalProps) {
             console.log("Burn from DB:", burn)
             setCurrentBurn(burn)
             setIsBurnFetchError(false)
+            if (burn.status === Status.SUCCESS) {
+                if (!poktTxSuccess) await getPoktTxStatus()
+            }
         } catch (error) {
             console.error(error)
             setIsBurnFetchError(true)
@@ -337,6 +340,9 @@ export function ProgressModal(props: ModalProps) {
 
 
 export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, destination}: {poktTxHash?: string, ethTxHash?: string, step: number, destination: string}) {
+    const ethTxUrl = Number(ETH_CHAIN_ID) !== 1 ? `https://${CHAIN.name}.etherscan.io/tx/${ethTxHash}` : `https://etherscan.io/tx/${ethTxHash}`
+    const poktTxUrl = POKT_CHAIN_ID !== "mainnet" ? `https://poktscan.com/testnet/tx/${poktTxHash}` : `https://poktscan.com/tx/${poktTxHash}`
+
     return (
         <Flex
             direction="column"
@@ -364,7 +370,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         {step > 2 && "Your wPOKT is in your destination wallet."}
                     </Text>
                 </Box>
-                <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://${Number(CHAIN.id) !== 1 ? CHAIN.network + "." : ""}etherscan.io/tx/${ethTxHash}` : `https://poktscan.com/tx/${poktTxHash}`} isExternal>
+                <Link textDecor="underline" color="poktLime" href={step < 2 ? ethTxUrl : poktTxUrl} isExternal>
                     {step === 0 && "View this transaction on Etherscan"}
                     {step === 1 && "View last transaction on Etherscan"}
                     {step === 2 && "View this transaction on PoktScan"}
@@ -387,7 +393,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         {step > 3 && "Your wPOKT is in your destination wallet."}
                     </Text>
                 </Box>
-                <Link textDecor="underline" color="poktLime" href={step < 2 ? `https://poktscan.com/tx/${poktTxHash}` : `https://${Number(CHAIN.id) !== 1 ? CHAIN.network + "." : ""}etherscan.io/tx/${ethTxHash}`} isExternal>
+                <Link textDecor="underline" color="poktLime" href={step < 2 ? poktTxUrl : ethTxUrl} isExternal>
                     {step === 0 && "View this transaction on PoktScan"}
                     {step === 1 && "View last transaction on PoktScan"}
                     {step === 2 && "View this transaction on Etherscan"}

@@ -1,6 +1,7 @@
 import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, Link, ModalProps } from "@chakra-ui/react";
 import { BluePoktIcon } from "../icons/pokt";
 import { useGlobalContext } from "@/context/Globals";
+import { POKT_CHAIN_ID } from "@/utils/constants";
 
 interface RefundModalProps extends ModalProps {
     refundTxHash: string
@@ -8,6 +9,7 @@ interface RefundModalProps extends ModalProps {
 
 export function RefundModal(props: RefundModalProps) {
     const { destination } = useGlobalContext()
+    const poktTxUrl = POKT_CHAIN_ID !== "mainnet" ? `https://poktscan.com/testnet/tx/${props.refundTxHash}` : `https://poktscan.com/tx/${props.refundTxHash}`
 
     return (
         <Modal {...props} size="md" isCentered>
@@ -33,7 +35,7 @@ export function RefundModal(props: RefundModalProps) {
                             Any tokens you have attempted to bridge have been returned to your wallet. 
                             Try waiting a few minutes before bridging again.
                         </Text>
-                        <Link textDecor="underline" color="poktLime" mt={3} href={`https://poktscan.com/tx/${props.refundTxHash}`} isExternal>
+                        <Link textDecor="underline" color="poktLime" mt={3} href={poktTxUrl} isExternal>
                             {destination === "pokt" ? "View this transaction on Etherscan" : "View this transaction on PoktScan"}
                         </Link>
                     </Flex>
