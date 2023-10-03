@@ -39,7 +39,7 @@ export function Footer() {
                 </Flex>
                 <VStack align="left" spacing={1}>
                     <Heading size="md">Resources</Heading>
-                    <Link href="https://docs.pokt.network/pokt/" isExternal>
+                    <Link href="https://docs.pokt.network/pokt/wpokt/" isExternal>
                         Documentation
                     </Link>
                     <Link href="https://poktscan.com" isExternal>
