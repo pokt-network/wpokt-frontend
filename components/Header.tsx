@@ -147,10 +147,10 @@ export function Header() {
                         <Button
                             color="white"
                             background="darkOverlay"
-                            leftIcon={<EthIcon fill="poktBlue" width="24px" height="24px" />}
-                            borderWidth={2}
+                            leftIcon={<EthIcon fill="poktBlue" width="21px" height="21px" />}
+                            borderWidth={1}
                             borderColor="darkOverlay"
-                            _hover={{ bg: "hover.darkBlue" }}
+                            _hover={{ bg: "rgba(255,255,255,0.1)" }}
                             paddingX={3}
                             width="140px"
                             height={8}
@@ -161,7 +161,7 @@ export function Header() {
                             onPointerOverCapture={() => setIsEthConnectBtnHovered(true)}
                             onPointerOutCapture={() => setIsEthConnectBtnHovered(false)}
                         >
-                            {isEthConnectBtnHovered ? "disconnect?" : address.substring(0,4) + "..." + address.substring(address.length - 4)}
+                            {isEthConnectBtnHovered ? "Disconnect?" : address.substring(0,4) + "..." + address.substring(address.length - 4)}
                         </Button>
                     ) : (
                         <Button
@@ -183,10 +183,10 @@ export function Header() {
                         <Button
                             color="white"
                             background="darkOverlay"
-                            leftIcon={<PoktIcon fill="poktBlue" width="24px" height="24px" />}
-                            borderWidth={2}
+                            leftIcon={<PoktIcon fill="poktBlue" width="21px" height="21px" />}
+                            borderWidth={1}
                             borderColor="darkOverlay"
-                            _hover={{ bg: "hover.darkBlue" }}
+                            _hover={{ bg: "rgba(255,255,255,0.1)" }}
                             paddingX={3}
                             width="140px"
                             height={8}
@@ -197,7 +197,7 @@ export function Header() {
                             onPointerOverCapture={() => setIsPoktConnectBtnHovered(true)}
                             onPointerOutCapture={() => setIsPoktConnectBtnHovered(false)}
                         >
-                            {isPoktConnectBtnHovered ? "disconnect?" : poktAddress.substring(0,4) + "..." + poktAddress.substring(poktAddress.length - 4)}
+                            {isPoktConnectBtnHovered ? "Disconnect?" : poktAddress.substring(0,4) + "..." + poktAddress.substring(poktAddress.length - 4)}
                         </Button>
                     ) : (
                         <Button
