@@ -9,7 +9,7 @@ import { MintModal } from "./MintModal";
 import { TimeoutModal } from "./TimeoutModal";
 import { InvalidMint, Status } from "@/types";
 import { RefundModal } from "./RefundModal";
-import { CHAIN } from "@/utils/constants";
+import { CHAIN, POKT_RPC_URL } from "@/utils/constants";
 import { useAccount } from "wagmi";
 
 
@@ -155,7 +155,7 @@ export function ProgressModal(props: ModalProps) {
     async function getPoktTxStatus(txHash: string = poktTxHash) {
         try {
             if (isUsingHardwareWallet) {
-                const poktGatewayUrl = `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`
+                const poktGatewayUrl = POKT_RPC_URL;
                 const res = await fetch(`${poktGatewayUrl}/v1/query/tx`, {
                     method: "POST",
                     headers: {

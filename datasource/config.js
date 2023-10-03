@@ -1,3 +1,5 @@
+import { POKT_RPC_URL } from "@/utils/constants";
+
 // Description: Configuration file for the Pocket Network data source.
 export const Config = {
   AAT_VERSION: '1.0',
@@ -10,7 +12,7 @@ export const Config = {
   MAX_TRANSACTION_LIST_COUNT: '100',
   TX_FEE: '10000',
   SESSION_LENGTH: '30',
-  GATEWAY_BASE_URL: `https://mainnet.gateway.pokt.network/v1/lb/${process.env.POKT_RPC_KEY}`,
+  GATEWAY_BASE_URL: POKT_RPC_URL,
   HTTP_TIMEOUT: '0',
   HTTP_HEADERS: '{"Content-Type": "application/json"}',
   USE_LEGACY_CODEC: 'false',
