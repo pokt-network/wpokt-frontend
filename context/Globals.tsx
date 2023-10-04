@@ -277,9 +277,9 @@ export function GlobalContextProvider({ children }: any) {
                         <ErrorIcon />
                         <Text color="error">
                           Wallet not found! Please install{" "}
-                          <Link href="https://sendwallet.net" isExternal>SendWallet</Link>
+                          <Link href="https://sendwallet.net" textDecor="underline" isExternal>SendWallet</Link>
                           {" or "}
-                          <Link href="https://docs.decentralizedauthority.com/nodewallet" isExternal>NodeWallet</Link>
+                          <Link href="https://docs.decentralizedauthority.com/nodewallet" textDecor="underline" isExternal>NodeWallet</Link>
                           {"."}
                         </Text>
                     </HStack>
