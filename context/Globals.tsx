@@ -4,7 +4,7 @@ import { WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_MULTISIG_ADDRESS, POKT_RPC_URL, WPOKT_ADDRESS } from "@/utils/constants";
 import { getDataSource } from "@/datasource";
 import { isValidEthAddress } from "@/utils/misc";
-import { HStack, Link, Text, useToast } from "@chakra-ui/react";
+import { HStack, Link, Text, useInterval, useToast } from "@chakra-ui/react";
 import { typeGuard } from "@pokt-network/pocket-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAddress } from "viem";
@@ -185,6 +185,12 @@ export function GlobalContextProvider({ children }: any) {
             getActiveBridgeRequests(address)
         }
     }, [address])
+
+    useInterval(() => {
+        if (poktAddress) {
+            getPoktBalance()
+        }
+    }, 120000)
 
     function resetProgress() {
         setPoktTxHash("")

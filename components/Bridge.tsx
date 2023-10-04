@@ -20,7 +20,6 @@ import { ConnectPoktModal } from "./modal/ConnectPoktModal";
 export function Bridge() {
     const [estGasCost, setEstGasCost] = useState<string>("")
     const [ethPrice, setEthPrice] = useState<bigint|undefined>(undefined)
-    const [insufficientPoktGas, setInsufficientPoktGas] = useState<boolean>(false)
     const [insufficientEthGas, setInsufficientEthGas] = useState<boolean>(false)
     const {
         screenWidth,
@@ -55,11 +54,15 @@ export function Bridge() {
     const { data: wPoktBalanceData, refetch: refetchWPoktBalance } = useBalance({
         address,
         token: WPOKT_ADDRESS,
+        watch: true,
+        cacheTime: 30_000
     })
     const { data: ethBalanceData, isSuccess } = useBalance({
         address,
+        watch: true,
+        cacheTime: 30_000
     })
-    const { data: feeData } = useFeeData({ chainId: CHAIN.id })
+    const { data: feeData } = useFeeData({ chainId: CHAIN.id, watch: true, cacheTime: 30_000 })
     const { data: priceData, isSuccess: isPriceSuccess } = useContractRead({
         address: CHAINLINK_ETH_USD_ADDRESS,
         abi: CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI,
@@ -86,6 +89,33 @@ export function Bridge() {
         }
     }, [address, poktAddress, destination, poktAmount, wPoktAmount])
 
+    const ethGas = useMemo(async () => {
+        let gas = BigInt(0)
+        if (address && poktAddress) {
+            try {
+                const pubClient = createPublicClient({
+                    chain: CHAIN,
+                    transport: http()
+                })
+                if (destination === "pokt") {
+                    gas = await pubClient.estimateContractGas({
+                        address: getAddress(WPOKT_ADDRESS),
+                        abi: WRAPPED_POCKET_ABI,
+                        functionName: 'burnAndBridge',
+                        args: [wPoktAmount, getAddress(`0x${poktAddress}`)],
+                        account: getAddress(address ?? '')
+                    })
+                } else {
+                    gas = poktAmount > BigInt(0) ? BigInt(289000) : BigInt(0) // Default estimate for minting
+                }
+            } catch (error) {
+                console.error(error)
+                if (destination === "eth" && poktAmount > BigInt(0)) gas = BigInt(289000) // Default estimate for minting
+            }
+        }
+        return gas
+    }, [destination, address, poktAddress, poktAmount, wPoktAmount])
+
     useEffect(() => {
         if (priceData) {
             const data = priceData as bigint[]
@@ -100,18 +130,12 @@ export function Bridge() {
     }, [poktTxOngoing])
 
     useEffect(() => {
-        if (address && poktAddress && destination) {
-            getGasCost(destination)
-        }
-    },[address, poktAddress, destination])
+        getGasCost()
+    }, [ethGas, feeData?.maxFeePerGas])
 
     useEffect(() => {
         if (allPendingMints.length > 0 && !isProgressOpen) onResumeMintOpen()
     }, [allPendingMints, isProgressOpen])
-
-    useEffect(() => {
-        if (poktAmount || wPoktAmount) getGasCost(destination)
-    }, [poktAmount, wPoktAmount, destination])
 
     useEffect(() => {
         if (isSuccess && ethBalanceData && estGasCost) {
@@ -120,11 +144,6 @@ export function Bridge() {
             } else {
                 setInsufficientEthGas(false)
             }
-        }
-        if (BigInt(poktBalance) < poktAmount + parsePokt('0.01')) {
-            setInsufficientPoktGas(true)
-        } else {
-            setInsufficientPoktGas(false)
         }
     }, [ethBalanceData?.value, poktBalance, estGasCost, poktAmount, wPoktAmount])
 
@@ -151,29 +170,8 @@ export function Bridge() {
         }
     }
 
-    async function getGasCost(dest: string): Promise<void> {
-        let gas: bigint
-        try {
-            const pubClient = createPublicClient({
-                chain: CHAIN,
-                transport: http()
-            })
-            if (dest === "pokt") {
-                gas = await pubClient.estimateContractGas({
-                    address: getAddress(WPOKT_ADDRESS),
-                    abi: WRAPPED_POCKET_ABI,
-                    functionName: 'burnAndBridge',
-                    args: [wPoktAmount, getAddress(`0x${poktAddress}`)],
-                    account: getAddress(address ?? '')
-                })
-            } else {
-                gas = poktAmount > BigInt(0) ? BigInt(289000) : BigInt(0) // Default estimate for minting
-            }
-        } catch (error) {
-            console.error(error)
-            gas = BigInt(0)
-            if (dest === "eth" && poktAmount > BigInt(0)) gas = BigInt(289000) // Default estimate for minting
-        }
+    async function getGasCost(): Promise<void> {
+        const gas = await ethGas
         setEstGasCost(gas > BigInt(0) ? formatEther(gas * (feeData?.maxFeePerGas ?? BigInt(0))) : "")
     }
 
@@ -201,7 +199,7 @@ export function Bridge() {
             render: () => (
                 <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
                     <ErrorIcon />
-                    <Text color="error">Insufficient token balance.</Text>
+                    <Text color="error">Insufficient {destination === "eth" ? "POKT" : "token"} balance.</Text>
                 </HStack>
             )
         })
@@ -389,7 +387,7 @@ export function Bridge() {
                                     <Text fontWeight={500} fontSize={16}>{0.01} POKT + {estGasCost ? (estGasCost.startsWith('0.0000') ? '<0.0001' : estGasCost.substring(0,7)) : '----'} ETH</Text>
                                     {(!!ethPrice && !!estGasCost) && <Text fontWeight={500} fontSize={16}>(~${(parseFloat(estGasCost) * parseFloat(formatUnits(ethPrice, 8))).toFixed(2)})</Text>}
                                     <InfoIcon _hover={{ cursor: "pointer" }} onClick={onGasInfoOpen} />
-                                    {((insufficientEthGas||insufficientPoktGas) && address && poktAddress) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
+                                    {((insufficientEthGas) && address && poktAddress) && <ErrorIcon _hover={{ cursor: 'pointer' }} onClick={displayInsufficientGasToast} />}
                                 </Flex>
                             </Box>
                             <Box>
