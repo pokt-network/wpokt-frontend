@@ -1,8 +1,7 @@
 import { useGlobalContext } from "@/context/Globals";
 import { useTransport } from "@/context/Transport";
-import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps, Box } from "@chakra-ui/react";
+import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, ModalProps } from "@chakra-ui/react";
 import { useEffect } from "react";
-import sendwalletLogo from "../../public/logo/sendnodes_logo.svg"
 
 
 export function ConnectPoktModal(props: ModalProps) {
@@ -11,15 +10,13 @@ export function ConnectPoktModal(props: ModalProps) {
 
     const poktWalletOptions = [
         {
-            name: "SendWallet",
-            icon: sendwalletLogo,
+            name: "SendWallet / NodeWallet",
             onConnect: () => {
                 connectSendWallet()
             }
         },
         {
             name: "Ledger",
-            icon: "",
             onConnect: async () => {
                 await connectLedgerDevice()
             }

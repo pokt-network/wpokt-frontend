@@ -1,10 +1,10 @@
-import { InfoIcon } from "@/components/icons/misc";
+import { ErrorIcon, InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_MULTISIG_ADDRESS, POKT_RPC_URL, WPOKT_ADDRESS } from "@/utils/constants";
 import { getDataSource } from "@/datasource";
 import { isValidEthAddress } from "@/utils/misc";
-import { HStack, Text, useToast } from "@chakra-ui/react";
+import { HStack, Link, Text, useToast } from "@chakra-ui/react";
 import { typeGuard } from "@pokt-network/pocket-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAddress } from "viem";
@@ -265,9 +265,33 @@ export function GlobalContextProvider({ children }: any) {
         }
     };
 
+    function displayWalletNotFoundToast() {
+        const toastId = "pokt-wallet-not-found";
+        if (!toast.isActive(toastId)) {
+            toast({
+                id: toastId,
+                position: "top-right",
+                duration: 5000,
+                render: () => (
+                    <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
+                        <ErrorIcon />
+                        <Text color="error">
+                          Wallet not found! Please install{" "}
+                          <Link href="https://sendwallet.net" isExternal>SendWallet</Link>
+                          {" or "}
+                          <Link href="https://github.com/decentralized-authority/nodewallet" isExternal>NodeWallet</Link>
+                          {"."}
+                        </Text>
+                    </HStack>
+                ),
+            });
+        }
+    }
+
     async function connectSendWallet() {
         if (window.pocketNetwork === undefined) {
-            return alert("SendWallet not found! Please visit https://sendwallet.net to install");
+            displayWalletNotFoundToast();
+            return;
         }
         try {
             // Connect Wallet
