@@ -1,17 +1,19 @@
-import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, Link, ModalProps, Button } from "@chakra-ui/react";
+import { Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, Link, ModalProps, Button, useStatStyles } from "@chakra-ui/react";
 import { BluePoktIcon } from "../icons/pokt";
 import { useGlobalContext } from "@/context/Globals";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite } from "wagmi";
-import { parseEther } from "viem";
-import { MINT_CONTROLLER_ADDRESS } from "@/utils/constants";
+import { useAccount, useBalance, useContractWrite, useFeeData, usePrepareContractWrite } from "wagmi";
+import { createPublicClient, formatEther, getAddress, http, parseEther } from "viem";
+import { CHAIN, MINT_CONTROLLER_ADDRESS } from "@/utils/constants";
 import { MINT_CONTROLLER_ABI } from "@/utils/abis";
 import { Mint } from "@/types";
+import { useEffect, useMemo, useState } from "react";
 
 export interface MintModalProps extends ModalProps {
     mintInfo?: Mint
 }
 
 export function MintModal(props: MintModalProps) {
+    const [gasCost, setGasCost] = useState<string>("")
     const { setMintTxHash } = useGlobalContext()
     const { address } = useAccount()
     const { data: ethBalance } = useBalance({ address })
@@ -22,6 +24,34 @@ export function MintModal(props: MintModalProps) {
         args: [props.mintInfo?.data, props.mintInfo?.signatures]
     })
     const mintFunc = useContractWrite(config)
+
+    const { data: feeData } = useFeeData({ chainId: CHAIN.id })
+
+    const gas = useMemo(async () => {
+        let g = BigInt(0)
+        try {
+            const pubClient = createPublicClient({
+                chain: CHAIN,
+                transport: http()
+            })
+            g = await pubClient.estimateContractGas({
+                address: MINT_CONTROLLER_ADDRESS,
+                abi: MINT_CONTROLLER_ABI,
+                functionName: 'mintWrappedPocket',
+                args: [props.mintInfo?.data, props.mintInfo?.signatures],
+                account: getAddress(address ?? '')
+            })
+        } catch (error) {
+            console.error(error)
+        }
+        return g
+    }, [props.mintInfo, mintFunc.writeAsync])
+
+    useEffect(() => {
+        gas
+            .then(g => setGasCost(g > BigInt(0) ? formatEther(g * (feeData?.maxFeePerGas ?? BigInt(0))) : ""))
+            .catch(error => console.error(error))
+    }, [gas, feeData])
 
     async function mintWPokt() {
         try {
@@ -54,16 +84,16 @@ export function MintModal(props: MintModalProps) {
                         <BluePoktIcon />
                         <Text color="poktBlue" fontSize={16}>
                             {
-                                ethBalance?.value && ethBalance?.value > parseEther('0.01') ? 
+                                ethBalance?.value && ethBalance?.value > parseEther(gasCost) ? 
                                     "Authorize the wPOKT mint to proceed" : 
                                     "You don’t have enough ETH in your wallet"
                             }
                         </Text>
                         <Text>
                             {
-                                ethBalance?.value && ethBalance?.value > parseEther('0.01') ? 
+                                ethBalance?.value && ethBalance?.value > parseEther(gasCost) ? 
                                     "To complete the bridge, authorize the minting of your wPOKT using the button below. The wPOKT will then be sent to your wallet." : 
-                                    "To complete this bridge, you need to pay the gas cost for this transaction. You should need about XXX ETH to pay for gas right now, but that can change as the market gets more or less busy."
+                                    `To complete this bridge, you need to pay the gas cost for this transaction. You should need about ${gasCost} ETH to pay for gas right now, but that can change as the market gets more or less busy.`
                             }
                         </Text>
                         <Button
