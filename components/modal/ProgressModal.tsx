@@ -273,17 +273,18 @@ export function ProgressModal(props: ModalProps) {
                 <ModalCloseButton color="poktBlue" />
                 <ModalBody padding={0}>
                     {destination === "eth" && step < 3 ? (
-                        <VStack paddingX={8} mb={8} gap={0}>
+                        <VStack paddingX={10} mb={8} gap={0}>
                             <HStack justify='center' gap={4} align='center'>
-                                <InfoIcon fill='warning' />
-                                <Text textColor='warning'>
-                                    Don&apos;t close this window!
+                                <InfoIcon fill='poktLime' />
+                                <Text textColor='poktLime'>
+                                    You still need to sign to mint wPOKT.
                                 </Text>
+                                <InfoIcon fill='poktLime' />
                             </HStack>
-                            <Text>There is one more transaction you need to sign.</Text>
+                            <Text textAlign="center">Keep an eye on this page, or check back later. We will let you know when we need your signature.</Text>
                         </VStack>
                     ) : (
-                        <Text paddingX={8} mb={8}>
+                        <Text textAlign="center" paddingX={10} mb={8}>
                             You can close this window or refresh this page without interrupting the process.
                         </Text>
                     )}
@@ -352,6 +353,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
             justify="center"
             align="center"
             padding={3}
+            paddingX={8}
             gap={2}
         >
             {destination === "pokt" ? (
@@ -363,12 +365,27 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         {step === 2 && "Unlocking POKT"}
                         {step > 2 && "Transaction Complete!"}
                     </Text>
-                    <Text>
-                        {step === 0 && "It may take up to 32 blocks to arrive, which is about 6 minutes."}
-                        {step === 1 && "We are reviewing and approving your order. This process should take about 5-10 minutes."}
-                        {step === 2 && "Your POKT is on the way! It may take a few blocks to confirm. Pocket blocks complete every 15 minutes."}
-                        {step > 2 && "Your wPOKT is in your destination wallet."}
-                    </Text>
+                    {step === 0 && (
+                        <>
+                        <Text>It may take up to 32 blocks to arrive,</Text>
+                        <Text>which is about 6 minutes.</Text>
+                        </>
+                    )}
+                    {step === 1 && (
+                        <>
+                        <Text>We are reviewing and approving your order.</Text>
+                        <Text>This process should take about 5-10 minutes.</Text>
+                        </>
+                    )}
+                    {step === 2 && (
+                        <>
+                        <Text>Your POKT is on the way! It may take a few blocks to confirm. Pocket blocks complete every 15 minutes.</Text>
+                        <Text></Text>
+                        </>
+                    )}
+                    {step > 2 && (
+                        <Text>Your POKT is in your destination wallet.</Text>
+                    )}
                 </Box>
                 <Link textDecor="underline" color="poktLime" href={step < 2 ? ethTxUrl : poktTxUrl} isExternal>
                     {step === 0 && "View this transaction on Etherscan"}
@@ -386,12 +403,24 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         {(step === 2 || step === 3) && "Minting wPOKT"}
                         {step > 3 && "Transaction Complete!"}
                     </Text>
-                    <Text>
-                        {step === 0 && "This may take several blocks to confirm. Pocket blocks complete every 15 minutes."}
-                        {step === 1 && "We are reviewing and approving your order. This process should take about 5-10 minutes."}
-                        {(step === 2 || step === 3) && "Your wPOKT is on the way! It may take up to 32 blocks to arrive, which is about 6 minutes."}
-                        {step > 3 && "Your wPOKT is in your destination wallet."}
-                    </Text>
+                    {step === 0 && (
+                        <>
+                        <Text>This may take several blocks to confirm.</Text>
+                        <Text>Pocket blocks complete every 15 minutes.</Text>
+                        </>
+                    )}
+                    {step === 1 && (
+                        <>
+                        <Text>We are reviewing and approving your order.</Text>
+                        <Text>This process should take about 5-10 minutes.</Text>
+                        </>
+                    )}
+                    {(step === 2 || step === 3) && (
+                        <Text>Your wPOKT is on the way! It may take up to 32 blocks to arrive, which is about 6 minutes.</Text>
+                    )}
+                    {step > 3 && (
+                        <Text>Your wPOKT is in your destination wallet.</Text>
+                    )}
                 </Box>
                 <Link textDecor="underline" color="poktLime" href={step < 2 ? poktTxUrl : ethTxUrl} isExternal>
                     {step === 0 && "View this transaction on PoktScan"}
