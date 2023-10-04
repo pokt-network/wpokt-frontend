@@ -366,7 +366,7 @@ export function Bridge() {
                     </Box>
                     <Center mt={6}>
                         <Box width={320}>
-                            <Text>Estimated wPOKT received</Text>
+                            <Text>Estimated wPOKT&#10697; received</Text>
                             <HStack justify="space-between" paddingX={10} paddingY={4} bg="darkBlue" height="52px" borderRadius={4}>
                                 <Text
                                     fontWeight={700}
