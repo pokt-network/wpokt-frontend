@@ -43,6 +43,7 @@ export function MintModal(props: MintModalProps) {
             })
         } catch (error) {
             console.error(error)
+            g = BigInt(289000) // Default gas
         }
         return g
     }, [props.mintInfo, mintFunc.writeAsync])
