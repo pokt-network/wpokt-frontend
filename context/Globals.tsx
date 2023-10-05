@@ -294,6 +294,25 @@ export function GlobalContextProvider({ children }: any) {
         }
     }
 
+    function displayWalletNoAccountSelectedToast() {
+        const toastId = "pokt-wallet-no-account-selected";
+        if (!toast.isActive(toastId)) {
+            toast({
+                id: toastId,
+                position: "top-right",
+                duration: 5000,
+                render: () => (
+                    <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
+                        <ErrorIcon />
+                        <Text color="error">
+                          No account selected! Please select an account in your wallet.
+                        </Text>
+                    </HStack>
+                ),
+            });
+        }
+    }
+
     async function connectSendWallet() {
         if (window.pocketNetwork === undefined) {
             displayWalletNotFoundToast();
@@ -309,6 +328,9 @@ export function GlobalContextProvider({ children }: any) {
                 })
                 .catch((e: any) => {
                     console.error("Failed to connect POKT address:", e);
+                    if (e.message.includes("No account selected")) {
+                      displayWalletNoAccountSelectedToast();
+                    }
                     return null;
                 });
             setPoktAddress(address)
