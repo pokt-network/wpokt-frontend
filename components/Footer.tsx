@@ -48,6 +48,9 @@ export function Footer() {
                     <Link href="https://forum.pokt.network" isExternal>
                         Forum
                     </Link>
+                    <Link href="https://v2.info.uniswap.org/pair/0xa7fd8ff8f4cada298286d3006ee8f9c11e2ff84e" isExternal>
+                        Uniswap Pool
+                    </Link>
                 </VStack>
             </Flex>
             {mobileFooter && <Center mb={2}>© 2023 Pocket Network</Center>}
