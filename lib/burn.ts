@@ -51,10 +51,10 @@ export const getAllBurnsFromSenderAndOrRecipient = async (senderEthAddress?: str
         {
           wpokt_address: WPOKT_ADDRESS.toLowerCase(),
           ...(senderEthAddress && {
-            sender_address: senderEthAddress,
+            sender_address: senderEthAddress.toLowerCase(),
           }),
           ...(recipientPoktAddress && {
-            recipient_address: recipientPoktAddress,
+            recipient_address: recipientPoktAddress.toLowerCase(),
           }),
         },
         { sort: { created_at: -1 } },
