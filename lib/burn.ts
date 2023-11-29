@@ -50,8 +50,12 @@ export const getAllBurnsFromSenderAndOrRecipient = async (senderEthAddress?: str
       .find(
         {
           wpokt_address: WPOKT_ADDRESS.toLowerCase(),
-          sender_address: senderEthAddress ? senderEthAddress.toLowerCase() : undefined,
-          recipient_address: recipientPoktAddress ? recipientPoktAddress.toLowerCase() : undefined,
+          ...(senderEthAddress && {
+            sender_address: senderEthAddress,
+          }),
+          ...(recipientPoktAddress && {
+            recipient_address: recipientPoktAddress,
+          }),
         },
         { sort: { created_at: -1 } },
       )
