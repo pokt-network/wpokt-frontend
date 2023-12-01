@@ -41,7 +41,7 @@ export const getAllBurns = async (): Promise<Burn[]> => {
   }
 };
 
-export const getAllBurnsFromSender = async (ethAddress: string): Promise<Burn[]> => {
+export const getAllBurnsFromSenderAndOrRecipient = async (senderEthAddress?: string, recipientPoktAddress?: string): Promise<Burn[]> => {
   try {
     const client = await dbPromise;
 
@@ -50,7 +50,12 @@ export const getAllBurnsFromSender = async (ethAddress: string): Promise<Burn[]>
       .find(
         {
           wpokt_address: WPOKT_ADDRESS.toLowerCase(),
-          sender_address: ethAddress.toLowerCase(),
+          ...(senderEthAddress && {
+            sender_address: senderEthAddress.toLowerCase(),
+          }),
+          ...(recipientPoktAddress && {
+            recipient_address: recipientPoktAddress.toLowerCase(),
+          }),
         },
         { sort: { created_at: -1 } },
       )

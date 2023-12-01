@@ -1,18 +1,20 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { getAllBurnsFromSender } from '@/lib/burn';
+import { getAllBurnsFromSenderAndOrRecipient } from '@/lib/burn';
 import { Status } from '@/types';
 
 const findAll = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') return res.status(405).end();
 
-  const { sender } = req.query;
+  const { sender, recipient } = req.query;
 
-  if (typeof sender !== 'string' || !sender) return res.status(400).end();
+  if (!sender && !recipient) {
+    return res.status(400).end()
+  }
 
   try {
-    const burns = await getAllBurnsFromSender(sender);
-    
+    const burns = await getAllBurnsFromSenderAndOrRecipient(sender as string, recipient as string);
+
     if (!burns) return res.status(204).end();
     const activeBurns = burns.filter(burn => burn.status !== Status.SUCCESS && burn.status !== Status.FAILED);
 
