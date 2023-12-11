@@ -646,7 +646,7 @@ export function Bridge() {
             )}
             <Container paddingY={2} textAlign={"center"} fontSize={10}>
                 <Text>
-                    If having trouble, please disable ad blockers and refresh this page. We don't serve ads but they may prevent the modals from popping up.
+                    If having trouble, please disable ad blockers and refresh this page. We don&apos;t serve ads but they may prevent the modals from popping up.
                 </Text>
             </Container>
             <ResumeWrapModal
