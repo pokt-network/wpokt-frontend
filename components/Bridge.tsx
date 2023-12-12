@@ -644,6 +644,11 @@ export function Bridge() {
                     </Center>
                 </Container>
             )}
+            <Container paddingY={4} borderRadius={4} fontSize={10} bg="darkOverlay">
+                <Text textAlign="center">
+                    If having trouble, please disable ad blockers and refresh this page. We don&apos;t serve ads but they may prevent the modals from popping up.
+                </Text>
+            </Container>
             <ResumeWrapModal
                 isOpen={isResumeMintOpen}
                 onClose={onResumeMintClose}
