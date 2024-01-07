@@ -39,7 +39,7 @@ export function RefundModal(props: RefundModalProps) {
                             Any tokens you have attempted to bridge have been returned to your wallet. 
                             Try waiting a few minutes before bridging again.
                         </Text>
-                        <Link textDecor="underline" color="poktLime" mt={3} href={poktTxUrl} isExternal>
+                        <Link textDecor="underline" color="poktLime" mt={3} href={poktTxUrl} isExternal _hover={{ color: "hover.poktLime" }}>
                             {destination === "pokt" ? "View this transaction on Etherscan" : "View this transaction on PoktScan"}
                         </Link>
                     </Flex>

@@ -107,6 +107,7 @@ export function MintModal(props: MintModalProps) {
                             mt={3}
                             onClick={mintWPokt}
                             isLoading={mintFunc.isLoading}
+                            _hover={{ bg: "hover.poktLime" }}
                         >
                             Mint wPOKT
                         </Button>

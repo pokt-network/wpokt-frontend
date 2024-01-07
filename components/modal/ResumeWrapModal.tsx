@@ -82,6 +82,7 @@ export function ResumeWrapModal({ mintInfo, openProgressModal, ...props }: Resum
                             mt={3}
                             onClick={mintWPokt}
                             isLoading={mintFunc.isLoading}
+                            _hover={{ bg: "hover.poktLime" }}
                         >
                             Complete Bridge
                         </Button>

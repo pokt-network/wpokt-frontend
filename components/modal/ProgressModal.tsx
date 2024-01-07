@@ -422,7 +422,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         <Text>Your wPOKT is in your destination wallet.</Text>
                     )}
                 </Box>
-                <Link textDecor="underline" color="poktLime" href={step < 2 ? poktTxUrl : ethTxUrl} isExternal>
+                <Link textDecor="underline" color="poktLime" href={step < 2 ? poktTxUrl : ethTxUrl} isExternal _hover={{ color: "hover.poktLime" }}>
                     {step === 0 && "View this transaction on PoktScan"}
                     {step === 1 && "View last transaction on PoktScan"}
                     {step === 2 && "View this transaction on Etherscan"}
