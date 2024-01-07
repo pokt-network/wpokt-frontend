@@ -6,12 +6,16 @@ export function GasInfoModal(props: ModalProps) {
         <Modal {...props} size="md" isCentered>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader textAlign="center" color="poktBlue">Why does this cost ETH and POKT?</ModalHeader>
-                <ModalCloseButton color="poktBlue" />
+                <ModalHeader textAlign="center" color="poktLime">Why does this cost ETH and POKT?</ModalHeader>
+                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
-                        bg="darkOverlay"
+                        // bg="darkOverlay"
+                        borderTopColor={"poktLime"}
+                        borderTopWidth={1}
+                        borderBottomColor={"poktLime"}
+                        borderBottomWidth={1}
                         justify="center"
                         align="center"
                         padding={4}
@@ -20,13 +24,13 @@ export function GasInfoModal(props: ModalProps) {
                         mb={10}
                     >
                         <Box>
-                            <Text color="poktBlue" fontSize={16} textAlign="center">wPOKT is minted and burned.</Text>
+                            <Text color="poktLime" fontSize={18} fontWeight={"bold"} textAlign="center">wPOKT is minted and burned.</Text>
                             <Text>
                                 To maintain 1:1 value between tokens, POKT is stored and released from our bridge vault, but wPOKT is minted and burned.
                             </Text>
                         </Box>
                         <Box>
-                            <Text color="poktBlue" fontSize={16} textAlign="center">Minting wPOKT costs gas.</Text>
+                            <Text color="poktLime" fontSize={18} fontWeight={"bold"} textAlign="center">Minting wPOKT costs gas.</Text>
                             <Text>
                                 While we handle all burn orders, you need to authorize and pay for the minting of wPOKT.
                             </Text>

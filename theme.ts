@@ -3,16 +3,17 @@ import { modalTheme } from "./components/theme/modal"
 import { PoktButton } from "./components/theme/button"
 
 export const colors = {
-    poktBlue: "rgba(29, 138, 237, 1)",
-    poktLime: "rgba(185, 240, 0, 1)",
-    darkBlue: "rgba(24, 33, 41, 1)",
+    poktBlue: "rgba(105,141,255, 1)",
+    poktLime: "rgba(255,255,255, 1)",
+    darkBlue: "rgba(35,31,32, 1)",
     darkOverlay: "rgba(255, 255, 255, 0.05)",
     warning: "rgba(247, 216, 88, 1)",
-    error: "rgba(249, 50, 50, 1)",
+    error: "rgba(221,0,53, 1)",
     hover: {
-        poktBlue: "rgba(29, 138, 237, 0.5)",
-        poktLime: "rgba(185, 240, 0, 0.5)",
-        darkBlue: "rgba(24, 33, 41, 0.5)",
+        poktBlue: "rgba(105,141,255, 0.5)",
+        // poktLime: "rgba(255,255,255, 0.5)",
+        poktLime: "rgba(105,141,255, 1)",
+        darkBlue: "rgba(35,31,32, 0.5)",
     }
 }
 
@@ -35,7 +36,7 @@ export const theme = extendTheme({
         global: {
             'html, body': {
                 color: 'white',
-                backgroundColor: 'rgba(24, 33, 41, 1)',
+                backgroundColor: 'rgba(35,31,32, 1)',
                 fontSize: '14px',
             }
         },

@@ -15,21 +15,25 @@ export function RefundModal(props: RefundModalProps) {
         <Modal {...props} size="md" isCentered>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader textAlign="center" color="poktBlue">BRIDGE REFUNDED</ModalHeader>
-                <ModalCloseButton color="poktBlue" />
+                <ModalHeader textAlign="center" color="poktLime">BRIDGE REFUNDED</ModalHeader>
+                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
-                        bg="darkOverlay"
+                        // bg="darkOverlay"
+                        borderTopColor={"poktLime"}
+                        borderTopWidth={1}
+                        borderBottomColor={"poktLime"}
+                        borderBottomWidth={1}
                         justify="center"
                         align="center"
                         padding={4}
-                        paddingX={8}
+                        paddingX={6}
                         gap={2}
                         mb={10}
                     >
                         <BluePoktIcon />
-                        <Text color="poktBlue" fontSize={16}>Your tokens have been refunded to your wallet.</Text>
+                        <Text color="poktLime" fontSize={18} fontWeight={"bold"}>Your tokens have been refunded to your wallet.</Text>
                         <Text>
                             There was an error during the bridging process. 
                             Any tokens you have attempted to bridge have been returned to your wallet. 

@@ -19,7 +19,7 @@ export function Footer() {
     };
 
     return (
-        <Flex direction="column" justify="center" paddingX={10} background="darkOverlay">
+        <Flex direction="column" justify="center" paddingX={10}>
             <Flex direction={mobileFooter ? "column" : "row"} justify="space-between" padding={10} gap={mobileFooter ? 10 : 4}>
                 <Flex direction="column" gap={4}>
                     <Box>

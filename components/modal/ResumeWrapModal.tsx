@@ -46,21 +46,25 @@ export function ResumeWrapModal({ mintInfo, openProgressModal, ...props }: Resum
         <Modal {...props} size="md" isCentered>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader textAlign="center" color="poktBlue">YOU HAVE A BRIDGE IN PROGRESS</ModalHeader>
-                <ModalCloseButton color="poktBlue" />
+                <ModalHeader textAlign="center" color="poktLime">YOU HAVE A BRIDGE IN PROGRESS</ModalHeader>
+                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
-                        bg="darkOverlay"
+                        // bg="darkOverlay"
+                        borderTopColor={"poktLime"}
+                        borderTopWidth={1}
+                        borderBottomColor={"poktLime"}
+                        borderBottomWidth={1}
                         justify="center"
                         align="center"
                         padding={4}
-                        paddingX={8}
+                        paddingX={6}
                         gap={2}
                         mb={10}
                     >
                         <BluePoktIcon />
-                        <Text color="poktBlue" fontSize={16}>
+                        <Text color="poktLime" fontSize={18} fontWeight={"bold"}>
                             Mint your wPOKT to complete your bridge.
                         </Text>
                         <Box>

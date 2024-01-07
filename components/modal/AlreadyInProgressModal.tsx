@@ -18,8 +18,8 @@ export function AlreadyInProgressModal(props: ModalProps) {
         <Modal {...props} size="md" isCentered>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader textAlign="center" color="poktBlue">YOU HAVE A BRIDGE IN PROGRESS</ModalHeader>
-                <ModalCloseButton color="poktBlue" />
+                <ModalHeader textAlign="center" color="poktLime">YOU HAVE A BRIDGE IN PROGRESS</ModalHeader>
+                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
@@ -32,7 +32,7 @@ export function AlreadyInProgressModal(props: ModalProps) {
                         mb={10}
                     >
                         <BluePoktIcon />
-                        <Text color="poktBlue" fontSize={16}>
+                        <Text color="poktLime" fontSize={18} fontWeight={"bold"}>
                             Please review this bridge before proceeding.
                         </Text>
                         <Box>

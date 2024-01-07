@@ -269,8 +269,8 @@ export function ProgressModal(props: ModalProps) {
         <Modal {...props} size="md" isCentered>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader textAlign="center" color="poktBlue">{destination === 'pokt' && 'UN'}WRAPPING IN PROGRESS</ModalHeader>
-                <ModalCloseButton color="poktBlue" />
+                <ModalHeader textAlign="center" color="poktLime">{destination === 'pokt' && 'UN'}WRAPPING IN PROGRESS</ModalHeader>
+                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
                 <ModalBody padding={0}>
                     {destination === "eth" && step < 3 ? (
                         <VStack paddingX={10} mb={8} gap={0}>
@@ -347,7 +347,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
     return (
         <Flex
             direction="column"
-            bg="darkOverlay"
+            // bg="darkOverlay"
             borderTopColor="poktLime"
             borderTopWidth={1}
             justify="center"
@@ -359,7 +359,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
             {destination === "pokt" ? (
                 <>
                 <Box textAlign="center">
-                    <Text color="poktBlue">
+                    <Text color="poktLime" fontSize={18} fontWeight={"bold"}>
                         {step === 0 && "Sending your wPOKT to the vault"}
                         {step === 1 && "Bridging your order"}
                         {step === 2 && "Unlocking POKT"}
@@ -397,7 +397,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
             ) : (
                 <>
                 <Box textAlign="center">
-                    <Text color="poktBlue">
+                    <Text color="poktLime" fontSize={18} fontWeight={"bold"}>
                         {step === 0 && "Sending your POKT to the vault"}
                         {step === 1 && "Bridging your order"}
                         {(step === 2 || step === 3) && "Minting wPOKT"}
