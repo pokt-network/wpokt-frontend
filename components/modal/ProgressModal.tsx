@@ -270,7 +270,7 @@ export function ProgressModal(props: ModalProps) {
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center" color="poktLime">{destination === 'pokt' && 'UN'}WRAPPING IN PROGRESS</ModalHeader>
-                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
+                <ModalCloseButton color="poktLime" _hover={{ color: "poktBlue" }} />
                 <ModalBody padding={0}>
                     {destination === "eth" && step < 3 ? (
                         <VStack paddingX={10} mb={8} gap={0}>
@@ -387,7 +387,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         <Text>Your POKT is in your destination wallet.</Text>
                     )}
                 </Box>
-                <Link textDecor="underline" color="poktLime" href={step < 2 ? ethTxUrl : poktTxUrl} isExternal>
+                <Link textDecor="underline" color="poktLime" href={step < 2 ? ethTxUrl : poktTxUrl} isExternal _hover={{ color: "poktBlue" }}>
                     {step === 0 && "View this transaction on Etherscan"}
                     {step === 1 && "View last transaction on Etherscan"}
                     {step === 2 && "View this transaction on PoktScan"}
@@ -422,7 +422,7 @@ export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, des
                         <Text>Your wPOKT is in your destination wallet.</Text>
                     )}
                 </Box>
-                <Link textDecor="underline" color="poktLime" href={step < 2 ? poktTxUrl : ethTxUrl} isExternal _hover={{ color: "hover.poktLime" }}>
+                <Link textDecor="underline" color="poktLime" href={step < 2 ? poktTxUrl : ethTxUrl} isExternal _hover={{ color: "poktBlue" }}>
                     {step === 0 && "View this transaction on PoktScan"}
                     {step === 1 && "View last transaction on PoktScan"}
                     {step === 2 && "View this transaction on Etherscan"}

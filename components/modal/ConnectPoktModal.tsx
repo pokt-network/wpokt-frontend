@@ -32,11 +32,10 @@ export function ConnectPoktModal(props: ModalProps) {
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center" color="poktLime">Connect a Wallet</ModalHeader>
-                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
+                <ModalCloseButton color="poktLime" _hover={{ color: "poktBlue" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
-                        // bg="darkOverlay"
                         borderTopColor={"poktLime"}
                         borderTopWidth={1}
                         borderBottomColor={"poktLime"}
@@ -58,12 +57,12 @@ export function ConnectPoktModal(props: ModalProps) {
                                 color="darkBlue"
                                 width="100%"
                                 padding={2}
-                                borderRadius={10}
+                                borderRadius={30}
                                 borderWidth={1}
                                 borderColor="white"
                                 cursor="pointer"
                                 onClick={wallet.onConnect}
-                                _hover={{ bg: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                             >
                                 <Text fontSize={16}>{wallet.name}</Text>
                             </Flex>

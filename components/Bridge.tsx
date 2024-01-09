@@ -248,7 +248,7 @@ export function Bridge() {
                                     width='160px'
                                     height={8}
                                     borderLeftRadius={0}
-                                    _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                    _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                     onClick={() => setDestination("pokt")}
                                 >
                                     Unwrap wPOKT
@@ -290,7 +290,7 @@ export function Bridge() {
                                             borderColor="poktLime"
                                             height={8}
                                             minW={200}
-                                            _hover={{ bg: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                            _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                             leftIcon={<PoktIcon />}
                                             onClick={onConnectPoktModalOpen}
                                         >
@@ -303,8 +303,7 @@ export function Bridge() {
                                             bg="transparent"
                                             color="white"
                                             height={8}
-                                            // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                            _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                            _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                             leftIcon={<PoktIcon />}
                                             onClick={onConnectPoktModalOpen}
                                             minW={200}
@@ -339,7 +338,7 @@ export function Bridge() {
                                         borderColor="poktLime"
                                         height={8}
                                         minW={200}
-                                        _hover={{ bg: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                        _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                         leftIcon={<EthIcon />}
                                         onClick={openConnectModal}
                                     >
@@ -352,8 +351,7 @@ export function Bridge() {
                                         bg="transparent"
                                         color="white"
                                         height={8}
-                                        // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                        _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                        _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                         leftIcon={<EthIcon />}
                                         onClick={openConnectModal}
                                         minW={200}
@@ -410,7 +408,7 @@ export function Bridge() {
                                 color="darkBlue"
                                 width="100px"
                                 paddingY={6}
-                                _hover={{ bg: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={async () => {
                                     if (poktAmount + parsePokt(0.01) > poktBalance) return displayInsufficientTokenBalanceToast()
                                     const recipient = address ?? ""
@@ -430,8 +428,7 @@ export function Bridge() {
                                 color="white"
                                 width="100px"
                                 paddingY={6}
-                                // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={displayMissingInputsToast}
                             >
                                 Wrap
@@ -453,7 +450,7 @@ export function Bridge() {
                                     borderRightRadius={0}
                                     width='160px'
                                     height={8}
-                                    _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                    _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                     onClick={() => setDestination("eth")}
                                 >
                                     Wrap POKT
@@ -507,8 +504,7 @@ export function Bridge() {
                                             borderColor="poktLime"
                                             height={8}
                                             minW={200}
-                                            // _hover={{ bg: "hover.poktLime" }}
-                                            _hover={{ bg: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                            _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                             leftIcon={<EthIcon />}
                                             onClick={openConnectModal}
                                         >
@@ -521,8 +517,7 @@ export function Bridge() {
                                             bg="transparent"
                                             color="white"
                                             height={8}
-                                            // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                            _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                            _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                             leftIcon={<EthIcon />}
                                             onClick={openConnectModal}
                                             minW={200}
@@ -556,8 +551,7 @@ export function Bridge() {
                                     borderColor="poktLime"
                                     height={8}
                                     minW={200}
-                                    // _hover={{ bg: "hover.poktLime" }}
-                                    _hover={{ bg: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                    _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                     leftIcon={<PoktIcon />}
                                     onClick={onConnectPoktModalOpen}
                                 >
@@ -570,8 +564,7 @@ export function Bridge() {
                                     bg="transparent"
                                     color="white"
                                     height={8}
-                                    // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                    _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                    _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                     leftIcon={<PoktIcon />}
                                     onClick={onConnectPoktModalOpen}
                                     minW={200}
@@ -626,7 +619,7 @@ export function Bridge() {
                                 color="darkBlue"
                                 width="100px"
                                 paddingY={6}
-                                _hover={{ bg: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={burn}
                                 isDisabled={!poktAddress||!address||!wPoktAmount}
                                 isLoading={isSigningTx}
@@ -642,8 +635,7 @@ export function Bridge() {
                                 color="white"
                                 width="100px"
                                 paddingY={6}
-                                // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                                _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={displayMissingInputsToast}
                             >
                                 Unwrap

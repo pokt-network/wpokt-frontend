@@ -15,14 +15,13 @@ export function TimeoutModal(props: ModalProps) {
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center" color="poktLime">BRIDGE IN PROGRESS</ModalHeader>
-                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
+                <ModalCloseButton color="poktLime" _hover={{ color: "poktBlue" }} />
                 <ModalBody padding={0}>
                     <Text paddingX={8} mb={4}>
                         You can close this window or refresh this page without interrupting the process.
                     </Text>
                     <Flex
                         direction="column"
-                        // bg="darkOverlay"
                         justify="center"
                         align="center"
                         padding={4}

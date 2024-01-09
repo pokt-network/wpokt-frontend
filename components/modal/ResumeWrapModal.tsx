@@ -47,11 +47,10 @@ export function ResumeWrapModal({ mintInfo, openProgressModal, ...props }: Resum
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center" color="poktLime">YOU HAVE A BRIDGE IN PROGRESS</ModalHeader>
-                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
+                <ModalCloseButton color="poktLime" _hover={{ color: "poktBlue" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
-                        // bg="darkOverlay"
                         borderTopColor={"poktLime"}
                         borderTopWidth={1}
                         borderBottomColor={"poktLime"}
@@ -82,7 +81,7 @@ export function ResumeWrapModal({ mintInfo, openProgressModal, ...props }: Resum
                             mt={3}
                             onClick={mintWPokt}
                             isLoading={mintFunc.isLoading}
-                            _hover={{ bg: "hover.poktLime" }}
+                            _hover={{ bg: "poktBlue" }}
                         >
                             Complete Bridge
                         </Button>

@@ -16,11 +16,10 @@ export function RefundModal(props: RefundModalProps) {
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center" color="poktLime">BRIDGE REFUNDED</ModalHeader>
-                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
+                <ModalCloseButton color="poktLime" _hover={{ color: "poktBlue" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
-                        // bg="darkOverlay"
                         borderTopColor={"poktLime"}
                         borderTopWidth={1}
                         borderBottomColor={"poktLime"}
@@ -39,7 +38,7 @@ export function RefundModal(props: RefundModalProps) {
                             Any tokens you have attempted to bridge have been returned to your wallet. 
                             Try waiting a few minutes before bridging again.
                         </Text>
-                        <Link textDecor="underline" color="poktLime" mt={3} href={poktTxUrl} isExternal _hover={{ color: "hover.poktLime" }}>
+                        <Link textDecor="underline" color="poktLime" mt={3} href={poktTxUrl} isExternal _hover={{ color: "poktBlue" }}>
                             {destination === "pokt" ? "View this transaction on Etherscan" : "View this transaction on PoktScan"}
                         </Link>
                     </Flex>

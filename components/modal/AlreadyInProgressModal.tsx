@@ -19,7 +19,7 @@ export function AlreadyInProgressModal(props: ModalProps) {
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center" color="poktLime">YOU HAVE A BRIDGE IN PROGRESS</ModalHeader>
-                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
+                <ModalCloseButton color="poktLime" _hover={{ color: "poktBlue" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"

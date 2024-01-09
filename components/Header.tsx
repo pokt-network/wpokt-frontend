@@ -80,6 +80,7 @@ export function Header() {
                                         textAlign="center"
                                         textDecor="underline"
                                         onClick={() => disconnect()}
+                                        _hover={{ color: "poktBlue" }}
                                     >
                                         Disconnect
                                     </Link>
@@ -88,13 +89,11 @@ export function Header() {
                                 <VStack spacing={1}>
                                     <Text fontSize={14}>Connect Ethereum Wallet</Text>
                                     <Button
-                                        // variant="outline"
-                                        // borderColor="poktLime"
                                         bg="poktLime"
                                         color="darkBlue"
                                         paddingX={8}
                                         height={8}
-                                        _hover={{ bg: "hover.poktLime" }}
+                                        _hover={{ bg: "poktBlue" }}
                                         leftIcon={<EthIcon />}
                                         onClick={openConnectModal}
                                     >
@@ -115,6 +114,7 @@ export function Header() {
                                         textAlign="center"
                                         textDecoration="underline"
                                         onClick={disconnectPokt}
+                                        _hover={{ color: "poktBlue" }}
                                     >
                                         Disconnect
                                     </Link>
@@ -123,13 +123,11 @@ export function Header() {
                                 <VStack spacing={1} mt={10}>
                                     <Text fontSize={14}>Connect Pocket Wallet</Text>
                                     <Button
-                                        // variant="outline"
-                                        // borderColor="poktLime"
                                         bg="white"
                                         color="darkBlue"
                                         paddingX={8}
                                         height={8}
-                                        _hover={{ bg: "hover.poktLime" }}
+                                        _hover={{ bg: "poktBlue" }}
                                         leftIcon={<PoktIcon />}
                                         onClick={onConnectPoktModalOpen}
                                     >
@@ -150,8 +148,7 @@ export function Header() {
                             leftIcon={<EthIcon width="21px" height="21px" />}
                             borderWidth={1}
                             borderColor="darkOverlay"
-                            // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                            _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                            _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                             paddingX={3}
                             width="140px"
                             height={8}
@@ -173,8 +170,7 @@ export function Header() {
                             paddingX={8}
                             width="140px"
                             height={8}
-                            // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                            _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                            _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                             leftIcon={<EthIcon />}
                             onClick={openConnectModal}
                         >
@@ -188,8 +184,7 @@ export function Header() {
                             leftIcon={<PoktIcon width="21px" height="21px" />}
                             borderWidth={1}
                             borderColor="darkOverlay"
-                            // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                            _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                            _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                             paddingX={3}
                             width="140px"
                             height={8}
@@ -211,8 +206,7 @@ export function Header() {
                             paddingX={8}
                             width="140px"
                             height={8}
-                            // _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                            _hover={{ color: "hover.poktLime", borderColor: "hover.poktLime" }}
+                            _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                             leftIcon={<PoktIcon />}
                             onClick={onConnectPoktModalOpen}
                         >

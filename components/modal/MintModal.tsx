@@ -70,11 +70,10 @@ export function MintModal(props: MintModalProps) {
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center" color="poktLime">wPOKT READY TO MINT</ModalHeader>
-                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
+                <ModalCloseButton color="poktLime" _hover={{ color: "poktBlue" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
-                        // bg="darkOverlay"
                         borderTopColor={"poktLime"}
                         borderTopWidth={1}
                         borderBottomColor={"poktLime"}
@@ -107,7 +106,7 @@ export function MintModal(props: MintModalProps) {
                             mt={3}
                             onClick={mintWPokt}
                             isLoading={mintFunc.isLoading}
-                            _hover={{ bg: "hover.poktLime" }}
+                            _hover={{ bg: "poktBlue" }}
                         >
                             Mint wPOKT
                         </Button>

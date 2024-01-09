@@ -7,11 +7,10 @@ export function TimeInfoModal(props: ModalProps) {
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader textAlign="center" color="poktLime">What determines bridge time?</ModalHeader>
-                <ModalCloseButton color="poktLime" _hover={{ color: "hover.poktLime" }} />
+                <ModalCloseButton color="poktLime" _hover={{ color: "poktBlue" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
-                        // bg="darkOverlay"
                         borderTopColor={"poktLime"}
                         borderTopWidth={1}
                         borderBottomColor={"poktLime"}
