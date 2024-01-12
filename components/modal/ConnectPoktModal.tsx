@@ -31,12 +31,15 @@ export function ConnectPoktModal(props: ModalProps) {
         <Modal {...props} size="md" isCentered>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader textAlign="center" color="poktBlue">Connect a Wallet</ModalHeader>
-                <ModalCloseButton color="poktBlue" />
+                <ModalHeader textAlign="center" color="poktLime">Connect a Wallet</ModalHeader>
+                <ModalCloseButton color="poktLime" _hover={{ color: "poktBlue" }} />
                 <ModalBody padding={0}>
                     <Flex
                         direction="column"
-                        bg="darkOverlay"
+                        borderTopColor={"poktLime"}
+                        borderTopWidth={1}
+                        borderBottomColor={"poktLime"}
+                        borderBottomWidth={1}
                         justify="center"
                         align="center"
                         padding={4}
@@ -50,14 +53,16 @@ export function ConnectPoktModal(props: ModalProps) {
                                 direction="row"
                                 justify="center"
                                 align="center"
-                                bg="darkBlue"
-                                color="poktLime"
+                                bg="poktLime"
+                                color="darkBlue"
                                 width="100%"
                                 padding={2}
-                                borderRadius={10}
+                                borderRadius={30}
+                                borderWidth={1}
+                                borderColor="white"
                                 cursor="pointer"
                                 onClick={wallet.onConnect}
-                                _hover={{ bg: "poktLime", color: "darkBlue" }}
+                                _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                             >
                                 <Text fontSize={16}>{wallet.name}</Text>
                             </Flex>

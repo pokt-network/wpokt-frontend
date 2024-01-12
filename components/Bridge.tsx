@@ -223,7 +223,7 @@ export function Bridge() {
     return (
         <VStack minWidth={screenWidth && screenWidth < 580 ? screenWidth : '580px'}>
             {destination === "eth" ? (
-                <Container bg="darkOverlay" paddingY={4} borderRadius={4}>
+                <Container paddingY={4} borderRadius={4} borderWidth={1} borderColor="white">
                     <Center>
                         <Box width={320}>
                             <ButtonGroup spacing={0} mb={6}>
@@ -248,7 +248,7 @@ export function Bridge() {
                                     width='160px'
                                     height={8}
                                     borderLeftRadius={0}
-                                    _hover={{ bg: "rgba(255,255,255,0.1)" }}
+                                    _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                     onClick={() => setDestination("pokt")}
                                 >
                                     Unwrap wPOKT
@@ -290,7 +290,7 @@ export function Bridge() {
                                             borderColor="poktLime"
                                             height={8}
                                             minW={200}
-                                            _hover={{ bg: "hover.poktLime" }}
+                                            _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                             leftIcon={<PoktIcon />}
                                             onClick={onConnectPoktModalOpen}
                                         >
@@ -303,8 +303,8 @@ export function Bridge() {
                                             bg="transparent"
                                             color="white"
                                             height={8}
-                                            _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                            leftIcon={<PoktIcon fill={"white"}/>}
+                                            _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
+                                            leftIcon={<PoktIcon />}
                                             onClick={onConnectPoktModalOpen}
                                             minW={200}
                                         >
@@ -324,7 +324,7 @@ export function Bridge() {
                         </Center>
                         {address ? (
                             <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2}>
-                                <EthIcon fill="poktBlue" width="21px" height="21px" />
+                                <EthIcon fill="poktLime" width="21px" height="21px" />
                                 <Text>{address}</Text>
                                 <CloseIcon width="22.63px" height="22.63px" fill="none" />
                             </Flex>
@@ -338,7 +338,7 @@ export function Bridge() {
                                         borderColor="poktLime"
                                         height={8}
                                         minW={200}
-                                        _hover={{ bg: "hover.poktLime" }}
+                                        _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                         leftIcon={<EthIcon />}
                                         onClick={openConnectModal}
                                     >
@@ -351,8 +351,8 @@ export function Bridge() {
                                         bg="transparent"
                                         color="white"
                                         height={8}
-                                        _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                        leftIcon={<EthIcon fill={"white"}/>}
+                                        _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
+                                        leftIcon={<EthIcon />}
                                         onClick={openConnectModal}
                                         minW={200}
                                     >
@@ -365,7 +365,7 @@ export function Bridge() {
                     <Center mt={6}>
                         <Box width={320}>
                             <Text>Estimated wPOKT received</Text>
-                            <HStack justify="space-between" paddingX={10} paddingY={4} bg="darkBlue" height="52px" borderRadius={4}>
+                            <HStack justify="space-between" paddingX={10} paddingY={4} bg="darkBlue" height="52px" borderRadius={4} borderWidth={1} borderColor={"poktLime"}>
                                 <Text
                                     fontWeight={700}
                                     fontSize={18}
@@ -408,7 +408,7 @@ export function Bridge() {
                                 color="darkBlue"
                                 width="100px"
                                 paddingY={6}
-                                _hover={{ bg: "hover.poktLime" }}
+                                _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={async () => {
                                     if (poktAmount + parsePokt(0.01) > poktBalance) return displayInsufficientTokenBalanceToast()
                                     const recipient = address ?? ""
@@ -428,7 +428,7 @@ export function Bridge() {
                                 color="white"
                                 width="100px"
                                 paddingY={6}
-                                _hover={{ bg: "rgba(255,255,255,0.1)" }}
+                                _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={displayMissingInputsToast}
                             >
                                 Wrap
@@ -437,7 +437,7 @@ export function Bridge() {
                     </Center>
                 </Container>
             ) : (
-                <Container bg="darkOverlay" paddingY={4} borderRadius={4}>
+                <Container paddingY={4} borderRadius={4} borderWidth={1} borderColor="white">
                     <Center>
                         <Box width={320}>
                         <ButtonGroup spacing={0} mb={6}>
@@ -450,7 +450,7 @@ export function Bridge() {
                                     borderRightRadius={0}
                                     width='160px'
                                     height={8}
-                                    _hover={{ bg: "rgba(255,255,255,0.1)" }}
+                                    _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                     onClick={() => setDestination("eth")}
                                 >
                                     Wrap POKT
@@ -504,7 +504,7 @@ export function Bridge() {
                                             borderColor="poktLime"
                                             height={8}
                                             minW={200}
-                                            _hover={{ bg: "hover.poktLime" }}
+                                            _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                             leftIcon={<EthIcon />}
                                             onClick={openConnectModal}
                                         >
@@ -517,8 +517,8 @@ export function Bridge() {
                                             bg="transparent"
                                             color="white"
                                             height={8}
-                                            _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                            leftIcon={<EthIcon fill={"white"}/>}
+                                            _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
+                                            leftIcon={<EthIcon />}
                                             onClick={openConnectModal}
                                             minW={200}
                                         >
@@ -537,7 +537,7 @@ export function Bridge() {
                     </Center>
                     {poktAddress ? (
                         <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2} maxW={screenWidth}>
-                            <PoktIcon fill="poktBlue" width="21px" height="21px" />
+                            <PoktIcon fill="poktLime" width="21px" height="21px" />
                             <Text>{screenWidth && screenWidth < 400 ? poktAddress.substring(0,6) + '...' + poktAddress.substring(poktAddress.length - 6, poktAddress.length - 1) : poktAddress}</Text>
                             <CloseIcon width="22.63px" height="22.63px" fill="none" />
                         </Flex>
@@ -551,7 +551,7 @@ export function Bridge() {
                                     borderColor="poktLime"
                                     height={8}
                                     minW={200}
-                                    _hover={{ bg: "hover.poktLime" }}
+                                    _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                     leftIcon={<PoktIcon />}
                                     onClick={onConnectPoktModalOpen}
                                 >
@@ -564,8 +564,8 @@ export function Bridge() {
                                     bg="transparent"
                                     color="white"
                                     height={8}
-                                    _hover={{ bg: "rgba(255,255,255,0.1)" }}
-                                    leftIcon={<PoktIcon fill={"white"}/>}
+                                    _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
+                                    leftIcon={<PoktIcon />}
                                     onClick={onConnectPoktModalOpen}
                                     minW={200}
                                 >
@@ -577,7 +577,7 @@ export function Bridge() {
                     <Center mt={6}>
                         <Box width={320}>
                             <Text>Estimated POKT received</Text>
-                            <HStack justify="space-between" paddingX={10} paddingY={4} bg="darkBlue" height="52px" borderRadius={4}>
+                            <HStack justify="space-between" paddingX={10} paddingY={4} bg="darkBlue" height="52px" borderRadius={4} borderWidth={1} borderColor={"poktLime"}>
                                 <Text
                                     fontWeight={700}
                                     fontSize={18}
@@ -619,7 +619,7 @@ export function Bridge() {
                                 color="darkBlue"
                                 width="100px"
                                 paddingY={6}
-                                _hover={{ bg: "hover.poktLime" }}
+                                _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={burn}
                                 isDisabled={!poktAddress||!address||!wPoktAmount}
                                 isLoading={isSigningTx}
@@ -635,7 +635,7 @@ export function Bridge() {
                                 color="white"
                                 width="100px"
                                 paddingY={6}
-                                _hover={{ bg: "rgba(255,255,255,0.1)" }}
+                                _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={displayMissingInputsToast}
                             >
                                 Unwrap
@@ -644,7 +644,7 @@ export function Bridge() {
                     </Center>
                 </Container>
             )}
-            <Container paddingY={4} borderRadius={4} fontSize={10} bg="darkOverlay">
+            <Container paddingY={4} borderRadius={4} fontSize={10}>
                 <Text textAlign="center">
                     If having trouble, please disable ad blockers and refresh this page. We don&apos;t serve ads but they may prevent the modals from popping up.
                 </Text>
