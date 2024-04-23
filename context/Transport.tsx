@@ -63,6 +63,7 @@ export function TransportProvider({ children }: any) {
     const pocket = new AppPokt(transport);
     setPocketApp(pocket);
     await setPoktAddressToLedger(pocket)
+    console.log("Initialized pokt app")
     return pocket;
   }, []);
 

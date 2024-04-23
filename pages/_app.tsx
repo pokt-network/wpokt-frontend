@@ -26,7 +26,7 @@ const config = createConfig({
   autoConnect: true,
   connectors,
   publicClient,
-  webSocketPublicClient
+  // webSocketPublicClient
 })
 
 export default function App({ Component, pageProps }: AppProps) {
