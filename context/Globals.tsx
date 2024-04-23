@@ -363,6 +363,7 @@ export function GlobalContextProvider({ children }: any) {
                         return 0;
                     }
                     balance = balanceResponse?.balance?.toString();
+                    console.log("POKT Balance: ", balance)
                 // } else {
                 //     // Get uPokt Balance
                 //     balance = await window.pocketNetwork
