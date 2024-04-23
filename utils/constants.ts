@@ -21,7 +21,7 @@ if (POKT_CHAIN_ID !== "testnet" && POKT_CHAIN_ID !== "mainnet") {
   );
 }
 
-export const POKT_RPC_URL = POKT_CHAIN_ID === "testnet" ? "https://node2.testnet.pokt.network" : `https://mainnet.rpc.grove.city/v1/lb/${POKT_RPC_KEY}`
+export const POKT_RPC_URL = POKT_CHAIN_ID === "testnet" ? "https://node2.testnet.pokt.network" : `https://mainnet.rpc.grove.city/v1/${POKT_RPC_KEY}`
 
 export const POKT_MULTISIG_ADDRESS =
   process.env.NEXT_PUBLIC_POKT_MULTISIG_ADDRESS ||
@@ -59,18 +59,18 @@ export const ETH_RPC_CONFIG: JsonRpcProviderConfig = {
     switch (chain.id) {
       case goerli.id:
         return {
-          http: `https://eth-goerli.rpc.grove.city/v1/lb/${POKT_RPC_KEY}`,
-          webSocket: `wss://eth-goerli.rpc.grove.city/v1/lb/${POKT_RPC_KEY}`,
+          http: `https://eth-goerli.rpc.grove.city/v1/${POKT_RPC_KEY}`,
+          webSocket: `wss://eth-goerli.rpc.grove.city/v1/${POKT_RPC_KEY}`,
         };
       case mainnet.id:
         return {
-          http: `https://eth-mainnet.rpc.grove.city/v1/lb/${POKT_RPC_KEY}`,
-          webSocket: `wss://eth-mainnet.rpc.grove.city/v1/lb/${POKT_RPC_KEY}`,
+          http: `https://eth-mainnet.rpc.grove.city/v1/${POKT_RPC_KEY}`,
+          webSocket: `wss://eth-mainnet.rpc.grove.city/v1/${POKT_RPC_KEY}`,
         };
       case sepolia.id:
         return {
-          http: `https://sepolia.rpc.grove.city/v1/lb/${POKT_RPC_KEY}`,
-          webSocket: `wss://sepolia.rpc.grove.city/v1/lb/${POKT_RPC_KEY}`,
+          http: `https://sepolia.rpc.grove.city/v1/${POKT_RPC_KEY}`,
+          webSocket: `wss://sepolia.rpc.grove.city/v1/${POKT_RPC_KEY}`,
         };
       default:
         return null;
