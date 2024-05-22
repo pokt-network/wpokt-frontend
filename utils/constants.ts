@@ -21,7 +21,7 @@ if (POKT_CHAIN_ID !== "testnet" && POKT_CHAIN_ID !== "mainnet") {
   );
 }
 
-export const POKT_RPC_URL = POKT_CHAIN_ID === "testnet" ? "https://node2.testnet.pokt.network" : `https://mainnet.rpc.grove.city/v1/${POKT_RPC_KEY}`
+export const POKT_RPC_URL = POKT_CHAIN_ID === "testnet" ? "https://node2.testnet.pokt.network" : `https://pocket-rpc.liquify.com`
 
 export const POKT_MULTISIG_ADDRESS =
   process.env.NEXT_PUBLIC_POKT_MULTISIG_ADDRESS ||
