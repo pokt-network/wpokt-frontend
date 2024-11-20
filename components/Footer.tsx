@@ -26,8 +26,8 @@ export function Footer() {
                         <Heading size="md">Connect With Us</Heading>
                     </Box>
                     <Flex gap={8}>
-                        <Link href="https://discord.com/invite/pokt" isExternal _hover={{ color: "poktBlue" }}>
-                            <DiscordIcon width={8} height={8} href="https://discord.com/invite/pokt" />
+                        <Link href="https://discord.com/invite/pocket-network" isExternal _hover={{ color: "poktBlue" }}>
+                            <DiscordIcon width={8} height={8} href="https://discord.com/invite/pocket-network" />
                         </Link>
                         <Link href="https://github.com/pokt-network" isExternal _hover={{ color: "poktBlue" }}>
                             <GithubIcon width={8} height={8} href="https://github.com/pokt-network" />
