@@ -64,7 +64,7 @@ export const ETH_RPC_CONFIG: JsonRpcProviderConfig = {
         };
       case mainnet.id:
         return {
-          http: `https://eth-mainnet.rpc.grove.city/v1/${POKT_RPC_KEY}`,
+          http: `https://eth-mainnet.rpc.porters.xyz/${POKT_RPC_KEY}`,
           webSocket: `wss://eth-mainnet.rpc.grove.city/v1/${POKT_RPC_KEY}`,
         };
       case sepolia.id:
