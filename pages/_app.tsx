@@ -4,16 +4,15 @@ import Head from 'next/head'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from "../theme"
 import { WagmiConfig, createConfig, configureChains } from 'wagmi'
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { RainbowKitProvider, getDefaultWallets, darkTheme } from '@rainbow-me/rainbowkit'
 import React from 'react';
 import { GlobalContextProvider } from '@/context/Globals';
 import { TransportProvider } from '@/context/Transport';
-import { CHAIN, ETH_RPC_CONFIG, WALLET_CONNECT_PROJECT_ID } from '@/utils/constants';
- 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
+import { CHAIN, ETH_PUBLIC_CLIENT, WALLET_CONNECT_PROJECT_ID } from '@/utils/constants';
+
+const { chains, publicClient } = configureChains(
   [CHAIN],
-  [jsonRpcProvider(ETH_RPC_CONFIG)],
+  [ETH_PUBLIC_CLIENT]
 )
 
 const { connectors } = getDefaultWallets({
@@ -21,12 +20,11 @@ const { connectors } = getDefaultWallets({
   projectId: WALLET_CONNECT_PROJECT_ID,
   chains
 })
- 
+
 const config = createConfig({
   autoConnect: true,
   connectors,
   publicClient,
-  // webSocketPublicClient
 })
 
 export default function App({ Component, pageProps }: AppProps) {
