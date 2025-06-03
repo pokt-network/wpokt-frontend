@@ -20,7 +20,7 @@ export default function Home() {
           width="100%"
         >
           <Text fontSize="lg" fontWeight="bold">
-            Bridge will be paused for 24 hours starting at 10am ET today (June 3rd)
+            Due to Pocket Network undergoing the Shannon upgrade, the bridge will be paused for 24 hours starting at 10am ET today (June 3rd)
           </Text>
         </Flex>
       )}
