@@ -3,6 +3,7 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
 import { mainnet, sepolia } from "wagmi/chains";
 
+export const IS_PAUSED = process.env.NEXT_PUBLIC_PAUSED === "true";
 
 const ETH_RPC_URL = process.env.NEXT_PUBLIC_ETH_RPC_URL;
 

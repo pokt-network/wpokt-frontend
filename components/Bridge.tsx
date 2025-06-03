@@ -9,7 +9,7 @@ import { TimeInfoModal } from "./modal/TimeInfoModal";
 import { useAccount, useBalance, useContractRead, useFeeData } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { formatPokt, parsePokt } from "@/utils/pokt";
-import { CHAIN, CHAINLINK_ETH_USD_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
+import { CHAIN, CHAINLINK_ETH_USD_ADDRESS, IS_PAUSED, WPOKT_ADDRESS } from "@/utils/constants";
 import { CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { createPublicClient, formatEther, formatUnits, getAddress, http, parseUnits } from "viem";
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
@@ -414,7 +414,7 @@ export function Bridge() {
                                     const recipient = address ?? ""
                                     await bridgePoktToEthereum(recipient, poktAmount)
                                 }}
-                                isDisabled={!poktAddress||!address||!poktAmount}
+                                isDisabled={!poktAddress||!address||!poktAmount||IS_PAUSED}
                                 isLoading={isSigningTx}
                             >
                                 Wrap
@@ -430,6 +430,7 @@ export function Bridge() {
                                 paddingY={6}
                                 _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={displayMissingInputsToast}
+                                isDisabled={IS_PAUSED}
                             >
                                 Wrap
                             </Button>
@@ -621,7 +622,7 @@ export function Bridge() {
                                 paddingY={6}
                                 _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={burn}
-                                isDisabled={!poktAddress||!address||!wPoktAmount}
+                                isDisabled={!poktAddress||!address||!wPoktAmount||IS_PAUSED}
                                 isLoading={isSigningTx}
                             >
                                 Unwrap
@@ -637,6 +638,7 @@ export function Bridge() {
                                 paddingY={6}
                                 _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={displayMissingInputsToast}
+                                isDisabled={IS_PAUSED}
                             >
                                 Unwrap
                             </Button>
