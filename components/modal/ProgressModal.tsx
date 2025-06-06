@@ -11,6 +11,7 @@ import { InvalidMint, Status } from "@/types";
 import { RefundModal } from "./RefundModal";
 import { CHAIN, ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_RPC_URL } from "@/utils/constants";
 import { useAccount } from "wagmi";
+import { getEtherscanTxUrl, getPoktScanTxUrl } from "@/utils/misc";
 
 
 export function ProgressModal(props: ModalProps) {
@@ -341,8 +342,8 @@ export function ProgressModal(props: ModalProps) {
 
 
 export function ProgressModalStatusDescription({poktTxHash, ethTxHash, step, destination}: {poktTxHash?: string, ethTxHash?: string, step: number, destination: string}) {
-    const ethTxUrl = Number(ETH_CHAIN_ID) !== 1 ? `https://${CHAIN.name}.etherscan.io/tx/${ethTxHash}` : `https://etherscan.io/tx/${ethTxHash}`
-    const poktTxUrl = POKT_CHAIN_ID !== "mainnet" ? `https://poktscan.com/testnet/tx/${poktTxHash}` : `https://poktscan.com/tx/${poktTxHash}`
+    const ethTxUrl = getEtherscanTxUrl(ETH_CHAIN_ID, ethTxHash||"")
+    const poktTxUrl = getPoktScanTxUrl(POKT_CHAIN_ID, poktTxHash||"")
 
     return (
         <Flex

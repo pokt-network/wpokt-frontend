@@ -2,6 +2,7 @@ import { Chain, Hex, getAddress, isAddress } from "viem";
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
 import { mainnet, sepolia } from "wagmi/chains";
+import { SupportedEthChain, SupportedPoktChain } from "./types";
 
 export const IS_PAUSED = process.env.NEXT_PUBLIC_PAUSED === "true";
 export const IS_POKT_PAUSED = process.env.NEXT_PUBLIC_POKT_PAUSED === "true";
@@ -11,8 +12,6 @@ const ETH_RPC_URL = process.env.NEXT_PUBLIC_ETH_RPC_URL;
 if (!ETH_RPC_URL) {
   throw new Error(`Missing env variable NEXT_PUBLIC_ETH_RPC_URL`);
 }
-
-type SupportedPoktChain = "testnet" | "mainnet" | "pocket-beta";
 
 export const POKT_CHAIN_ID = (process.env.NEXT_PUBLIC_POKT_CHAIN ||
   "testnet") as SupportedPoktChain;
@@ -45,9 +44,7 @@ if (!POKT_MULTISIG_ADDRESS) {
 const ETH_CHAIN_LABEL = (process.env.NEXT_PUBLIC_ETH_CHAIN ||
   "sepolia") as SupportedEthChain;
 
-type SupportedEthChain = "mainnet" | "sepolia";
-
-const ETH_CHAINS: Record<SupportedEthChain, Chain> = {
+export const ETH_CHAINS: Record<SupportedEthChain, Chain> = {
   mainnet: mainnet,
   sepolia: sepolia,
 };
