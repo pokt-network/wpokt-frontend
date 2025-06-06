@@ -102,7 +102,7 @@ export function Header() {
                                 </VStack>
                             )}
 
-                            {poktAddress ? (
+                            {/* {poktAddress ? (
                                 <VStack mt={10} spacing={1}>
                                     <Flex align="center" justify="space-between" bg="darkBlue" width={width} padding={2}>
                                         <PoktIcon fill="poktLime" width="26px" height="26px" />
@@ -134,7 +134,7 @@ export function Header() {
                                         Connect
                                     </Button>
                                 </VStack>
-                            )}
+                            )} */}
                         </DrawerBody>
                     </DrawerContent>
                 </Drawer>
@@ -177,7 +177,7 @@ export function Header() {
                             Connect
                         </Button>
                     )}
-                    {poktAddress ? (
+                    {/* {poktAddress ? (
                         <Button
                             color="white"
                             background="darkOverlay"
@@ -212,7 +212,7 @@ export function Header() {
                         >
                             Connect
                         </Button>
-                    )}
+                    )} */}
                 </ButtonGroup>
             )}
         </HStack>

@@ -1,3 +1,6 @@
+import { bech32 } from "bech32";
+import { isAddress } from "viem";
+
 export function parsePokt(amount: string | number): bigint {
     return BigInt(Number(amount) * 1e6)
 }
@@ -17,3 +20,22 @@ export const STDX_MSG_TYPES = {
     send: "pos/Send",
     stake8: "pos/8.0MsgStake",
 };
+
+export const poktAddressPrefix = 'pokt';
+
+export function bech32ToHex(address: string): string {
+  const decoded = bech32.decode(address);
+  if (decoded.prefix !== poktAddressPrefix) {
+    return '';
+  }
+  const hex = Buffer.from(bech32.fromWords(decoded.words)).toString('hex');
+  return `0x${hex}`;
+}
+
+export function isPoktShannonAddress(address: string): boolean {
+  return (
+    address.startsWith(poktAddressPrefix) && 
+    address.length === 43 && 
+    isAddress(bech32ToHex(address))
+  )
+}

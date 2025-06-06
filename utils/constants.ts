@@ -4,6 +4,7 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { mainnet, sepolia } from "wagmi/chains";
 
 export const IS_PAUSED = process.env.NEXT_PUBLIC_PAUSED === "true";
+export const IS_POKT_PAUSED = process.env.NEXT_PUBLIC_POKT_PAUSED === "true";
 
 const ETH_RPC_URL = process.env.NEXT_PUBLIC_ETH_RPC_URL;
 
@@ -11,24 +12,29 @@ if (!ETH_RPC_URL) {
   throw new Error(`Missing env variable NEXT_PUBLIC_ETH_RPC_URL`);
 }
 
-type SupportedPoktChain = "testnet" | "mainnet";
+type SupportedPoktChain = "testnet" | "mainnet" | "pocket-beta";
 
 export const POKT_CHAIN_ID = (process.env.NEXT_PUBLIC_POKT_CHAIN ||
   "testnet") as SupportedPoktChain;
 
-if (POKT_CHAIN_ID !== "testnet" && POKT_CHAIN_ID !== "mainnet") {
+if (POKT_CHAIN_ID !== "testnet" && POKT_CHAIN_ID !== "mainnet" && POKT_CHAIN_ID !== "pocket-beta") {
   throw new Error(
     `Invalid env variable NEXT_PUBLIC_POKT_CHAIN: ${POKT_CHAIN_ID}`
   );
 }
 
-export const POKT_RPC_URL = POKT_CHAIN_ID === "testnet" ? "https://node2.testnet.pokt.network" : `https://pocket-rpc.liquify.com`
+// export const POKT_RPC_URL = POKT_CHAIN_ID === "testnet" ? "https://node2.testnet.pokt.network" : `https://pocket-rpc.liquify.com`
+export const POKT_RPC_URL = process.env.NEXT_PUBLIC_POKT_RPC_URL;
+if (!POKT_RPC_URL) {
+  throw new Error(`Missing env variable NEXT_PUBLIC_POKT_RPC_URL`);
+}
 
 export const POKT_MULTISIG_ADDRESS =
-  process.env.NEXT_PUBLIC_POKT_MULTISIG_ADDRESS ||
-  "EA98FA1BE6E73403CD2F8C70146B0402172307B9";
+  process.env.NEXT_PUBLIC_POKT_MULTISIG_ADDRESS || "";
+  // || "EA98FA1BE6E73403CD2F8C70146B0402172307B9";
 
-if (!isAddress("0x" + POKT_MULTISIG_ADDRESS)) {
+// if (!isAddress("0x" + POKT_MULTISIG_ADDRESS)) {
+if (!POKT_MULTISIG_ADDRESS) {
   throw new Error(
     `Invalid env variable NEXT_PUBLIC_POKT_MULTISIG_ADDRESS: ${POKT_MULTISIG_ADDRESS}`
   );
@@ -52,6 +58,15 @@ if (!CHAIN) {
   throw new Error(
     `Invalid env variable NEXT_PUBLIC_ETH_CHAIN: ${ETH_CHAIN_LABEL}`
   );
+}
+
+// Confirm both networks are either mainnet or testnet
+if (
+  (POKT_CHAIN_ID === "testnet" && ETH_CHAIN_LABEL === "mainnet") || 
+  (POKT_CHAIN_ID === "mainnet" && ETH_CHAIN_LABEL === "sepolia") ||
+  (POKT_CHAIN_ID === "pocket-beta" && ETH_CHAIN_LABEL === "mainnet")
+) {
+  throw new Error(`Cannot bridge between ${POKT_CHAIN_ID} and ${ETH_CHAIN_LABEL}`);
 }
 
 export const ETH_PUBLIC_CLIENT = jsonRpcProvider({

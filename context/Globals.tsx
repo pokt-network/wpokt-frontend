@@ -11,7 +11,7 @@ import { getAddress } from "viem";
 import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "@/utils/ledger";
-import { STDX_MSG_TYPES } from "@/utils/pokt";
+import { bech32ToHex, isPoktShannonAddress, STDX_MSG_TYPES } from "@/utils/pokt";
 
 declare global {
     interface Window {
@@ -31,6 +31,10 @@ export async function fetchActiveBurns(ethAddress: string): Promise<Burn[]> {
     return burns as Burn[]
 }
 
+// pokt1jm6ww5ydcude4q7nj029y7usruzsksnqwwf96l
+// pokt1cq4s6pf2kukh36a9h3npy6d6v9tpnjl5ph4aec
+// 317bbb64a0dda24aa07284c64fbdf765ba1f0b50
+
 export interface GlobalContextProps {
     mobile: boolean
     setMobile: (mobile: boolean) => void
@@ -38,11 +42,12 @@ export interface GlobalContextProps {
     setPoktBalance: (balance: bigint) => void
     poktAddress: string
     setPoktAddress: (address: string) => void
+    setPoktShannonAddress: (address: string) => void
     connectSendWallet: () => void
     ethAddress: string
     setEthAddress: (address: string) => void
-    destination: string
-    setDestination: (destination: string) => void,
+    destination: "eth" | "pokt"
+    setDestination: (destination: "eth" | "pokt") => void,
     poktAmount: bigint
     setPoktAmount: (amount: bigint) => void
     wPoktAmount: bigint
@@ -92,10 +97,11 @@ export const GlobalContext = createContext<GlobalContextProps>({
     setPoktBalance: () => {},
     poktAddress: "",
     setPoktAddress: () => {},
+    setPoktShannonAddress: () => {},
     connectSendWallet: () => {},
     ethAddress: "",
     setEthAddress: () => {},
-    destination: "eth",
+    destination: "pokt",
     setDestination: () => {},
     poktAmount: BigInt(0),
     setPoktAmount: () => {},
@@ -149,7 +155,7 @@ export function GlobalContextProvider({ children }: any) {
     const [poktBalance, setPoktBalance] = useState<bigint>(BigInt(0))
     const [poktAddress, setPoktAddress] = useState<string>("")
     const [ethAddress, setEthAddress] = useState<string>("")
-    const [destination, setDestination] = useState<string>("eth") // eth = pokt -> wpokt, pokt = wpokt -> pokt
+    const [destination, setDestination] = useState<"eth" | "pokt">("pokt") // eth = pokt -> wpokt, pokt = wpokt -> pokt
     const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
     const [wPoktAmount, setWPoktAmount] = useState<bigint>(BigInt(0))
     const [poktAmountInput, setPoktAmountInput] = useState<string>("")
@@ -313,6 +319,19 @@ export function GlobalContextProvider({ children }: any) {
         }
     }
 
+    function setPoktShannonAddress(address: string) {
+      const poktAddress = address.trim()
+      try {
+        if (!isPoktShannonAddress(poktAddress)) {
+          throw new Error("Invalid POKT address")
+        }
+        setPoktAddress(poktAddress)
+      } catch (error) {
+        console.error(error)
+        displayWalletNotFoundToast()
+      }
+    }
+
     async function connectSendWallet() {
         if (window.pocketNetwork === undefined) {
             displayWalletNotFoundToast();
@@ -391,7 +410,7 @@ export function GlobalContextProvider({ children }: any) {
         address: WPOKT_ADDRESS,
         abi: WRAPPED_POCKET_ABI,
         functionName: 'burnAndBridge',
-        args: [wPoktAmount, poktAddress ? getAddress(`0x${poktAddress}`) : ''],
+        args: [wPoktAmount, poktAddress ? getAddress(bech32ToHex(poktAddress)) : ''],
     })
     const burnFunc = useContractWrite(config)
 
@@ -515,6 +534,7 @@ export function GlobalContextProvider({ children }: any) {
             setPoktBalance,
             poktAddress,
             setPoktAddress,
+            setPoktShannonAddress,
             connectSendWallet,
             ethAddress,
             setEthAddress,

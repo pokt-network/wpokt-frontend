@@ -19,5 +19,6 @@ export type Burn = WithId<{
   status: Status;
   return_tx: string;
   signers: string[];
-  return_tx_hash: string;
+  // return_tx_hash: string;
+  return_transaction_hash: string;
 }>;

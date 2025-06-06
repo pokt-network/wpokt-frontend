@@ -47,7 +47,7 @@ export function ProgressModal(props: ModalProps) {
     const { isOpen: isRefundOpen, onOpen: onRefundOpen, onClose: onRefundClose } = useDisclosure()
     const { address } = useAccount()
 
-    const step = useMemo(() => getCurrentStep(), [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, currentBurn?.return_tx_hash, mintTx?.status, currentMint?.status])
+    const step = useMemo(() => getCurrentStep(), [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, currentBurn?.return_transaction_hash, mintTx?.status, currentMint?.status])
     const timeInterval = useMemo(() => {
         if (destination === "eth") {
             if (step === 0) return 1000 * 60 * 5
@@ -126,13 +126,13 @@ export function ProgressModal(props: ModalProps) {
     function getCurrentStep(): number {
         if (destination === "pokt") {
             if (currentBurn?.status === Status.SUCCESS) {
-                setPoktTxHash(currentBurn?.return_tx_hash)
+                setPoktTxHash(currentBurn?.return_transaction_hash)
                 if (poktTxSuccess) return 3
                 return 2
             }
             if (currentBurn?.status === Status.SIGNED || currentBurn?.status === Status.SUMBITTED) {
-                if (!currentBurn?.return_tx_hash) return 1
-                setPoktTxHash(currentBurn?.return_tx_hash)
+                if (!currentBurn?.return_transaction_hash) return 1
+                setPoktTxHash(currentBurn?.return_transaction_hash)
                 return 2
             }
             if (currentBurn?.status === Status.CONFIRMED || currentBurn?.status === Status.PENDING || burnTx?.isSuccess) return 1
@@ -257,7 +257,7 @@ export function ProgressModal(props: ModalProps) {
             const invalidMint = await res.json()
             console.log("Invalid Mint from DB:", invalidMint)
             setInvalidMint(invalidMint)
-            setPoktRefundTxHash(invalidMint?.return_tx_hash || "")
+            setPoktRefundTxHash(invalidMint?.return_transaction_hash || "")
             onRefundOpen()
             props.onClose()
         } catch (error) {
@@ -331,7 +331,7 @@ export function ProgressModal(props: ModalProps) {
                     )}
                     <TimeoutModal isOpen={isTimeoutOpen} onClose={onTimeoutClose}><></></TimeoutModal>
                     {(!!invalidMint||!!poktRefundTxHash) && (
-                        <RefundModal isOpen={isRefundOpen} onClose={onRefundClose} refundTxHash={poktRefundTxHash ?? invalidMint?.return_tx_hash}><></></RefundModal>
+                        <RefundModal isOpen={isRefundOpen} onClose={onRefundClose} refundTxHash={poktRefundTxHash ?? invalidMint?.return_transaction_hash}><></></RefundModal>
                     )}
                 </ModalBody>
             </ModalContent>
