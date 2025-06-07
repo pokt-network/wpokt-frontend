@@ -1,7 +1,7 @@
 import { ErrorIcon, InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
-import { ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_MULTISIG_ADDRESS, POKT_RPC_URL, POKT_RPC_URL_PATH, WPOKT_ADDRESS } from "@/utils/constants";
+import { ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_MULTISIG_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
 import { getDataSource } from "@/datasource";
 import { isValidEthAddress } from "@/utils/misc";
 import { HStack, Link, Text, useInterval, useToast } from "@chakra-ui/react";
@@ -11,7 +11,7 @@ import { getAddress } from "viem";
 import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "@/utils/ledger";
-import { bech32ToHex, isPoktShannonAddress, STDX_MSG_TYPES } from "@/utils/pokt";
+import { bech32ToHex, isPoktShannonAddress, PoktGatewayApi, STDX_MSG_TYPES } from "@/utils/pokt";
 
 declare global {
   interface Window {
@@ -364,14 +364,7 @@ export function GlobalContextProvider({ children }: any) {
         let balance = BigInt(0)
         let balanceResponse;
         try {
-          const poktGatewayUrl = POKT_RPC_URL;
-          const res = await fetch(`${poktGatewayUrl}/${POKT_RPC_URL_PATH}/balances/${poktAddress}`, {
-            method: "GET",
-            headers: {
-              "Accept": "application/json",
-            },
-          })
-          balanceResponse = await res.json()
+          balanceResponse = await PoktGatewayApi.getBalance(poktAddress)
           console.log("Balance Response:", balanceResponse)
         } catch (error) {
           console.log(error);

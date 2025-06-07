@@ -9,9 +9,10 @@ import { MintModal } from "./MintModal";
 import { TimeoutModal } from "./TimeoutModal";
 import { InvalidMint, Status } from "@/types";
 import { RefundModal } from "./RefundModal";
-import { CHAIN, ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_RPC_URL, POKT_RPC_URL_PATH } from "@/utils/constants";
+import { ETH_CHAIN_ID, POKT_CHAIN_ID } from "@/utils/constants";
 import { useAccount } from "wagmi";
 import { getEtherscanTxUrl, getPoktScanTxUrl } from "@/utils/misc";
+import { PoktGatewayApi } from "@/utils/pokt";
 
 
 export function ProgressModal(props: ModalProps) {
@@ -155,30 +156,29 @@ export function ProgressModal(props: ModalProps) {
 
     async function getPoktTxStatus(txHash: string = poktTxHash) {
         try {
-            if (isUsingHardwareWallet) {
-                const poktGatewayUrl = POKT_RPC_URL;
-                const res = await fetch(`${poktGatewayUrl}/${POKT_RPC_URL_PATH}/tx`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        hash: txHash,
-                        prove: false
-                    })
-                })
-                const tx = await res.json()
+            // if (isUsingHardwareWallet) {
+                // const res = await fetch(`${poktGatewayUrl}/${POKT_RPC_URL_PATH}/tx`, {
+                //     method: "POST",
+                //     headers: {
+                //         "Content-Type": "application/json"
+                //     },
+                //     body: JSON.stringify({
+                //         hash: txHash,
+                //         prove: false
+                //     })
+                // })
+                const tx = await PoktGatewayApi.getTx(txHash)
                 console.log("Pokt Tx Status:", tx)
-                if (!tx.hash) throw new Error("Tx hash is pending or invalid")
+                if (!tx.tx_response) throw new Error("Tx hash is pending or invalid")
                 setPoktTxSuccess(true)
                 return tx
-            } else {
-                const tx = await window.pocketNetwork.send("pokt_tx", [{ hash: txHash }])
-                console.log("Pokt Tx Status:", tx)
-                if (!tx.hash) throw new Error("Tx hash is pending or invalid")
-                setPoktTxSuccess(true)
-                return tx
-            }
+            // } else {
+            //     const tx = await window.pocketNetwork.send("pokt_tx", [{ hash: txHash }])
+            //     console.log("Pokt Tx Status:", tx)
+            //     if (!tx.hash) throw new Error("Tx hash is pending or invalid")
+            //     setPoktTxSuccess(true)
+            //     return tx
+            // }
         } catch (error) {
             console.error(error)
             return undefined
