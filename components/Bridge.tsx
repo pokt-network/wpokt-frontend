@@ -9,7 +9,7 @@ import { TimeInfoModal } from "./modal/TimeInfoModal";
 import { useAccount, useBalance, useContractRead, useFeeData } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { bech32ToHex, formatPokt, isPoktShannonAddress, parsePokt } from "@/utils/pokt";
-import { CHAIN, CHAINLINK_ETH_USD_ADDRESS, IS_PAUSED, IS_POKT_PAUSED, WPOKT_ADDRESS } from "@/utils/constants";
+import { CHAIN, CHAINLINK_ETH_USD_ADDRESS, IS_PAUSED, IS_POKT_PAUSED, POKT_RPC_URL, POKT_RPC_URL_PATH, WPOKT_ADDRESS } from "@/utils/constants";
 import { CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { createPublicClient, formatEther, formatUnits, getAddress, http, parseUnits } from "viem";
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
@@ -537,8 +537,7 @@ export function Bridge() {
                     <Center mt={6}>
                         <HStack width={320} mb={1} justify="space-between">
                             <Text>Destination Wallet</Text>
-                            {/* TODO: Display this once balance check is fixed */}
-                            {/* <Text>{poktAddress ? `${formatPokt(poktBalance)} POKT in wallet` : 'No wallet connected'}</Text> */}
+                            <Text>{poktAddress ? `${formatPokt(poktBalance)} POKT in wallet` : ''}</Text>
                         </HStack>
                     </Center>
                     {/* Set Shannon Pokt Address */}

@@ -7,7 +7,9 @@ import { SupportedEthChain, SupportedPoktChain } from "./types";
 export const IS_PAUSED = process.env.NEXT_PUBLIC_PAUSED === "true";
 export const IS_POKT_PAUSED = process.env.NEXT_PUBLIC_POKT_PAUSED === "true";
 
-const ETH_RPC_URL = process.env.NEXT_PUBLIC_ETH_RPC_URL;
+export const ETH_RPC_URL = process.env.NEXT_PUBLIC_ETH_RPC_URL;
+
+export const POKT_RPC_URL_PATH = "cosmos/bank/v1beta1"
 
 if (!ETH_RPC_URL) {
   throw new Error(`Missing env variable NEXT_PUBLIC_ETH_RPC_URL`);
