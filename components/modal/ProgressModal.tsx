@@ -216,10 +216,10 @@ export function ProgressModal(props: ModalProps) {
 
     async function getBurnInfo() {
       try {
-        if (currentBurn?.status === Status.SUCCESS) {
-          if (!poktTxHash) setPoktTxHash(currentBurn?.return_transaction_hash)
-          if (!poktTxSuccess) return await getPoktTxStatus(currentBurn?.return_transaction_hash)
-          else return
+        if (currentBurn?.status === Status.SUCCESS && currentBurn?.return_transaction_hash) {
+          if (!poktTxHash) setPoktTxHash(currentBurn.return_transaction_hash)
+          setPoktTxSuccess(true)
+          return
         }
         const res = await fetch(`/api/burns/hash/${ethTxHash}`)
         const burn = await res.json()
@@ -228,7 +228,8 @@ export function ProgressModal(props: ModalProps) {
         setIsBurnFetchError(false)
         if (burn.status === Status.SUCCESS) {
           if (!poktTxHash) setPoktTxHash(burn.return_transaction_hash)
-          if (!poktTxSuccess) await getPoktTxStatus(burn.return_transaction_hash)
+          if (!poktTxSuccess) return await getPoktTxStatus(burn.return_transaction_hash)
+          else return
         }
       } catch (error) {
         console.error(error)
