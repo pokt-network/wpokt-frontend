@@ -62,7 +62,7 @@ export function ProgressModal(props: ModalProps) {
         } else {
             if (step === 0) return 1000 * 15
             if (step === 1) return 1000 * 60
-            if (step === 2) return 1000 * 60 * 3
+            if (step === 2) return 1000 * 15
             return 60000
         }
     }, [step])
@@ -216,7 +216,7 @@ export function ProgressModal(props: ModalProps) {
 
     async function getBurnInfo() {
         try {
-            if (currentBurn?.status === "success") {
+            if (currentBurn?.status === "success" || currentBurn?.return_transaction_hash) {
                 if (!poktTxSuccess) return await getPoktTxStatus()
                 else return
             }
