@@ -8,8 +8,8 @@ import { useGlobalContext } from "@/context/Globals";
 import { TimeInfoModal } from "./modal/TimeInfoModal";
 import { useAccount, useBalance, useContractRead, useFeeData } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { formatPokt, parsePokt } from "@/utils/pokt";
-import { CHAIN, CHAINLINK_ETH_USD_ADDRESS, IS_PAUSED, WPOKT_ADDRESS } from "@/utils/constants";
+import { bech32ToHex, formatPokt, isPoktShannonAddress, parsePokt } from "@/utils/pokt";
+import { CHAIN, CHAINLINK_ETH_USD_ADDRESS, IS_PAUSED, IS_POKT_PAUSED, WPOKT_ADDRESS } from "@/utils/constants";
 import { CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { createPublicClient, formatEther, formatUnits, getAddress, http, parseUnits } from "viem";
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
@@ -21,6 +21,8 @@ export function Bridge() {
     const [estGasCost, setEstGasCost] = useState<string>("")
     const [ethPrice, setEthPrice] = useState<bigint|undefined>(undefined)
     const [insufficientEthGas, setInsufficientEthGas] = useState<boolean>(false)
+    const [poktAddressInput, setPoktAddressInput] = useState<string>("")
+    const [enablePoktAddressInput, setEnablePoktAddressInput] = useState<boolean>(false)
     const {
         screenWidth,
         poktAddress,
@@ -47,6 +49,7 @@ export function Bridge() {
         isSigningTx,
         setIsSigningTx,
         resetProgress,
+        setPoktShannonAddress,
     } = useGlobalContext()
 
     const { address } = useAccount()
@@ -102,7 +105,7 @@ export function Bridge() {
                         address: getAddress(WPOKT_ADDRESS),
                         abi: WRAPPED_POCKET_ABI,
                         functionName: 'burnAndBridge',
-                        args: [wPoktAmount, getAddress(`0x${poktAddress}`)],
+                        args: [wPoktAmount, getAddress(bech32ToHex(poktAddress))],
                         account: getAddress(address ?? '')
                     })
                 } else {
@@ -414,7 +417,7 @@ export function Bridge() {
                                     const recipient = address ?? ""
                                     await bridgePoktToEthereum(recipient, poktAmount)
                                 }}
-                                isDisabled={!poktAddress||!address||!poktAmount||IS_PAUSED}
+                                isDisabled={!poktAddress||!address||!poktAmount||IS_PAUSED||IS_POKT_PAUSED}
                                 isLoading={isSigningTx}
                             >
                                 Wrap
@@ -430,7 +433,7 @@ export function Bridge() {
                                 paddingY={6}
                                 _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                 onClick={displayMissingInputsToast}
-                                isDisabled={IS_PAUSED}
+                                isDisabled={IS_PAUSED||IS_POKT_PAUSED}
                             >
                                 Wrap
                             </Button>
@@ -453,6 +456,7 @@ export function Bridge() {
                                     height={8}
                                     _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
                                     onClick={() => setDestination("eth")}
+                                    isDisabled={IS_POKT_PAUSED}
                                 >
                                     Wrap POKT
                                 </Button>
@@ -533,47 +537,110 @@ export function Bridge() {
                     <Center mt={6}>
                         <HStack width={320} mb={1} justify="space-between">
                             <Text>Destination Wallet</Text>
-                            <Text>{poktAddress ? `${formatPokt(poktBalance)} POKT in wallet` : 'No wallet connected'}</Text>
+                            <Text>{poktAddress ? `${formatPokt(poktBalance)} POKT in wallet` : ''}</Text>
                         </HStack>
                     </Center>
-                    {poktAddress ? (
+                    {/* Set Shannon Pokt Address */}
+                    {(!poktAddress || enablePoktAddressInput) && (
+                      <form onSubmit={(e) => {
+                        e.preventDefault()
+                        setPoktShannonAddress(poktAddressInput)
+                        setEnablePoktAddressInput(false)
+                      }}>
+                        <Flex maxWidth={screenWidth} justify="center">
+                          <Button
+                            type="submit"
+                            bg="transparent"
+                            color="poktLime"
+                            _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
+                            position="absolute"
+                            ml={270} 
+                            mt="8px" 
+                            width="40px" 
+                            height="30px"
+                            variant="outline"
+                            borderColor="poktLime"
+                            borderWidth={1}
+                            zIndex={5}
+                          >
+                            Set
+                          </Button>
+                          <Input
+                            type="text"
+                            width={320}
+                            fontWeight={700}
+                            fontSize={16}
+                            paddingY={6}
+                            paddingX={8}
+                            paddingRight={14}
+                            borderRadius={4}
+                            borderColor={isPoktShannonAddress(poktAddressInput) ? "none" : !poktAddressInput ? 'poktLime' : 'error'}
+                            _focus={{ borderColor: isPoktShannonAddress(poktAddressInput) ? "none" : !poktAddressInput ? 'poktLime' : 'error' }}
+                            _hover={{ borderColor: !poktAddressInput ? 'poktLime' : 'none' }}
+                            placeholder="Enter POKT address"
+                            value={poktAddressInput}
+                            onChange={(e) => {
+                              const { value } = e.currentTarget
+                              setPoktAddressInput(value ?? '')
+                            }}
+                          />
+                        </Flex>
+                        {/* <Flex maxWidth={screenWidth} justify="center">
+                          <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2} width={320} borderRadius={4} borderWidth={1} borderColor="poktLime">
+                              <PoktIcon fill="poktLime" width="21px" height="21px" />
+                              <Input
+                                type="text"
+                                textAlign="center"
+                                border="none"
+                                placeholder="Enter POKT address"
+                                value={poktAddressInput}
+                                onChange={(e) => {
+                                  setPoktAddressInput(e.target.value)
+                                }}
+                              />
+                              <Button type="submit" bg="transparent" color="poktLime">Set</Button>
+                          </Flex>
+                        </Flex> */}
+                      </form>
+                    )}
+                    {poktAddress && !enablePoktAddressInput && (
                         <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2} maxW={screenWidth}>
                             <PoktIcon fill="poktLime" width="21px" height="21px" />
                             <Text>{screenWidth && screenWidth < 400 ? poktAddress.substring(0,6) + '...' + poktAddress.substring(poktAddress.length - 6, poktAddress.length - 1) : poktAddress}</Text>
-                            <CloseIcon width="22.63px" height="22.63px" fill="none" />
+                            <CloseIcon width="22.63px" height="22.63px" fill="poktLime" _hover={{ fill: "poktBlue", cursor: "pointer" }} onClick={() => setEnablePoktAddressInput(true)} />
                         </Flex>
-                    ) : (
-                        <Center>
-                            {currentStep === 2 ? (
-                                <Button
-                                    color="darkBlue"
-                                    background="poktLime"
-                                    borderWidth={2}
-                                    borderColor="poktLime"
-                                    height={8}
-                                    minW={200}
-                                    _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
-                                    leftIcon={<PoktIcon />}
-                                    onClick={onConnectPoktModalOpen}
-                                >
-                                    Connect POKT Wallet
-                                </Button>
-                            ) : (
-                                <Button
-                                    variant="outline"
-                                    borderColor="poktLime"
-                                    bg="transparent"
-                                    color="white"
-                                    height={8}
-                                    _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
-                                    leftIcon={<PoktIcon />}
-                                    onClick={onConnectPoktModalOpen}
-                                    minW={200}
-                                >
-                                    Connect POKT Wallet
-                                </Button>
-                            )}
-                        </Center>
+                    // ) : (
+                    //     <Center>
+                    //         {currentStep === 2 ? (
+                    //             <Button
+                    //                 color="darkBlue"
+                    //                 background="poktLime"
+                    //                 borderWidth={2}
+                    //                 borderColor="poktLime"
+                    //                 height={8}
+                    //                 minW={200}
+                    //                 _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
+                    //                 leftIcon={<PoktIcon />}
+                    //                 onClick={onConnectPoktModalOpen}
+                    //             >
+                    //                 Connect POKT Wallet
+                    //             </Button>
+                    //         ) : (
+                    //             <Button
+                    //                 variant="outline"
+                    //                 borderColor="poktLime"
+                    //                 bg="transparent"
+                    //                 color="white"
+                    //                 height={8}
+                    //                 _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
+                    //                 leftIcon={<PoktIcon />}
+                    //                 onClick={onConnectPoktModalOpen}
+                    //                 minW={200}
+                    //             >
+                    //                 Connect POKT Wallet
+                    //             </Button>
+                    //         )}
+                    //     </Center>
                     )}
                     <Center mt={6}>
                         <Box width={320}>

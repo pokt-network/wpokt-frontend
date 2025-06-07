@@ -5,6 +5,7 @@ import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "../utils/ledger";
 import { typeGuard } from "@pokt-network/pocket-js";
 import { useGlobalContext, dataSource } from "./Globals";
+import { POKT_CHAIN_ID } from "@/utils/constants";
 
 
 const DEFAULT_TRANSPORT_STATE = {
@@ -172,7 +173,7 @@ export function TransportProvider({ children }: any) {
     ).toString();
 
     const tx = {
-      chain_id: 'mainnet',
+      chain_id: POKT_CHAIN_ID,
       entropy: entropy.toString(),
       fee: [
         {
