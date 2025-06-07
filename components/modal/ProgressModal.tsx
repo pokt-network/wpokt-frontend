@@ -215,24 +215,26 @@ export function ProgressModal(props: ModalProps) {
     }
 
     async function getBurnInfo() {
-        try {
-            if (currentBurn?.status === "success" || currentBurn?.return_transaction_hash) {
-                if (!poktTxSuccess) return await getPoktTxStatus()
-                else return
-            }
-            const res = await fetch(`/api/burns/hash/${ethTxHash}`)
-            const burn = await res.json()
-            console.log("Burn from DB:", burn)
-            setCurrentBurn(burn)
-            setIsBurnFetchError(false)
-            if (burn.status === Status.SUCCESS) {
-                if (!poktTxSuccess) await getPoktTxStatus()
-            }
-        } catch (error) {
-            console.error(error)
-            setIsBurnFetchError(true)
+      try {
+        if (currentBurn?.status === Status.SUCCESS) {
+          if (!poktTxHash) setPoktTxHash(currentBurn?.return_transaction_hash)
+          if (!poktTxSuccess) return await getPoktTxStatus(currentBurn?.return_transaction_hash)
+          else return
         }
-        isTakingTooLong()
+        const res = await fetch(`/api/burns/hash/${ethTxHash}`)
+        const burn = await res.json()
+        console.log("Burn from DB:", burn)
+        setCurrentBurn(burn)
+        setIsBurnFetchError(false)
+        if (burn.status === Status.SUCCESS) {
+          if (!poktTxHash) setPoktTxHash(burn.return_transaction_hash)
+          if (!poktTxSuccess) await getPoktTxStatus(burn.return_transaction_hash)
+        }
+      } catch (error) {
+        console.error(error)
+        setIsBurnFetchError(true)
+      }
+      isTakingTooLong()
     }
 
     async function getMintInfo() {
