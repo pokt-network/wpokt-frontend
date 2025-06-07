@@ -11,15 +11,16 @@ export function isValidEthAddress(address: string): boolean {
 }
 
 export function getPoktScanTxUrl(chain: SupportedPoktChain, poktTxHash: string): string {
+  const hash = poktTxHash.startsWith("0x") ? poktTxHash.substring(2) : poktTxHash
   switch (chain) {
     case "testnet":
-      return `https://poktscan.com/testnet/tx/${poktTxHash}`
+      return `https://poktscan.com/testnet/tx/${hash}`
     case "mainnet":
-      return `https://poktscan.com/tx/${poktTxHash}`
+      return `https://poktscan.com/tx/${hash}`
     case "pocket-beta":
-      return `https://beta.poktscan.com/tx/${poktTxHash}`
+      return `https://explorer.pocket.network/pocket-beta/tx/${hash}`
     default:
-      return `https://poktscan.com/tx/${poktTxHash}`
+      return `https://poktscan.com/tx/${hash}`
   }
 }
 
