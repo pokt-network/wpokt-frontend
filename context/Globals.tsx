@@ -288,10 +288,8 @@ export function GlobalContextProvider({ children }: any) {
           <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
             <ErrorIcon />
             <Text color="error">
-              Wallet not found! Please install{" "}
-              <Link href="https://sendwallet.net" textDecor="underline" isExternal>SendWallet</Link>
-              {" or "}
-              <Link href="https://docs.decentralizedauthority.com/nodewallet" textDecor="underline" isExternal>NodeWallet</Link>
+              Invalid POKT address! If you do not have one, please install{" "}
+              <Link href="https://trustsoothe.io/" textDecor="underline" isExternal>Soothe Vault</Link>
               {"."}
             </Text>
           </HStack>
