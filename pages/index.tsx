@@ -2,7 +2,7 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { Flex, Text } from '@chakra-ui/react'
 import { Bridge } from '@/components/Bridge'
-import { IS_PAUSED } from '@/utils/constants'
+import { IS_PAUSED, IS_POKT_PAUSED } from '@/utils/constants'
 
 
 export default function Home() {
@@ -24,6 +24,23 @@ export default function Home() {
           </Text>
         </Flex>
       )}
+
+      {IS_POKT_PAUSED && !IS_PAUSED && (
+        <Flex 
+          flexGrow={1} 
+          justify="center" 
+          align="center" 
+          paddingY={10}
+          bg="poktLime"
+          color="darkBlue"
+          width="100%"
+        >
+          <Text fontSize="lg" fontWeight="bold">
+            This bridge only supports wPOKT → POKT transfers as Pocket Network transitions to a unified xERC-20 token standard.
+          </Text>
+        </Flex>
+      )}
+      
       <Flex flexGrow={1} justify="center" align="center" paddingY={10}>
         <Bridge />
       </Flex>
