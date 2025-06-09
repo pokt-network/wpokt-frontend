@@ -372,7 +372,7 @@ export function GlobalContextProvider({ children }: any) {
         }
         balance = balanceResponse?.balances?.[0]?.amount?.toString();
         console.log("POKT Balance: ", balance)
-        setPoktBalance(BigInt(balance))
+        setPoktBalance(BigInt(balance ?? "0"))
       } catch (error) {
         console.error(error)
       }
