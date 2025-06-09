@@ -16,7 +16,7 @@ export function getPoktScanTxUrl(chain: SupportedPoktChain, poktTxHash: string):
     case "testnet":
       return `https://poktscan.com/testnet/tx/${hash}`
     case "mainnet":
-      return `https://poktscan.com/tx/${hash}`
+      return `https://explorer.pocket.network/pocket-mainnet/tx/${hash}`
     case "pocket-beta":
       return `https://explorer.pocket.network/pocket-beta/tx/${hash}`
     default:
