@@ -25,7 +25,7 @@ export default function Home() {
         </Flex>
       )}
 
-      {IS_POKT_PAUSED && !IS_PAUSED && (
+      {(IS_POKT_PAUSED && !IS_PAUSED) && (
         <Flex 
           flexGrow={1} 
           justify="center" 
