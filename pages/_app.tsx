@@ -4,7 +4,19 @@ import Head from 'next/head'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from "../theme"
 import { WagmiConfig, createConfig, configureChains } from 'wagmi'
-import { RainbowKitProvider, getDefaultWallets, darkTheme } from '@rainbow-me/rainbowkit'
+import {
+  RainbowKitProvider, 
+  darkTheme, 
+  connectorsForWallets
+} from '@rainbow-me/rainbowkit'
+import {
+  injectedWallet, 
+  walletConnectWallet, 
+  coinbaseWallet, 
+  metaMaskWallet,
+  rabbyWallet, 
+  rainbowWallet,
+} from '@rainbow-me/rainbowkit/wallets'
 import React from 'react';
 import { GlobalContextProvider } from '@/context/Globals';
 import { TransportProvider } from '@/context/Transport';
@@ -15,11 +27,32 @@ const { chains, publicClient } = configureChains(
   [ETH_PUBLIC_CLIENT]
 )
 
-const { connectors } = getDefaultWallets({
-  appName: 'wPOKT Bridge',
-  projectId: WALLET_CONNECT_PROJECT_ID,
-  chains
-})
+// const { connectors } = getDefaultWallets({
+//   appName: 'wPOKT Bridge',
+//   projectId: WALLET_CONNECT_PROJECT_ID,
+//   chains,
+// })
+
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: 'Popular',
+      wallets: [
+        coinbaseWallet({ chains, appName: 'wPOKT Bridge' }), 
+        metaMaskWallet({ chains, projectId: WALLET_CONNECT_PROJECT_ID }),
+        rabbyWallet({ chains, name: 'wPOKT Bridge' }), 
+        rainbowWallet({ chains, projectId: WALLET_CONNECT_PROJECT_ID, name: 'wPOKT Bridge' }),
+      ]
+    },
+    {
+      groupName: 'Other',
+      wallets: [
+        injectedWallet({ chains, name: 'wPOKT Bridge' }), 
+        walletConnectWallet({ chains, projectId: WALLET_CONNECT_PROJECT_ID}), 
+      ]
+    }
+  ]
+)
 
 const config = createConfig({
   autoConnect: true,
