@@ -34,10 +34,11 @@ export function bech32ToHex(address: string): string {
 }
 
 export function isPoktShannonAddress(address: string): boolean {
+  const addr = address.trim().toLowerCase()
   return (
-    address.startsWith(poktAddressPrefix) && 
-    address.length === 43 && 
-    isAddress(bech32ToHex(address))
+    addr.startsWith(poktAddressPrefix) && 
+    addr.length === 43 && 
+    isAddress(bech32ToHex(addr))
   )
 }
 
