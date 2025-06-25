@@ -318,7 +318,7 @@ export function GlobalContextProvider({ children }: any) {
   }
 
   function setPoktShannonAddress(address: string) {
-    const poktAddress = address.trim()
+    const poktAddress = address.trim().toLowerCase()
     try {
       if (!isPoktShannonAddress(poktAddress)) {
         throw new Error("Invalid POKT address")
