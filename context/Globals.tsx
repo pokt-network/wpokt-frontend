@@ -288,7 +288,7 @@ export function GlobalContextProvider({ children }: any) {
           <HStack spacing={4} padding={4} minW={330} bg="darkBlue" borderRadius={10} borderBottomColor="error" borderBottomWidth={1}>
             <ErrorIcon />
             <Text color="error">
-              Invalid POKT address! If you do not have one, please install{" "}
+              Invalid POKT address! It should start with "pokt" and be 43 characters long. If you do not have one, please install{" "}
               <Link href="https://trustsoothe.io/" textDecor="underline" isExternal>Soothe Vault</Link>
               {"."}
             </Text>
@@ -318,7 +318,7 @@ export function GlobalContextProvider({ children }: any) {
   }
 
   function setPoktShannonAddress(address: string) {
-    const poktAddress = address.trim()
+    const poktAddress = address.trim().toLowerCase()
     try {
       if (!isPoktShannonAddress(poktAddress)) {
         throw new Error("Invalid POKT address")
