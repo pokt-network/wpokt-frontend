@@ -471,7 +471,7 @@ export function Bridge() {
                             <Box>
                                 <Text>Memo:</Text>
                                 <Flex align="center" gap={2}>
-                                    <Code fontSize={12}>{`{"address": "${address ?? "<ETHEREUM_ADDRESS>"}", "chain_id": "${ETH_CHAIN_ID}}"`}</Code>
+                                    <Code fontSize={12}>{`{"address": "${address ?? "<ETHEREUM_ADDRESS>"}", "chain_id": "${ETH_CHAIN_ID}"}`}</Code>
                                 </Flex>
                             </Box>
                             <Text>Then, wait and return here to finish minting your wPOKT.</Text>
