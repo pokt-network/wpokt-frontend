@@ -371,7 +371,7 @@ export function GlobalContextProvider({ children }: any) {
           console.log(error);
           return 0;
         }
-        balance = balanceResponse?.balances?.[0]?.amount?.toString();
+        balance = balanceResponse?.balances?.find((bal: {denom: string, amount: string}) => bal.denom === "upokt").amount?.toString();
         console.log("POKT Balance: ", balance)
         setPoktBalance(BigInt(balance ?? "0"))
       } catch (error) {
