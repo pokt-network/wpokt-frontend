@@ -15,6 +15,7 @@ import { createPublicClient, formatEther, formatUnits, getAddress, http, parseUn
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
 import { GasInfoModal } from "./modal/GasInfoModal";
 import { ConnectPoktModal } from "./modal/ConnectPoktModal";
+import { useTransport } from "@/context/Transport";
 
 
 export function Bridge() {
@@ -26,6 +27,8 @@ export function Bridge() {
     const {
         screenWidth,
         poktAddress,
+        setPoktAddress,
+        isUsingHardwareWallet,
         destination,
         setDestination,
         poktBalance,
@@ -51,6 +54,9 @@ export function Bridge() {
         resetProgress,
         setPoktShannonAddress,
     } = useGlobalContext()
+    const {
+      removeTransport
+    } = useTransport()
 
     const { address } = useAccount()
     const { openConnectModal } = useConnectModal()
@@ -222,6 +228,13 @@ export function Bridge() {
             )
         })
     }
+
+    async function disconnectPokt() {
+      if (isUsingHardwareWallet) {
+          return removeTransport()
+      }
+      return setPoktAddress("")
+  }
 
     return (
         <VStack minWidth={screenWidth && screenWidth < 580 ? screenWidth : '580px'}>
@@ -541,7 +554,7 @@ export function Bridge() {
                         </HStack>
                     </Center>
                     {/* Set Shannon Pokt Address */}
-                    {(!poktAddress || enablePoktAddressInput) && (
+                    {/* {(!poktAddress || enablePoktAddressInput) && (
                       <form onSubmit={(e) => {
                         e.preventDefault()
                         setPoktShannonAddress(poktAddressInput)
@@ -584,7 +597,7 @@ export function Bridge() {
                               setPoktAddressInput(value ?? '')
                             }}
                           />
-                        </Flex>
+                        </Flex> */}
                         {/* <Flex maxWidth={screenWidth} justify="center">
                           <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2} width={320} borderRadius={4} borderWidth={1} borderColor="poktLime">
                               <PoktIcon fill="poktLime" width="21px" height="21px" />
@@ -601,46 +614,46 @@ export function Bridge() {
                               <Button type="submit" bg="transparent" color="poktLime">Set</Button>
                           </Flex>
                         </Flex> */}
-                      </form>
-                    )}
-                    {poktAddress && !enablePoktAddressInput && (
+                      {/* </form>
+                    )} */}
+                    {poktAddress ? (
                         <Flex align="center" justify="space-between" bg="darkBlue" paddingX={4} paddingY={2} maxW={screenWidth}>
                             <PoktIcon fill="poktLime" width="21px" height="21px" />
                             <Text>{screenWidth && screenWidth < 400 ? poktAddress.substring(0,6) + '...' + poktAddress.substring(poktAddress.length - 6, poktAddress.length - 1) : poktAddress}</Text>
-                            <CloseIcon width="22.63px" height="22.63px" fill="poktLime" _hover={{ fill: "poktBlue", cursor: "pointer" }} onClick={() => setEnablePoktAddressInput(true)} />
+                            <CloseIcon width="22.63px" height="22.63px" fill="poktLime" _hover={{ fill: "poktBlue", cursor: "pointer" }} onClick={() => disconnectPokt()} />
                         </Flex>
-                    // ) : (
-                    //     <Center>
-                    //         {currentStep === 2 ? (
-                    //             <Button
-                    //                 color="darkBlue"
-                    //                 background="poktLime"
-                    //                 borderWidth={2}
-                    //                 borderColor="poktLime"
-                    //                 height={8}
-                    //                 minW={200}
-                    //                 _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
-                    //                 leftIcon={<PoktIcon />}
-                    //                 onClick={onConnectPoktModalOpen}
-                    //             >
-                    //                 Connect POKT Wallet
-                    //             </Button>
-                    //         ) : (
-                    //             <Button
-                    //                 variant="outline"
-                    //                 borderColor="poktLime"
-                    //                 bg="transparent"
-                    //                 color="white"
-                    //                 height={8}
-                    //                 _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
-                    //                 leftIcon={<PoktIcon />}
-                    //                 onClick={onConnectPoktModalOpen}
-                    //                 minW={200}
-                    //             >
-                    //                 Connect POKT Wallet
-                    //             </Button>
-                    //         )}
-                    //     </Center>
+                    ) : (
+                        <Center>
+                            {currentStep === 2 ? (
+                                <Button
+                                    color="darkBlue"
+                                    background="poktLime"
+                                    borderWidth={2}
+                                    borderColor="poktLime"
+                                    height={8}
+                                    minW={200}
+                                    _hover={{ bg: "poktBlue", borderColor: "poktBlue" }}
+                                    leftIcon={<PoktIcon />}
+                                    onClick={onConnectPoktModalOpen}
+                                >
+                                    Connect POKT Wallet
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    borderColor="poktLime"
+                                    bg="transparent"
+                                    color="white"
+                                    height={8}
+                                    _hover={{ color: "poktBlue", borderColor: "poktBlue" }}
+                                    leftIcon={<PoktIcon />}
+                                    onClick={onConnectPoktModalOpen}
+                                    minW={200}
+                                >
+                                    Connect POKT Wallet
+                                </Button>
+                            )}
+                        </Center>
                     )}
                     <Center mt={6}>
                         <Box width={320}>

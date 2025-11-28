@@ -16,6 +16,7 @@ import { bech32ToHex, isPoktShannonAddress, PoktGatewayApi, STDX_MSG_TYPES } fro
 declare global {
   interface Window {
     pocketNetwork: any;
+    pocketShannon: any;
   }
 }
 
@@ -331,13 +332,13 @@ export function GlobalContextProvider({ children }: any) {
   }
 
   async function connectSendWallet() {
-    if (window.pocketNetwork === undefined) {
+    if (window.pocketShannon === undefined) {
       displayWalletNotFoundToast();
       return;
     }
     try {
       // Connect Wallet
-      let address = await window.pocketNetwork
+      let address = await window.pocketShannon
         .send("pokt_requestAccounts")
         .then(([address]: any[]) => {
           console.log("Connected POKT address:", address);
@@ -425,7 +426,7 @@ export function GlobalContextProvider({ children }: any) {
         if (typeGuard(res, Error)) throw res
         txHash = res?.txhash
       } else {
-        const { hash } = await window.pocketNetwork.send("pokt_sendTransaction", [
+        const { hash } = await window.pocketShannon.send("pokt_sendTransaction", [
           {
             amount: amount.toString(), // in uPOKT
             from: poktAddress,

@@ -15,12 +15,12 @@ export function ConnectPoktModal(props: ModalProps) {
                 connectSendWallet()
             }
         },
-        {
-            name: "Ledger",
-            onConnect: async () => {
-                await connectLedgerDevice()
-            }
-        },
+        // {
+        //     name: "Ledger",
+        //     onConnect: async () => {
+        //         await connectLedgerDevice()
+        //     }
+        // },
     ]
 
     useEffect(() => {
