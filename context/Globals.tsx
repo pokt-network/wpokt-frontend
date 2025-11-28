@@ -464,12 +464,10 @@ export function GlobalContextProvider({ children }: any) {
         //   }
         // ]).then(result => console.log(reult)).catch(error => console.error(error))
         // console.log({signature})
-        console.log("Signed Payload:", signedPayload)
         const client = await StargateClient.connect(POKT_RPC_URL)
         console.log("Broadcasting...")
         const hash = await client.broadcastTxSync(Buffer.from(signedPayload.transactionHex, "hex"))
         txHash = hash
-        console.log("txHash:", txHash)
         // const { hash } = await window.pocketShannon.send("pokt_sendTransaction", [
         //   {
         //     amount: amount.toString(), // in uPOKT
