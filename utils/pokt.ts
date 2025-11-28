@@ -1,5 +1,5 @@
 import { bech32 } from "bech32";
-import { isAddress } from "viem";
+import { formatUnits, isAddress } from "viem";
 import { POKT_RPC_URL } from "./constants";
 
 export function parsePokt(amount: string | number): bigint {
@@ -7,7 +7,7 @@ export function parsePokt(amount: string | number): bigint {
 }
 
 export function formatPokt(amount: string | bigint): string {
-    return (BigInt(amount) / BigInt(1e6)).toString()
+    return formatUnits(BigInt(amount), 6)
 }
 
 export const UPOKT = 1000000;
