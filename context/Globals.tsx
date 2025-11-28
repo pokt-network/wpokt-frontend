@@ -158,7 +158,7 @@ export function GlobalContextProvider({ children }: any) {
   const [poktBalance, setPoktBalance] = useState<bigint>(BigInt(0))
   const [poktAddress, setPoktAddress] = useState<string>("")
   const [ethAddress, setEthAddress] = useState<string>("")
-  const [destination, setDestination] = useState<"eth" | "pokt">("pokt") // eth = pokt -> wpokt, pokt = wpokt -> pokt
+  const [destination, setDestination] = useState<"eth" | "pokt">("eth") // eth = pokt -> wpokt, pokt = wpokt -> pokt
   const [poktAmount, setPoktAmount] = useState<bigint>(BigInt(0))
   const [wPoktAmount, setWPoktAmount] = useState<bigint>(BigInt(0))
   const [poktAmountInput, setPoktAmountInput] = useState<string>("")
