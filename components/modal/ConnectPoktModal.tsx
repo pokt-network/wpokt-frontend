@@ -10,7 +10,7 @@ export function ConnectPoktModal(props: ModalProps) {
 
     const poktWalletOptions = [
         {
-            name: "Soothe Vault / NodeWallet",
+            name: "Soothe Vault",
             onConnect: () => {
                 connectSendWallet()
             }
