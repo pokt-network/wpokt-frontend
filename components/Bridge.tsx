@@ -417,7 +417,7 @@ export function Bridge() {
                     </Center>
 
                     {/* Disable temporarily because Soothe Vault does not support `pokt_sendTransaction` for its Shannon provider */}
-                    {/* <Center>
+                    <Center>
                         {currentStep === 3 ? (
                             <Button
                                 bg="poktLime"
@@ -453,10 +453,10 @@ export function Bridge() {
                                 Wrap
                             </Button>
                         )}
-                    </Center> */}
+                    </Center>
 
                     {/* Alternative method to enable mint temporarily */}
-                    <Center>
+                    {/* <Center>
                         <Divider borderColor={"poktLime"} maxW={360} />
                     </Center>
                     <Center my={6}>
@@ -476,7 +476,7 @@ export function Bridge() {
                             </Box>
                             <Text>Then, wait and return here to finish minting your wPOKT.</Text>
                         </VStack>
-                    </Center>
+                    </Center> */}
                 </Container>
             ) : (
                 <Container paddingY={4} borderRadius={4} borderWidth={1} borderColor="white">

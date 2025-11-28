@@ -49,6 +49,14 @@ export function ProgressModal(props: ModalProps) {
     const { isOpen: isRefundOpen, onOpen: onRefundOpen, onClose: onRefundClose } = useDisclosure()
     const { address } = useAccount()
 
+    function to0xHash(hash: string): `0x${string}` {
+      return (hash.startsWith("0x") ? hash : "0x" + hash) as `0x${string}`
+    }
+
+    function remove0x(hash: string): string {
+      return hash.startsWith("0x") ? hash.slice(2) : hash
+    }
+
     const step = useMemo(() => getCurrentStep(), [poktTxOngoing, poktTxSuccess, poktTxError, burnTx?.status, currentBurn?.status, currentBurn?.return_transaction_hash, mintTx?.status, currentMint?.status])
     const timeInterval = useMemo(() => {
         if (destination === "eth") {
@@ -167,7 +175,7 @@ export function ProgressModal(props: ModalProps) {
                 //         prove: false
                 //     })
                 // })
-                const tx = await PoktGatewayApi.getTx(txHash)
+                const tx = await PoktGatewayApi.getTx(remove0x(txHash))
                 console.log("Pokt Tx Status:", tx)
                 if (!tx.tx_response) throw new Error("Tx hash is pending or invalid")
                 setPoktTxSuccess(true)
@@ -242,7 +250,7 @@ export function ProgressModal(props: ModalProps) {
         if (!currentMint || currentMint?.status !== Status.SUCCESS) {
             try {
                 if (step === 0) await getPoktTxStatus()
-                const res = await fetch(`/api/mints/hash/${poktTxHash}`)
+                const res = await fetch(`/api/mints/hash/${to0xHash(poktTxHash).toLowerCase()}`)
                 const mint = await res.json()
                 console.log("Mint from DB:", mint)
                 setCurrentMint(mint)
@@ -257,7 +265,7 @@ export function ProgressModal(props: ModalProps) {
 
     async function getInvalidMintInfo() {
         try {
-            const res = await fetch(`/api/invalidMints/hash/${poktTxHash}`)
+            const res = await fetch(`/api/invalidMints/hash/${to0xHash(poktTxHash).toLowerCase()}`)
             const invalidMint = await res.json()
             console.log("Invalid Mint from DB:", invalidMint)
             setInvalidMint(invalidMint)

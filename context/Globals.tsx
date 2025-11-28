@@ -1,7 +1,7 @@
 import { ErrorIcon, InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
-import { ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_MULTISIG_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
+import { ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_MULTISIG_ADDRESS, POKT_RPC_URL, WPOKT_ADDRESS } from "@/utils/constants";
 import { getDataSource } from "@/datasource";
 import { isValidEthAddress } from "@/utils/misc";
 import { HStack, Link, Text, useInterval, useToast } from "@chakra-ui/react";
@@ -12,6 +12,8 @@ import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransa
 import AppPokt from "../hw-app/Pokt";
 import { LEDGER_CONFIG } from "@/utils/ledger";
 import { bech32ToHex, isPoktShannonAddress, PoktGatewayApi, STDX_MSG_TYPES } from "@/utils/pokt";
+import { StargateClient } from "@cosmjs/stargate"
+import { SignedPocketShannonTransaction } from "@/utils/types";
 
 declare global {
   interface Window {
@@ -426,6 +428,22 @@ export function GlobalContextProvider({ children }: any) {
         if (typeGuard(res, Error)) throw res
         txHash = res?.txhash
       } else {
+        const messages = [{
+          typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+          body: {
+            fromAddress: poktAddress,
+            toAddress: POKT_MULTISIG_ADDRESS,
+            amount: amount.toString(),
+          },
+        }]
+        const transaction = {
+          address: poktAddress,
+          gas: 'auto',
+          gasAdjustment: 2,
+          messages,
+          memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`
+        }
+        const signedPayload: SignedPocketShannonTransaction = await window.pocketShannon.send("pokt_signTransaction", [transaction])
         // const client = await StargateClient.connect(POKT_RPC_URL!)
         // const signature = await window.pocketShannon.send("pokt_signTransaction", [
         //   {
@@ -446,15 +464,21 @@ export function GlobalContextProvider({ children }: any) {
         //   }
         // ]).then(result => console.log(reult)).catch(error => console.error(error))
         // console.log({signature})
-        const { hash } = await window.pocketShannon.send("pokt_sendTransaction", [
-          {
-            amount: amount.toString(), // in uPOKT
-            from: poktAddress,
-            to: POKT_MULTISIG_ADDRESS,
-            memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
-          },
-        ])
-        txHash = hash;
+        console.log("Signed Payload:", signedPayload)
+        const client = await StargateClient.connect(POKT_RPC_URL)
+        console.log("Broadcasting...")
+        const hash = await client.broadcastTxSync(Buffer.from(signedPayload.transactionHex, "hex"))
+        txHash = hash
+        console.log("txHash:", txHash)
+        // const { hash } = await window.pocketShannon.send("pokt_sendTransaction", [
+        //   {
+        //     amount: amount.toString(), // in uPOKT
+        //     from: poktAddress,
+        //     to: POKT_MULTISIG_ADDRESS,
+        //     memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
+        //   },
+        // ])
+        // txHash = hash;
       }
       console.log("Sent POKT:", {
         txHash
