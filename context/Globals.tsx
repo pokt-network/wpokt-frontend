@@ -426,6 +426,26 @@ export function GlobalContextProvider({ children }: any) {
         if (typeGuard(res, Error)) throw res
         txHash = res?.txhash
       } else {
+        // const client = await StargateClient.connect(POKT_RPC_URL!)
+        // const signature = await window.pocketShannon.send("pokt_signTransaction", [
+        //   {
+        //     address: poktAddress,
+        //     memo: `{"address":"${ethAddress}","chain_id":"${ETH_CHAIN_ID}"}`,
+        //     gas: 'auto',
+        //     gasPrice: undefined,
+        //     gasAdjustment: undefined,
+        //     id: "",
+        //     messages: {
+        //       typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+        //       body: {
+        //         toAddress: POKT_MULTISIG_ADDRESS,
+        //         amount: amount.toString()
+        //       }
+        //     },
+        //     protocol: "Cosmos"
+        //   }
+        // ]).then(result => console.log(reult)).catch(error => console.error(error))
+        // console.log({signature})
         const { hash } = await window.pocketShannon.send("pokt_sendTransaction", [
           {
             amount: amount.toString(), // in uPOKT

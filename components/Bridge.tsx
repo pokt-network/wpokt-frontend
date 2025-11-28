@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Center, Container, Divider, Flex, HStack, Input, Link, Text, VStack, useDisclosure, useToast } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Center, Code, Container, Divider, Flex, HStack, Input, Link, Text, VStack, useDisclosure, useToast } from "@chakra-ui/react";
 import { EthIcon } from "./icons/eth";
 import { PoktIcon } from "./icons/pokt";
 import { useEffect, useMemo, useState } from "react";
@@ -9,7 +9,7 @@ import { TimeInfoModal } from "./modal/TimeInfoModal";
 import { useAccount, useBalance, useContractRead, useFeeData } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { bech32ToHex, formatPokt, isPoktShannonAddress, parsePokt } from "@/utils/pokt";
-import { CHAIN, CHAINLINK_ETH_USD_ADDRESS, IS_PAUSED, IS_POKT_PAUSED, WPOKT_ADDRESS } from "@/utils/constants";
+import { CHAIN, CHAINLINK_ETH_USD_ADDRESS, ETH_CHAIN_ID, IS_PAUSED, IS_POKT_PAUSED, POKT_MULTISIG_ADDRESS, WPOKT_ADDRESS } from "@/utils/constants";
 import { CHAINLINK_AGGREGATOR_V3_INTERFACE_ABI, WRAPPED_POCKET_ABI } from "@/utils/abis";
 import { createPublicClient, formatEther, formatUnits, getAddress, http, parseUnits } from "viem";
 import { ResumeWrapModal } from "./modal/ResumeWrapModal";
@@ -415,7 +415,9 @@ export function Bridge() {
                             </Box>
                         </VStack>
                     </Center>
-                    <Center>
+
+                    {/* Disable temporarily because Soothe Vault does not support `pokt_sendTransaction` for its Shannon provider */}
+                    {/* <Center>
                         {currentStep === 3 ? (
                             <Button
                                 bg="poktLime"
@@ -451,6 +453,29 @@ export function Bridge() {
                                 Wrap
                             </Button>
                         )}
+                    </Center> */}
+
+                    {/* Alternative method to enable mint temporarily */}
+                    <Center>
+                        <Divider borderColor={"poktLime"} maxW={360} />
+                    </Center>
+                    <Center my={6}>
+                        <VStack width={320} spacing={4} align="flex-start">
+                            <Text>Open your wallet to create a send transaction with the following parameters:</Text>
+                            <Box>
+                                <Text>Recipient Address:</Text>
+                                <Flex align="center" gap={2}>
+                                    <Code fontSize={12}>{POKT_MULTISIG_ADDRESS}</Code>
+                                </Flex>
+                            </Box>
+                            <Box>
+                                <Text>Memo:</Text>
+                                <Flex align="center" gap={2}>
+                                    <Code fontSize={12}>{`{"address": ${address ?? "<ETHEREUM_ADDRESS>"}, "chain_id": ${ETH_CHAIN_ID}}`}</Code>
+                                </Flex>
+                            </Box>
+                            <Text>Then, wait and return here to finish minting your wPOKT.</Text>
+                        </VStack>
                     </Center>
                 </Container>
             ) : (
