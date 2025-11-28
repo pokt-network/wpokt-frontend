@@ -39,18 +39,18 @@ export function Footer() {
                 </Flex>
                 <VStack align="left" spacing={1}>
                     <Heading size="md">Resources</Heading>
-                    <Link href="https://docs.pokt.network/pokt/wpokt/" isExternal _hover={{ color: "poktBlue" }}>
+                    <Link href="https://docs.pocket.network/growing-with-usdpokt/usdpokt-the-heart-of-the-pocket-network/bridging-usdwpokt-to-pocket-mainnet" isExternal _hover={{ color: "poktBlue" }}>
                         Documentation
                     </Link>
-                    <Link href="https://poktscan.com" isExternal _hover={{ color: "poktBlue" }}>
+                    <Link href="https://explorer.pocket.network/pocket-mainnet" isExternal _hover={{ color: "poktBlue" }}>
                         Explorer
                     </Link>
-                    <Link href="https://forum.pokt.network" isExternal _hover={{ color: "poktBlue" }}>
+                    {/* <Link href="https://forum.pokt.network" isExternal _hover={{ color: "poktBlue" }}>
                         Forum
                     </Link>
                     <Link href="https://v2.info.uniswap.org/pair/0xa7fd8ff8f4cada298286d3006ee8f9c11e2ff84e" isExternal _hover={{ color: "poktBlue" }}>
                         Uniswap Pool
-                    </Link>
+                    </Link> */}
                 </VStack>
             </Flex>
             {mobileFooter && <Center mb={2}>© 2023 Pocket Network</Center>}
