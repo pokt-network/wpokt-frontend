@@ -1,6 +1,6 @@
 import { bech32 } from "bech32";
 import { formatUnits, isAddress } from "viem";
-import { POKT_RPC_URL } from "./constants";
+import { POKT_API_URL } from "./constants";
 
 export function parsePokt(amount: string | number): bigint {
     return BigInt(Number(amount) * 1e6)
@@ -43,7 +43,7 @@ export function isPoktShannonAddress(address: string): boolean {
 
 export const PoktGatewayApi = {
   getTx: async (txHash: string): Promise<any> => {
-    const res = await fetch(`${POKT_RPC_URL}/cosmos/tx/v1beta1/txs/${txHash}`, {
+    const res = await fetch(`${POKT_API_URL}/cosmos/tx/v1beta1/txs/${txHash}`, {
       method: "GET",
       headers: {
         "Accept": "application/json"
@@ -52,7 +52,7 @@ export const PoktGatewayApi = {
     return await res.json()
   },
   getBalance: async (address: string): Promise<any> => {
-    const res = await fetch(`${POKT_RPC_URL}/cosmos/bank/v1beta1/balances/${address}`, {
+    const res = await fetch(`${POKT_API_URL}/cosmos/bank/v1beta1/balances/${address}`, {
       method: "GET",
       headers: {
         "Accept": "application/json"

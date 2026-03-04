@@ -23,6 +23,11 @@ if (POKT_CHAIN_ID !== "testnet" && POKT_CHAIN_ID !== "mainnet" && POKT_CHAIN_ID 
 }
 
 // export const POKT_RPC_URL = POKT_CHAIN_ID === "testnet" ? "https://node2.testnet.pokt.network" : `https://pocket-rpc.liquify.com`
+export const POKT_API_URL = process.env.NEXT_PUBLIC_POKT_API_URL || "";
+if (!POKT_API_URL) {
+  throw new Error(`Missing env variable NEXT_PUBLIC_POKT_API_URL`);
+}
+
 export const POKT_RPC_URL = process.env.NEXT_PUBLIC_POKT_RPC_URL || "";
 if (!POKT_RPC_URL) {
   throw new Error(`Missing env variable NEXT_PUBLIC_POKT_RPC_URL`);

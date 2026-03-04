@@ -1,7 +1,7 @@
 import { ErrorIcon, InfoIcon } from "@/components/icons/misc";
 import { Burn, Mint } from "@/types";
 import { WRAPPED_POCKET_ABI } from "@/utils/abis";
-import { ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_MULTISIG_ADDRESS, POKT_RPC_URL, WPOKT_ADDRESS } from "@/utils/constants";
+import { ETH_CHAIN_ID, POKT_CHAIN_ID, POKT_MULTISIG_ADDRESS, POKT_API_URL, POKT_RPC_URL, WPOKT_ADDRESS } from "@/utils/constants";
 import { getDataSource } from "@/datasource";
 import { isValidEthAddress } from "@/utils/misc";
 import { HStack, Link, Text, useInterval, useToast } from "@chakra-ui/react";
